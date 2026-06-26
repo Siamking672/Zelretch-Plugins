@@ -27,7 +27,7 @@ COPY requirements.txt ./
 RUN python3 -m pip install --upgrade pip setuptools wheel \
     && python3 -m pip install -r requirements.txt
 
-COPY . .
-RUN chmod +x ./start.sh
+COPY setup ./setup
+RUN chmod +x ./setup
 
-CMD ["bash", "./start.sh"]
+CMD ["bash", "./setup"]

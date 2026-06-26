@@ -1,30 +1,26 @@
 ---
-title: Zelretch Plugins
-emoji: 💎
-colorFrom: indigo
+title: Zelretch
+emoji: 🗡️
+colorFrom: red
 colorTo: purple
 sdk: docker
 pinned: false
 license: gpl-3.0
 ---
 
-# Zelretch Plugins
+# Zelretch
 
-Plugin source repository for **Zelretch**.
+Docker-only deployment wrapper for **Zelretch Plugins**. This build uses a Fate-inspired Rin Tohsaka theme.
 
-The main wrapper repository downloads this repo by default:
+This repository intentionally stays small. It downloads the plugin repository at container startup and runs the bot from that source tree.
+
+## Default plugin repository
 
 ```text
 Siamking672/Zelretch-Plugins
 ```
 
-## Runtime stack
-
-- Python 3.11
-- Kurigram installed through `kurigram`
-- Pyrogram-compatible import namespace: `from pyrogram ...`
-- MongoDB through Motor
-- Docker-only deployment
+Override it with `PLUGINS_REPO` or `PLUGINS_ZIP_URL` when needed.
 
 ## Required variables
 
@@ -89,22 +85,11 @@ Stop:
 docker compose down
 ```
 
-## Plugin template
-
-```python
-from . import HelpMenu, on_message, zelretch
-
-
-@on_message("hii")
-async def hi(_, message):
-    await zelretch.edit(message, "Hello!")
-
-
-HelpMenu("hii").add(
-    "hii", None, "Says hello."
-).done()
-```
-
 ## Notes
 
+- Kurigram is installed through the `kurigram` package. The code keeps `from pyrogram ...` imports because Kurigram is a drop-in replacement that exposes the Pyrogram-compatible namespace.
 - The GPL license file is retained.
+
+## Theme
+
+This build uses a Rin Tohsaka / Fate-style fan theme for startup cards, menus, buttons, and bot status text. It is not affiliated with the Fate franchise.
