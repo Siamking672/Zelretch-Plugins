@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PLUGINS_REPO="${PLUGINS_REPO:-Siamking672/Jeweled-Sword-Zelretch-Plugins}"
+PLUGINS_BRANCH="${PLUGINS_BRANCH:-main}"
+PLUGINS_ZIP_URL="${PLUGINS_ZIP_URL:-https://github.com/${PLUGINS_REPO}/archive/refs/heads/${PLUGINS_BRANCH}.zip}"
+ZIP_PATH="Plugins.zip"
+
+echo "Downloading Jeweled Sword Zelretch plugins from ${PLUGINS_REPO}:${PLUGINS_BRANCH}"
+if ! wget -q "${PLUGINS_ZIP_URL}" -O "${ZIP_PATH}"; then
+    if [ "${PLUGINS_BRANCH}" != "master" ]; then
+        FALLBACK_URL="https://github.com/${PLUGINS_REPO}/archive/refs/heads/master.zip"
+        echo "Primary branch download failed. Trying master branch."
+        wget -q "${FALLBACK_URL}" -O "${ZIP_PATH}"
+    else
+        echo "Failed to download plugin repository." >&2
+        exit 1
+    fi
+fi
+
+EXTRACTED_DIR="$(zipinfo -1 "${ZIP_PATH}" | head -1 | cut -d/ -f1)"
+unzip -qq "${ZIP_PATH}"
+rm -f "${ZIP_PATH}"
+cd "${EXTRACTED_DIR}"
+
+echo "Installing plugin dependencies"
+python3 -m pip install --root-user-action=ignore --upgrade pip setuptools wheel
+python3 -m pip install --root-user-action=ignore -r requirements.txt
+
+chmod +x start.sh
+exec ./start.sh

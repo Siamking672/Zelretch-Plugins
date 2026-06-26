@@ -2,6 +2,7 @@ FROM python:3.11-slim
 
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
+    PIP_ROOT_USER_ACTION=ignore \
     CHROME_BIN=/usr/bin/chromium \
     CHROME_DRIVER=/usr/bin/chromedriver
 
@@ -26,7 +27,7 @@ COPY requirements.txt ./
 RUN python3 -m pip install --upgrade pip setuptools wheel \
     && python3 -m pip install -r requirements.txt
 
-COPY . .
-RUN chmod +x ./start.sh
+COPY setup ./setup
+RUN chmod +x ./setup
 
-CMD ["bash", "./start.sh"]
+CMD ["bash", "./setup"]
