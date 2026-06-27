@@ -36,10 +36,22 @@ working unchanged.
 
 import sys
 
-# Import pyrogram (which IS Kurigram at runtime) and every submodule
-# the project uses. Importing them here ensures they are cached in
+# Import pyrogram (which IS Kurigram at runtime). If pyrogram is not
+# yet installed (e.g., _ensure_deps() hasn't run), raise a clear error
+# rather than letting Python cache a broken `kurigram` entry in
+# sys.modules — which would make every subsequent `import kurigram`
+# fail even after pyrogram is installed.
+try:
+    import pyrogram
+except ImportError as _exc:
+    raise ImportError(
+        "The 'kurigram' shim requires the 'pyrogram' module, which is "
+        "provided by the 'kurigram' PyPI package. Install it with: "
+        "pip install kurigram"
+    ) from _exc
+
+# Import every submodule the project uses so they are cached in
 # sys.modules under their pyrogram.* names before we alias them.
-import pyrogram
 import pyrogram.enums
 import pyrogram.errors
 import pyrogram.errors.exceptions
