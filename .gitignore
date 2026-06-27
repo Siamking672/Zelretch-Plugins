@@ -4,17 +4,17 @@ __pycache__/
 *$py.class
 *.so
 *.egg-info/
+.pytest_cache/
 
-# Editor / OS
+# Runtime artifacts
+downloads/
+temp/
+*.session
+*.session-journal
+
+# IDE / OS
 .vscode/
 .idea/
+.DS_Store
 *.swp
 *.swo
-.DS_Store
-Thumbs.db
-
-# Runtime (shouldn't exist in this repo, but ignore if accidentally created)
-userdata/
-*.log
-*.session
-*.db

@@ -1,0 +1,7 @@
+services:
+  zelretch-plugins:
+    build: .
+    container_name: zelretch-plugins
+    env_file:
+      - .env
+    restart: unless-stopped

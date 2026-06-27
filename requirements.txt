@@ -1,23 +1,28 @@
-# AstralModules — plugin-specific dependencies
-# Install in addition to AstralBot/requirements.txt
-
-# Image processing (sticker / kang / image conversion)
-Pillow==10.4.0
-
-# QR code generation (offline; otherwise falls back to public API)
-qrcode==7.4.2
-
-# Text-to-speech (free, no API key required)
-edge-tts==6.1.18
-
-# Web scraping (used by some media plugins — telegraph paste, etc.)
-beautifulsoup4==4.12.3
-
-# Async DNS (used by url expander if added later)
-aiodns==3.2.0
-
-# Media metadata (used by media convert plugin if added later)
-mutagen==1.47.0
-
-# YouTube download (used by songs / ytdl plugin if added later)
-yt-dlp==2024.8.6
+bs4
+cinemagoer
+edge-tts
+emoji
+geopy
+git-python
+glitch_this
+googlesearch-python
+googletrans==4.0.0rc1
+httpx
+icrawler
+lottie
+lyricsgenius
+motor
+pillow
+psutil
+pyroaddon
+kurigram
+pySmartDL
+python-dotenv
+pytz
+requests
+selenium
+speedtest-cli
+telegraph
+tgcrypto
+Unidecode
+wikipedia
