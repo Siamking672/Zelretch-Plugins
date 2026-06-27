@@ -1,0 +1,25 @@
+services:
+  astralbot:
+    build: .
+    container_name: astralbot
+    restart: unless-stopped
+    # Map the wizard port so you can complete setup in your browser.
+    # If .env is already present, the bot starts directly and the port is unused.
+    # Default HuggingFace Spaces port is 7860 — we use the same to keep things
+    # consistent between local Docker and HF Spaces deploys.
+    ports:
+      - "7860:7860"
+    volumes:
+      # Persist userdata (SQLite db, plugin state, downloads) across container rebuilds.
+      # If .env is placed in ./userdata, it survives rebuilds too.
+      - ./userdata:/app/userdata
+      # Persist logs (optional)
+      - ./logs:/app/logs
+    # Pass through a .env file if you have one (otherwise wizard creates it)
+    env_file:
+      - path: .env
+        required: false
+    # To simulate HuggingFace Spaces mode locally (bind to 0.0.0.0:7860,
+    # don't auto-open browser), uncomment:
+    # environment:
+    #   - SPACE_ID=yourname/astralbot

@@ -1,23 +1,28 @@
-# AstralModules — plugin-specific dependencies
-# Install in addition to AstralBot/requirements.txt
+# AstralBot core dependencies — pinned for reproducibility.
+# Plugin-specific dependencies are listed separately in AstralModules/requirements.txt
+# and should be installed alongside these.
 
-# Image processing (sticker / kang / image conversion)
+# MTProto client (Pyrogram v2 fork with active maintenance)
+pyrogram==2.0.106
+tgcrypto==1.2.5
+
+# Async DB drivers
+aiosqlite==0.20.0
+motor==3.5.1              # only needed if DATABASE_URL points to MongoDB
+
+# Config / env
+python-dotenv==1.0.1
+
+# HTTP client (used by helpers/net.py and many plugins)
+aiohttp==3.10.5
+requests==2.32.3
+
+# Media / image processing (used by sticker / image plugins)
 Pillow==10.4.0
 
-# QR code generation (offline; otherwise falls back to public API)
-qrcode==7.4.2
+# Web setup wizard (one-command deploy)
+flask==3.0.3
 
-# Text-to-speech (free, no API key required)
-edge-tts==6.1.18
-
-# Web scraping (used by some media plugins — telegraph paste, etc.)
-beautifulsoup4==4.12.3
-
-# Async DNS (used by url expander if added later)
-aiodns==3.2.0
-
-# Media metadata (used by media convert plugin if added later)
-mutagen==1.47.0
-
-# YouTube download (used by songs / ytdl plugin if added later)
-yt-dlp==2024.8.6
+# Misc utilities
+psutil==6.0.0
+pytz==2024.1

@@ -1,0 +1,28 @@
+[Unit]
+Description=AstralBot Telegram Userbot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=astralbot
+Group=astralbot
+WorkingDirectory=/opt/astralbot
+EnvironmentFile=-/opt/astralbot/.env
+ExecStart=/opt/astralbot/venv/bin/python -m astralbot
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/astralbot/userdata /opt/astralbot/logs
+CapabilityBoundingSet=
+AmbientCapabilities=
+
+[Install]
+WantedBy=multi-user.target
