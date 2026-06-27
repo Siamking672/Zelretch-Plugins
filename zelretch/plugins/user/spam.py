@@ -1,7 +1,7 @@
 import asyncio
 
-from pyrogram import Client
-from pyrogram.types import Message
+from kurigram import Client
+from kurigram.types import Message
 
 from . import HelpMenu, Symbols, zelretch, on_message
 
@@ -163,33 +163,33 @@ async def listSpam(_, message: Message):
 
 HelpMenu("spam").add(
     "spam",
-    "<count> <message>",
-    "Spam a message in the chat for x times.",
-    "spam 10 hi",
-    "Spamming may get you banned.",
+    "<count> <message text>",
+    "Send the given text message N times in rapid succession into the current chat.",
+    "spam 10 hello",
+    "Excessive spamming can trigger Telegram's flood protection and may get the userbot account restricted or banned.",
 ).add(
     "dspam",
-    "<count> <delay> <message>",
-    "Spam a message in the chat for x times with delay. Delay must be in seconds.",
-    "dspam 10 1 hi",
-    "Spamming may get you banned.",
+    "<count> <delay (seconds)> <message text>",
+    "Send the given text message N times with a fixed delay between each send. Useful for staying under Telegram's rate limits.",
+    "dspam 10 1 hello",
+    "Excessive spamming can still get the account restricted even with delays.",
 ).add(
     "mspam",
     "<count> <reply to media>",
-    "Spam a media in the chat for x times.",
+    "Copy and resend the replied media message N times into the current chat.",
     "mspam 10",
-    "Spamming may get you banned.",
+    "Excessive spamming can trigger Telegram's flood protection.",
 ).add(
     "stopspam",
     None,
-    "Stop all spam tasks running in the chat.",
+    "Immediately cancel every active spam task running in the current chat.",
     "stopspam",
-    "This command is chat dependent.",
+    "Only affects the chat where the command is sent; other chats continue their tasks.",
 ).add(
     "listspam",
     None,
-    "List all active spam tasks in the bot.",
+    "List every active spam task across all chats, showing the chat ID and remaining count for each.",
     "listspam",
 ).info(
-    "Spam Messages"
+    "Message spam tools — send text or media repeatedly, with optional delays, and the ability to stop tasks mid-run."
 ).done()

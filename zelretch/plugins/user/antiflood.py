@@ -2,8 +2,8 @@ import asyncio
 import datetime
 import time
 
-from pyrogram import Client, filters
-from pyrogram.types import ChatPermissions, Message
+from kurigram import Client, filters
+from kurigram.types import ChatPermissions, Message
 
 from zelretch.core import Config, Symbols, db
 from zelretch.functions.utility import Flood
@@ -92,7 +92,7 @@ async def antiflood(client: Client, message: Message):
                 "**{symbol} 𝖴𝗌𝖾𝗋:** `{mention}`\n"
                 "**{symbol} 𝖳𝗂𝗅𝗅 𝖣𝖺𝗍𝖾:** `🗓️ {till_date}`\n"
             )
-            hell = await message.reply_text("Flood Detected!")
+            kaleido = await message.reply_text("Flood Detected!")
 
             if mode == "mute":
                 permission = ChatPermissions(can_send_messages=False)
@@ -106,7 +106,7 @@ async def antiflood(client: Client, message: Message):
                     )
                 except Exception as e:
                     return await zelretch.error(
-                        hell, f"__Error in Antiflood while trying to mute!__\n{str(e)}"
+                        kaleido, f"__Error in Antiflood while trying to mute!__\n{str(e)}"
                     )
 
                 Flood.updateFlood(
@@ -114,7 +114,7 @@ async def antiflood(client: Client, message: Message):
                 )
                 till_date = "Forever" if mtime == 0 else until_date.ctime()
 
-                return await hell.edit(
+                return await kaleido.edit(
                     template.format(
                         mode=mode.title(),
                         symbol=Symbols.triangle_right,
@@ -128,10 +128,10 @@ async def antiflood(client: Client, message: Message):
                     await client.ban_chat_member(message.chat.id, message.from_user.id)
                 except Exception as e:
                     return await zelretch.error(
-                        hell, f"__Error in Antiflood while trying to kick!__\n{str(e)}"
+                        kaleido, f"__Error in Antiflood while trying to kick!__\n{str(e)}"
                     )
 
-                await hell.edit(
+                await kaleido.edit(
                     template.format(
                         mode=mode.title(),
                         symbol=Symbols.triangle_right,
@@ -156,7 +156,7 @@ async def antiflood(client: Client, message: Message):
                     )
                 except Exception as e:
                     return await zelretch.error(
-                        hell, f"__Error in Antiflood while trying to ban!__\n{str(e)}"
+                        kaleido, f"__Error in Antiflood while trying to ban!__\n{str(e)}"
                     )
 
                 Flood.updateFlood(
@@ -164,7 +164,7 @@ async def antiflood(client: Client, message: Message):
                 )
                 till_date = "Forever" if mtime == 0 else until_date.ctime()
 
-                return await hell.edit(
+                return await kaleido.edit(
                     template.format(
                         mode=mode.title(),
                         symbol=Symbols.triangle_right,
@@ -186,15 +186,15 @@ async def antiflood(client: Client, message: Message):
 
 HelpMenu("antiflood").add(
     "setflood",
-    "<limit> <mode> <time>",
-    "Set antiflood in the chat! All arguments are optional, bydefault limit is 5 and mode is permanent mute.",
+    "<limit> <mode> <time (optional)>",
+    "Configure flood protection for the current chat. When a user exceeds the message limit within a short window, the configured action is taken automatically.",
     "setflood 10 ban 1d",
-    "Mode can be mute, kick or ban. Time can be xd (days), xh (hours) or xm (minutes) where x is number.",
+    "Mode: 'mute', 'kick', or 'ban'. Time: 'xd' (days), 'xh' (hours), 'xm' (minutes). Defaults: limit 5, mode mute, no expiry.",
 ).add(
-    "setflood 0",
-    None,
-    "Disable antiflood in the chat!",
+    "setflood",
+    "0",
+    "Disable flood protection in the current chat.",
     "setflood 0",
 ).info(
-    "Control Flood in the chat!"
+    "Automatic flood protection — punishes users who send too many messages too quickly."
 ).done()

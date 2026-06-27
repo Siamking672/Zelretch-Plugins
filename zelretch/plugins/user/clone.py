@@ -1,8 +1,8 @@
 import os
 
-from pyrogram import Client
-from pyrogram.raw.functions.users import GetFullUser
-from pyrogram.types import Message
+from kurigram import Client
+from kurigram.raw.functions.users import GetFullUser
+from kurigram.types import Message
 
 from . import HelpMenu, db, zelretch, on_message
 
@@ -18,7 +18,7 @@ async def clone(client: Client, message: Message):
     if replied_user.is_self:
         return await zelretch.delete(message, "I can't clone myself!")
 
-    hell = await zelretch.edit(message, "Cloning ...")
+    kaleido = await zelretch.edit(message, "Cloning ...")
 
     try:
         meh = await client.resolve_peer(client.me.id)
@@ -55,7 +55,7 @@ async def clone(client: Client, message: Message):
     except:
         pass
 
-    await hell.edit("**😁 Hello 𝗆𝗒 𝖿𝗋𝗂𝖾𝗇𝖽!**")
+    await kaleido.edit("**😁 Hello 𝗆𝗒 𝖿𝗋𝗂𝖾𝗇𝖽!**")
     await zelretch.check_and_log(
         "clone",
         f"**Cloned {replied_user.mention}** ({replied_user.id}) \n\n**By:** {first_name}",
@@ -71,7 +71,7 @@ async def revert(client: Client, message: Message):
     if not first_name:
         return await zelretch.delete(message, "I'm not cloned yet.")
 
-    hell = await zelretch.edit(message, "Reverting ...")
+    kaleido = await zelretch.edit(message, "Reverting ...")
 
     await client.update_profile(first_name, last_name, about)
 
@@ -82,7 +82,7 @@ async def revert(client: Client, message: Message):
     await db.rm_env("CLONE_LAST_NAME")
     await db.rm_env("CLONE_ABOUT")
 
-    await hell.edit("**Reverted back!**")
+    await kaleido.edit("**Reverted back!**")
     await zelretch.check_and_log(
         "revert",
         f"**Reverted to my original profile.** \n\n**By:** {first_name}",
@@ -92,15 +92,15 @@ async def revert(client: Client, message: Message):
 HelpMenu("clone").add(
     "clone",
     "<reply to user's message>",
-    "Clone the profile of replied user.",
+    "Copy the replied user's first name, last name, bio, and profile photo onto your account.",
     "clone",
-    "You can revert back to last profile only. Clone with precaution.",
+    "Only the most recent previous profile can be restored. Use with caution — impersonating real users may violate Telegram's Terms of Service.",
 ).add(
     "revert",
     None,
-    "Revert back to original profile.",
+    "Restore the profile (name, bio, and photo) that was active before the last 'clone' command.",
     "revert",
-    "You can revert back to last profile only. Clone with precaution.",
+    "Only one level of undo is available — you cannot revert twice.",
 ).info(
-    "Clone Menu"
+    "Temporarily mimic another user's profile, then revert back to your own."
 ).done()

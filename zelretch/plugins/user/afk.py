@@ -2,9 +2,9 @@ import os
 import random
 import time
 
-from pyrogram import Client, filters
-from pyrogram.enums import MessageMediaType
-from pyrogram.types import Message
+from kurigram import Client, filters
+from kurigram.enums import MessageMediaType
+from kurigram.types import Message
 
 from zelretch.core import Config, db, zelretch
 from zelretch.functions.formatter import add_to_dict, get_from_dict, readable_time
@@ -138,7 +138,7 @@ async def remove_afk(_, message: Message):
         data = await db.get_afk(message.from_user.id)
         total_afk_time = readable_time(round(time.time() - data["time"]))
 
-        hell = await message.reply_text(
+        kaleido = await message.reply_text(
             f"🫡 **𝖡𝖺𝖼𝗄 𝗍𝗈 𝗏𝗂𝗋𝗍𝗎𝖺𝗅 𝗐𝗈𝗋𝗅𝖽! \n\n⌚ Was away for:** `{total_afk_time}`"
         )
         await message.delete()
@@ -146,14 +146,14 @@ async def remove_afk(_, message: Message):
         await db.rm_afk(message.from_user.id)
         await zelretch.check_and_log(
             "afk",
-            f"Returned from AFK! \n\n**Time:** `{total_afk_time}`\n**Link:** {hell.link}",
+            f"Returned from AFK! \n\n**Time:** `{total_afk_time}`\n**Link:** {kaleido.link}",
         )
 
 
 HelpMenu("afk").add(
     "afk",
-    "<reason>",
-    "Set your status as AFK. When someone mentions' you, the bot will tell them you're currently Offline! You can also use a media by replying to it.",
-    "afk good night!",
-    "To unset afk you can send a message to any chat and it'll automaticslly get disabled! You can use 'afk' in your message to bypass automatic disabling of afk.",
-).info("Away From Keyboard").done()
+    "<reason (optional)>",
+    "Mark yourself as Away From Keyboard. Anyone who mentions you will receive an automatic reply with your reason and the time elapsed. Reply to a media message to attach it to the AFK notice.",
+    "afk catching some sleep",
+    "Sending any message in any chat automatically clears the AFK status. Include the word 'afk' in your message to stay AFK while sending it.",
+).info("Away From Keyboard — let the bot answer mentions for you while you are away.").done()

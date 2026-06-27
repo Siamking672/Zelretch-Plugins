@@ -1,7 +1,7 @@
 import asyncio
 
-from pyrogram import Client, filters
-from pyrogram.types import ChatPermissions, ChatPrivileges, Message
+from kurigram import Client, filters
+from kurigram.types import ChatPermissions, ChatPrivileges, Message
 
 from zelretch.core import LOGS
 
@@ -406,19 +406,19 @@ async def unpin(_, message: Message):
     allow_master=True,
 )
 async def zombies(_, message: Message):
-    hell = await zelretch.edit(message, "☠️ 𝖣𝖾𝗍𝖾𝖼𝗍𝗂𝗇𝗀 𝗓𝗈𝗆𝖻𝗂𝖾𝗌...")
+    kaleido = await zelretch.edit(message, "☠️ 𝖣𝖾𝗍𝖾𝖼𝗍𝗂𝗇𝗀 𝗓𝗈𝗆𝖻𝗂𝖾𝗌...")
     ded_users = []
     async for members in message.chat.get_members():
         if members.user.is_deleted:
             ded_users.append(members.user.id)
 
     if not ded_users:
-        return await hell.edit(
+        return await kaleido.edit(
             "🫡 𝖣𝗈𝗇'𝗍 𝗁𝖺𝗏𝖾 𝖺𝗇𝗒 𝗓𝗈𝗆𝖻𝗂𝖾𝗌 𝗂𝗇 𝗍𝗁𝗂𝗌 𝗀𝗋𝗈𝗎𝗉. **𝖦𝗋𝗈𝗎𝗉𝗌' 𝖼𝗅𝖾𝖺𝗇 𝖠𝖥!**"
         )
 
     if len(message.command) > 1 and message.command[1].lower() == "clean":
-        await hell.edit(
+        await kaleido.edit(
             f"☠️ 𝖥𝗈𝗎𝗇𝖽 {len(ded_users)} 𝗓𝗈𝗆𝖻𝗂𝖾𝗌... **🔫 𝖳𝗂𝗆𝖾 𝗍𝗈 𝗉𝗎𝗋𝗀𝖾 𝗍𝗁𝖾𝗆!**"
         )
         failed = 0
@@ -431,9 +431,9 @@ async def zombies(_, message: Message):
                 LOGS.error(e)
                 failed += 1
 
-        await hell.edit(f"**𝖯𝗎𝗋𝗀𝖾𝖽 {success} 𝗓𝗈𝗆𝖻𝗂𝖾𝗌!**\n`{failed}` holds immunity!")
+        await kaleido.edit(f"**𝖯𝗎𝗋𝗀𝖾𝖽 {success} 𝗓𝗈𝗆𝖻𝗂𝖾𝗌!**\n`{failed}` holds immunity!")
     else:
-        await hell.edit(
+        await kaleido.edit(
             f"**☠️ 𝖥𝗈𝗎𝗇𝖽 {len(ded_users)} 𝗓𝗈𝗆𝖻𝗂𝖾𝗌!**\n\n__Use__ `{handler}zombies clean` __to kill them!__"
         )
 
@@ -461,52 +461,68 @@ async def multiple_handler(client: Client, message: Message):
 
 HelpMenu("admin").add(
     "promote",
-    "<𝗎𝗌𝖾𝗋𝗇𝖺𝗆𝖾/𝗂𝖽/reply> <𝗍𝗂𝗍𝗅𝖾>",
-    "Promote a user to admin.",
-    "promote @ForGo10God hellboy",
+    "<username/id/reply> <title (optional)>",
+    "Promote a user to admin in the current chat. An optional custom title can be assigned.",
+    "promote @ZelretchUser Workshop Keeper",
 ).add(
-    "demote", "<username/id/reply>", "Demote a user from admin.", "demote @ForGo10God"
+    "demote",
+    "<username/id/reply>",
+    "Remove admin privileges from a user in the current chat.",
+    "demote @ZelretchUser",
 ).add(
     "ban",
-    "<username/id/reply> <reason>",
-    "Ban a user from the group.",
-    "ban @ForGo10God",
-    "You can also use dban to delete the message of the user.",
+    "<username/id/reply> <reason (optional)>",
+    "Ban a user from the current chat. Use 'dban' to also delete their message.",
+    "ban @ZelretchUser spamming",
+    "Alias 'dban' deletes the replied message before banning.",
 ).add(
-    "unban", "<username/id/reply>", "Unban a user from the group.", "unban @ForGo10God"
+    "unban",
+    "<username/id/reply>",
+    "Lift a ban on a previously banned user.",
+    "unban @ZelretchUser",
 ).add(
     "kick",
-    "<username/id/reply> <reason>",
-    "Kick a user from the group.",
-    "kick @ForGo10God",
-    "You can also use dkick to delete the message of the user.",
+    "<username/id/reply> <reason (optional)>",
+    "Remove a user from the chat. They can rejoin if they have an invite link.",
+    "kick @ZelretchUser off-topic",
+    "Alias 'dkick' deletes the replied message before kicking.",
 ).add(
     "mute",
-    "<username/id/reply> <reason>",
-    "Mute a user in the group",
-    "mute @ForGo10God",
-    "You can also use dmute to delete the message of the user.",
+    "<username/id/reply> <reason (optional)>",
+    "Mute a user so they cannot send messages in the chat.",
+    "mute @ZelretchUser excessive mentions",
+    "Alias 'dmute' mutes and deletes their new messages automatically.",
 ).add(
-    "unmute", "<username/id/reply>", "Unmute a user in the group.", "unmute @ForGo10God"
+    "unmute",
+    "<username/id/reply>",
+    "Restore a muted user's ability to send messages.",
+    "unmute @ZelretchUser",
 ).add(
     "dmute",
     "<username/id/reply>",
-    "Mute a user by deleting their new messages in the group.",
-    "dmute @ForGo10God",
-    "Need delete message permission for proper functioning.",
+    "Mute a user and automatically delete any new messages they send.",
+    "dmute @ZelretchUser",
+    "Requires delete message permission. Use 'undmute' to lift this restriction.",
 ).add(
     "undmute",
     "<username/id/reply>",
-    "Unmute a user who's muted using 'dmute' command in the group.",
-    "undmute @ForGo10God",
+    "Lift a deletion-mute previously applied with 'dmute'.",
+    "undmute @ZelretchUser",
 ).add(
-    "pin", "<reply>", "Pin the replied message in the group."
+    "pin",
+    "<reply>",
+    "Pin the replied message to the top of the chat.",
+    "pin",
 ).add(
-    "unpin", "<reply>", "Unpin the replied pinned message in the group."
+    "unpin",
+    "<reply>",
+    "Unpin the replied pinned message.",
+    "unpin",
 ).add(
     "zombies",
-    "clean",
-    "Finds the total number of deleted users present in that group and ban them.",
+    None,
+    "Scan the chat for deleted (zombie) accounts. Pass 'clean' to also remove them.",
+    "zombies clean",
 ).info(
-    "Admin Menu"
+    "Group administration commands. The userbot must be an admin with the appropriate rights for each command to work."
 ).done()

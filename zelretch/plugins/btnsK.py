@@ -1,6 +1,6 @@
 # K: Keyboard Buttons
 
-from pyrogram.types import InlineKeyboardButton, KeyboardButton, ReplyKeyboardMarkup
+from kurigram.types import InlineKeyboardButton, KeyboardButton, ReplyKeyboardMarkup
 
 
 def gen_keyboard(collection: list, row: int = 2) -> list[list[KeyboardButton]]:

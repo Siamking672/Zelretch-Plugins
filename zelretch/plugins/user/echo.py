@@ -1,5 +1,5 @@
-from pyrogram import Client
-from pyrogram.types import Message
+from kurigram import Client
+from kurigram.types import Message
 
 from zelretch.core import Symbols
 
@@ -66,26 +66,26 @@ async def reSend(_, message: Message):
 
 HelpMenu("echo").add(
     "echo",
-    "<reply> or <userid>",
-    "Echo every message of the replied user in present chat!",
-    "echo @ForGo10God",
-    "Echo works on text and sticker messages only!",
+    "<reply to user> or <user id>",
+    "Mirror every text or sticker message the target user sends in this chat. The userbot will repost their message content immediately after they send it.",
+    "echo @ZelretchUser",
+    "Only text messages and stickers are echoed — media, voice, and animations are ignored.",
 ).add(
     "unecho",
-    "<reply> or <userid>",
-    "Stop echoing messages of the replied user in present chat!",
-    "unecho @ForGo10God",
+    "<reply to user> or <user id>",
+    "Stop echoing a user's messages in the current chat.",
+    "unecho @ZelretchUser",
 ).add(
     "listecho",
     None,
-    "List all the users whose messages are being echoed in present chat!",
+    "List every user whose messages are currently being echoed in this chat.",
     "listecho",
 ).add(
     "resend",
-    "<reply>",
-    "Resend the replied message!",
+    "<reply to message>",
+    "Forward the replied message as a new message without a forward tag, preserving its content and media.",
     "resend",
-    "An alias of 'copy' is also available!",
+    "Alias 'copy' can also be used.",
 ).info(
-    "Is it Echoing?"
+    "Mirror or copy messages — echo users in real time, or resend a single message anonymously."
 ).done()

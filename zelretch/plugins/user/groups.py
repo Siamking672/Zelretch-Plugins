@@ -1,8 +1,8 @@
 import random
 
-from pyrogram import Client
-from pyrogram.enums import ChatMembersFilter, ChatMemberStatus
-from pyrogram.types import Message
+from kurigram import Client
+from kurigram.enums import ChatMembersFilter, ChatMemberStatus
+from kurigram.types import Message
 
 from zelretch.functions.media import get_media_fileid
 from zelretch.functions.templates import chat_info_templates
@@ -149,12 +149,12 @@ async def getglink(_, message: Message):
 
 @on_message("kickme", chat_type=group_n_channel, allow_master=True)
 async def kickme(client: Client, message: Message):
-    hell = await zelretch.edit(message, random.choice(kickme_quotes))
+    kaleido = await zelretch.edit(message, random.choice(kickme_quotes))
     try:
         await client.leave_chat(message.chat.id)
     except Exception as e:
         return await zelretch.delete(
-            hell, f"Deym! Can't leave this chat.\n**Error:** `{e}`"
+            kaleido, f"Deym! Can't leave this chat.\n**Error:** `{e}`"
         )
 
 
@@ -202,7 +202,7 @@ async def chatInfo(client: Client, message: Message):
     else:
         chat = message.chat
 
-    hell = await zelretch.edit(message, "Fetching chat info...")
+    kaleido = await zelretch.edit(message, "Fetching chat info...")
 
     if chat.invite_link:
         chat_link = f"[Invite Link]({chat.invite_link})"
@@ -239,7 +239,7 @@ async def chatInfo(client: Client, message: Message):
 
     if chat.photo:
         async for photo in client.get_chat_photos(chat.id, 1):
-            await hell.delete()
+            await kaleido.delete()
             await client.send_photo(
                 message.chat.id,
                 photo.file_id,
@@ -249,7 +249,7 @@ async def chatInfo(client: Client, message: Message):
             )
             return
     else:
-        await hell.edit(chat_info, disable_web_page_preview=True)
+        await kaleido.edit(chat_info, disable_web_page_preview=True)
 
 
 @on_message("chatadmins", allow_master=True)
@@ -262,7 +262,7 @@ async def chatAdmins(client: Client, message: Message):
         except Exception as e:
             return await zelretch.error(message, f"`{e}`")
 
-    hell = await zelretch.edit(message, "Fetching chat admins...")
+    kaleido = await zelretch.edit(message, "Fetching chat admins...")
 
     admin_count = 0
     admins = "**💫 𝖠𝖽𝗆𝗂𝗇𝗌 𝗂𝗇 𝗍𝗁𝗂𝗌 𝖼𝗁𝖺𝗍:**\n\n"
@@ -272,7 +272,7 @@ async def chatAdmins(client: Client, message: Message):
         admin_count += 1
         admins += f"**{'0' if admin_count < 10 else ''}{admin_count}:** {admin.user.mention} - `{admin.status}`\n"
 
-    await hell.edit(admins, disable_web_page_preview=True)
+    await kaleido.edit(admins, disable_web_page_preview=True)
 
 
 @on_message("chatbots", allow_master=True)
@@ -285,7 +285,7 @@ async def chatBots(client: Client, message: Message):
         except Exception as e:
             return await zelretch.error(message, f"`{e}`")
 
-    hell = await zelretch.edit(message, "Fetching chat bots...")
+    kaleido = await zelretch.edit(message, "Fetching chat bots...")
 
     bot_count = 0
     bots = "**🤖 𝖡𝗈𝗍𝗌 𝗂𝗇 𝗍𝗁𝗂𝗌 𝖼𝗁𝖺𝗍:**\n\n"
@@ -295,7 +295,7 @@ async def chatBots(client: Client, message: Message):
             f"**{'0' if bot_count < 10 else ''}{bot_count}:** @{bot.user.username}\n"
         )
 
-    await hell.edit(bots, disable_web_page_preview=True)
+    await kaleido.edit(bots, disable_web_page_preview=True)
 
 
 @on_message("id", allow_master=True)
@@ -305,7 +305,7 @@ async def chatId(_, message: Message):
     else:
         msg = message
 
-    hell = await zelretch.edit(message, "Fetching message info...")
+    kaleido = await zelretch.edit(message, "Fetching message info...")
 
     info = f"**💫 ChatID:** `{msg.chat.id}`\n"
     info += f"**🪪 MessageID:** `{msg.id}`\n\n"
@@ -323,7 +323,7 @@ async def chatId(_, message: Message):
     if file_id:
         info += f"**📁 FileID:** `{file_id}`\n\n"
 
-    await hell.edit(info, disable_web_page_preview=True)
+    await kaleido.edit(info, disable_web_page_preview=True)
 
 
 @on_message("invite", allow_master=True)
@@ -334,58 +334,81 @@ async def inviteUser(client: Client, message: Message):
         )
 
     users = (await zelretch.input(message)).split(" ")
-    hell = await zelretch.edit(message, "Inviting users...")
+    kaleido = await zelretch.edit(message, "Inviting users...")
 
     resolved_users = await client.get_users(users)
     await message.chat.add_members([user.id for user in resolved_users])
 
-    await hell.edit("Successfully invited users to this chat.")
+    await kaleido.edit("Successfully invited users to this chat.")
 
 
 HelpMenu("groups").add(
-    "setgpic", "<reply to photo>", "Set the group profile picture.", "setgpic"
-).add("setgtitle", "<title>", "Set the group title.", "setgtitle chat group").add(
+    "setgpic",
+    "<reply to photo>",
+    "Set the replied photo as the group's profile picture. The userbot must be an admin with the change chat photo permission.",
+    "setgpic",
+).add(
+    "setgtitle",
+    "<title>",
+    "Change the title (name) of the current group or channel.",
+    "setgtitle Workshop",
+).add(
     "setgabout",
     "<text>",
-    "Set the group description/about",
-    "setgabout some group description",
+    "Update the description (about) text of the current group or channel.",
+    "setgabout A workshop for Mystic Codes",
 ).add(
     "setgusername",
     "<username>",
-    "Set the group username.",
+    "Set or change the public username of the current chat. Provide the username without the leading '@'.",
     "setgusername Zelretch",
-    "Only group owners can use this command. Give username without '@'.",
+    "Only group owners can use this command.",
 ).add(
-    "getglink", None, "Get the group invite link.", "getglink"
+    "getglink",
+    None,
+    "Generate and show the primary invite link for the current chat.",
+    "getglink",
 ).add(
-    "kickme", None, "Leave the chat in swag 😎!", "kickme"
+    "kickme",
+    None,
+    "Leave the current chat immediately, accompanied by a random farewell line.",
+    "kickme",
 ).add(
-    "newgroup", "<title>", "Create a new group.", "newgroup Zelretch Group"
+    "newgroup",
+    "<title>",
+    "Create a brand new Telegram group with the given title. The userbot becomes the owner.",
+    "newgroup Workshop",
 ).add(
-    "newchannel", "<title>", "Create a new channel.", "newchannel Zelretch Channel"
+    "newchannel",
+    "<title>",
+    "Create a brand new Telegram broadcast channel with the given title. The userbot becomes the owner.",
+    "newchannel Workshop Announcements",
 ).add(
-    "chatinfo", "<chat id (optional)>", "Get info about the chat.", "chatinfo"
+    "chatinfo",
+    "<chat id/username (optional)>",
+    "Display detailed information about a chat — title, type, member count, username, and description. Defaults to the current chat.",
+    "chatinfo",
 ).add(
     "chatadmins",
-    "<chat id (optional)>",
-    "Get the list of admins of mentioned chat.",
+    "<chat id/username (optional)>",
+    "List every administrator of a chat along with their custom titles and permissions. Defaults to the current chat.",
     "chatadmins @Zelretch_Chats",
 ).add(
     "chatbots",
-    "<chat id (optional)>",
-    "Get the list of bots of mentioned chat.",
+    "<chat id/username (optional)>",
+    "List every bot that is a member of a chat. Defaults to the current chat.",
     "chatbots @Zelretch_Chats",
 ).add(
     "id",
     "<reply to message (optional)>",
-    "Get the ID of the replied message, replied user, and more.",
+    "Show the numeric IDs of the current chat, the replied user, and the replied message. Useful for configuring LOGGER_ID or OWNER_ID.",
     "id",
 ).add(
     "invite",
-    "<username/id>",
-    "Invite the mentioned user to this chat.",
-    "invite @ForGo10God",
-    "You can invite multiple users by giving their username/id separated by space.",
+    "<username/id> (multiple allowed)",
+    "Invite one or more users to the current chat via an invite link. Separate multiple usernames or IDs with spaces.",
+    "invite @ZelretchUser",
+    "Useful when the chat's privacy settings prevent adding users directly.",
 ).info(
-    "Group Menu"
+    "Group and channel management — edit profile, title, description, username, invite links, and inspect chat membership."
 ).done()

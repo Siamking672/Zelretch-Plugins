@@ -3,8 +3,8 @@ import time
 
 import requests
 from PIL import Image
-from pyrogram.enums import MessageMediaType
-from pyrogram.types import Message
+from kurigram.enums import MessageMediaType
+from kurigram.types import Message
 
 from zelretch.core import ENV
 from zelretch.functions.convert import tgs_to_png, video_to_png
@@ -24,7 +24,7 @@ async def mediaInfo(_, message: Message):
         return await zelretch.delete(message, "Reply to a media file")
 
     media = message.reply_to_message.media
-    hell = await zelretch.edit(message, "Getting media info...")
+    kaleido = await zelretch.edit(message, "Getting media info...")
 
     if media == MessageMediaType.ANIMATION:
         media_file = message.reply_to_message.animation
@@ -45,32 +45,32 @@ async def mediaInfo(_, message: Message):
     if not metadata:
         return await zelretch.delete(message, "Failed to get media info")
 
-    await hell.edit(f"Fetched metadata, now fetching extra mediainfo...")
+    await kaleido.edit(f"Fetched metadata, now fetching extra mediainfo...")
 
     start_time = time.time()
     try:
         file_path = await message.reply_to_message.download(
             Config.DWL_DIR,
             progress=progress,
-            progress_args=(hell, start_time, "⬇️ Downloading"),
+            progress_args=(kaleido, start_time, "⬇️ Downloading"),
         )
     except Exception:
-        return await hell.edit(
+        return await kaleido.edit(
             f"**Failed to download media check the metadata instead!**\n\n{metadata}"
         )
 
     out, _, _, _ = await runcmd(f"mediainfo '{file_path}'")
     if not out:
-        return await hell.edit(
+        return await kaleido.edit(
             f"Failed to get mediainfo, check the metadata instead!\n\n{metadata}"
         )
 
-    await hell.edit(f"Uploading mediainfo to telegraph...")
+    await kaleido.edit(f"Uploading mediainfo to telegraph...")
 
     to_paste = f"<strong>💫 Zelretch Media Info:</strong><br>{metadata}<br><b>📝 MediaInfo:</b><br><code>{out}</code>"
     link = post_to_telegraph("ZelretchMediaInfo", to_paste)
 
-    await hell.edit(f"**📌 Media Info:** [Here]({link})", disable_web_page_preview=True)
+    await kaleido.edit(f"**📌 Media Info:** [Here]({link})", disable_web_page_preview=True)
     os.remove(file_path)
 
 
@@ -83,11 +83,11 @@ async def memify(_, message: Message):
         return await zelretch.delete(message, "Reply to a media file")
 
     start_time = time.time()
-    hell = await zelretch.edit(message, "Memifying...")
+    kaleido = await zelretch.edit(message, "Memifying...")
     file = await message.reply_to_message.download(
         Config.DWL_DIR,
         progress=progress,
-        progress_args=(hell, start_time, "⬇️ Downloading"),
+        progress_args=(kaleido, start_time, "⬇️ Downloading"),
     )
 
     text = await zelretch.input(message)
@@ -97,22 +97,22 @@ async def memify(_, message: Message):
         upper_text, lower_text = text, ""
 
     if file and file.endswith(".tgs"):
-        await hell.edit("Looks like an animated sticker, converting to image...")
+        await kaleido.edit("Looks like an animated sticker, converting to image...")
         pic = await tgs_to_png(file)
     elif file and file.endswith((".webp", ".png")):
         pic = Image.open(file).save(file, "PNG", optimize=True)
     elif file:
-        await hell.edit("Converting to image...")
+        await kaleido.edit("Converting to image...")
         pic, status = await video_to_png(file, 0)
         if status == False:
-            return await zelretch.error(hell, pic)
+            return await zelretch.error(kaleido, pic)
     else:
         return await zelretch.delete(message, "Unsupported media type")
 
-    await hell.edit("Adding text...")
+    await kaleido.edit("Adding text...")
     memes = await draw_meme(file, upper_text, lower_text)
 
-    await zelretch.delete(hell, "Done!")
+    await zelretch.delete(kaleido, "Done!")
     await message.reply_sticker(memes[1])
     await message.reply_photo(
         memes[0],
@@ -150,17 +150,17 @@ async def set_thumbnail(_, message: Message):
             "This photo is too big to upload to telegraph! You need to choose a photo below 5mb.",
         )
 
-    hell = await zelretch.edit(message, "Uploading to telegraph...")
+    kaleido = await zelretch.edit(message, "Uploading to telegraph...")
     path = await message.reply_to_message.download(Config.TEMP_DIR)
 
     try:
         media_url = TGraph.telegraph.upload_file(path)
         url = f"https://te.legra.ph{media_url[0]['src']}"
     except Exception as e:
-        return await zelretch.error(hell, str(e))
+        return await zelretch.error(kaleido, str(e))
 
     await db.set_env(ENV.thumbnail_url)
-    await zelretch.delete(hell, f"Thumbnail set to [this image]({url})!", 20)
+    await zelretch.delete(kaleido, f"Thumbnail set to [this image]({url})!", 20)
     os.remove(path)
 
 
@@ -188,17 +188,17 @@ async def renameMedia(_, message: Message):
         )
 
     new_name = await zelretch.input(message)
-    hell = await zelretch.edit(message, f"Renaming to `{new_name}` ...")
+    kaleido = await zelretch.edit(message, f"Renaming to `{new_name}` ...")
 
     strart_time = time.time()
     renamed_file = await message.reply_to_message.download(
         Config.DWL_DIR + new_name,
         progress=progress,
-        progress_args=(hell, strart_time, "⬇️ Downloading"),
+        progress_args=(kaleido, strart_time, "⬇️ Downloading"),
     )
 
     dwl_time = readable_time(int(strart_time - time.time()))
-    await hell.edit(f"**Downloaded and Renamed in** `{dwl_time}`**,** __uploading...__")
+    await kaleido.edit(f"**Downloaded and Renamed in** `{dwl_time}`**,** __uploading...__")
 
     start2 = time.time()
 
@@ -220,12 +220,12 @@ async def renameMedia(_, message: Message):
         file_name=new_name,
         force_document=True,
         progress=progress,
-        progress_args=(hell, start2, "⬆️ Uploading"),
+        progress_args=(kaleido, start2, "⬆️ Uploading"),
     )
 
     end_time = readable_time(int(start2 - time.time()))
     total_time = readable_time(int(strart_time - time.time()))
-    await hell.edit(
+    await kaleido.edit(
         f"**📁 File Name:** `{new_name}`\n\n**⬇️ Downloaded in:** `{dwl_time}`\n**⬆️ Uploaded in:** `{end_time}`\n**💫 Total time taken:** `{total_time}`"
     )
     os.remove(renamed_file)
@@ -236,26 +236,25 @@ async def renameMedia(_, message: Message):
 HelpMenu("media").add(
     "mediainfo",
     "<reply to media message>",
-    "Get the metadata and detailed media info of replied media file.",
+    "Fetch and display the metadata of the replied media file, including codec, resolution, duration, bitrate, and stream information via mediainfo.",
     "mediainfo",
 ).add(
     "memify",
-    "<reply to media message> <upper text>;<lower text>",
-    "Add text to a media file and make it a meme.",
-    "memify Hello World",
-    "When ';' is used, the text before it will be the upper text and the text after it will be the lower text.",
+    "<reply to media> <upper text>;<lower text>",
+    "Overlay meme-style caption text on the replied photo or sticker. Use a semicolon to separate upper and lower captions.",
+    "memify TOP;BOTTOM",
+    "When ';' is omitted, all text is rendered as the upper caption only.",
 ).add(
     "rename",
-    "<reply to media message> <new file name>",
-    "Rename a media file with the provided name.",
-    "rename Zelretch.jpg",
-    "The file name must have an extention.",
+    "<reply to media file> <new filename with extension>",
+    "Re-upload the replied media file with a new filename. The extension must be included and should match the file's actual type.",
+    "rename zelretch.jpg",
 ).add(
     "setthumbnail",
     "<reply to photo>",
-    "Set the replied photo as the thumbnail of the bot for all the upload/rename function.",
-    "setthumbnail <reply>",
-    "The photo must be below 5mb and in photo format and not in file.",
+    "Set the replied photo as the default thumbnail for all subsequent file uploads performed by the bot (e.g. via the rename command).",
+    "setthumbnail",
+    "The photo must be sent as a compressed photo (not as a document) and be under 5 MB.",
 ).info(
-    "Media utils"
+    "Media utilities — inspect metadata, add meme captions, rename files, and configure upload thumbnails."
 ).done()

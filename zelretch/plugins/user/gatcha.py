@@ -2,8 +2,8 @@ import os
 
 import requests
 from bs4 import BeautifulSoup
-from pyrogram import Client, filters
-from pyrogram.types import Message
+from kurigram import Client, filters
+from kurigram.types import Message
 
 from zelretch import LOGS
 
@@ -95,7 +95,7 @@ async def delgatcha(client: Client, message: Message):
 
 @on_message("gatchalist", chat_type=group_only, allow_master=True)
 async def gatchalist(client: Client, message: Message):
-    hell = await zelretch.edit(message, "`Fetching gatcha bot list ...`")
+    kaleido = await zelretch.edit(message, "`Fetching gatcha bot list ...`")
     gatchabots = await db.get_all_gachabots(client.me.id)
 
     if len(gatchabots) > 0:
@@ -106,7 +106,7 @@ async def gatchalist(client: Client, message: Message):
     else:
         text = "No gatcha bots found in the list."
 
-    await hell.edit(text, disable_web_page_preview=True)
+    await kaleido.edit(text, disable_web_page_preview=True)
 
 
 @on_message("gatcha", chat_type=group_only, allow_master=True)
@@ -183,25 +183,26 @@ async def gacha_handler(client: Client, message: Message):
 
 HelpMenu("gatcha").add(
     "addgatcha",
-    "<bot id> <catch command> <-g (optional)>",
-    "Auto-catch spawns from gatcha bots in the current chat. Use -g to auto-catch in all groups else it only enables in the current chat.",
-    "addgatcha 69696969 /protecc",
+    "<bot username/id> <catch command> <-g (optional)>",
+    "Register a gacha bot so the userbot auto-sends the catch command whenever it spawns a character. Use the -g flag to enable auto-catch in every group the userbot is in, otherwise it only applies to the current chat.",
+    "addgatcha @WaifuBot /protecc",
+    "The catch command is whatever the bot expects (e.g. /protecc, /catch, /grab).",
 ).add(
     "delgatcha",
-    "<bot id> <flag (optional)>",
-    "Remove a bot from the gatcha bots list in the current chat. Use flag for better control.",
-    "delgatcha 69696969 -g",
-    "Flags: \n ->   -g: Remove from all groups\n ->   -a: Remove from all chats\n",
+    "<bot username/id> <flag (optional)>",
+    "Remove a gacha bot from the auto-catch list. Without a flag, removes it from the current chat only.",
+    "delgatcha @WaifuBot",
+    "Flags: '-g' removes the bot from all groups; '-a' removes it from every chat.",
 ).add(
     "gatchalist",
     None,
-    "List all the gatcha bots added for auto-catching.",
+    "List every gacha bot the userbot is currently auto-catching for, along with its catch command.",
     "gatchalist",
 ).add(
     "gatcha",
-    "<bot id>",
-    "Get detailed information about a gatcha bot.",
-    "gatcha 69696969",
+    "<bot username/id>",
+    "Show the configuration of a single registered gacha bot, including the catch command and target chats.",
+    "gatcha @WaifuBot",
 ).info(
-    "gatcha Bot Auto-Catcher",
+    "Auto-catcher for gacha bots — automatically runs the catch command when a character spawns."
 ).done()

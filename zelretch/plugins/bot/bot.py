@@ -1,5 +1,5 @@
-from pyrogram import filters
-from pyrogram.types import InlineKeyboardMarkup, Message
+from kurigram import filters
+from kurigram.types import InlineKeyboardMarkup, Message
 
 from zelretch.core import LOGS
 from zelretch.functions.runtime import restart

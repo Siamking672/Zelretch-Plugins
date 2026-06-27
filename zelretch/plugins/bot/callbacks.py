@@ -1,6 +1,6 @@
-from pyrogram import filters
-from pyrogram.enums import ParseMode
-from pyrogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
+from kurigram import filters
+from kurigram.enums import ParseMode
+from kurigram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 
 from zelretch.functions.templates import command_template, help_template
 from zelretch.functions.runtime import restart

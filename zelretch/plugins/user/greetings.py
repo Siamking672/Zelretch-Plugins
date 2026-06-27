@@ -1,5 +1,5 @@
-from pyrogram import Client, filters
-from pyrogram.types import Message
+from kurigram import Client, filters
+from kurigram.types import Message
 
 from . import Config, HelpMenu, custom_handler, db, zelretch, on_message
 
@@ -208,42 +208,42 @@ async def goodbyehandler(client: Client, message: Message):
 HelpMenu("greetings").add(
     "greetings",
     None,
-    "Get the formattings for welcome and goodbye messages.",
+    "Show the currently configured welcome and goodbye messages for this chat.",
+    "greetings",
 ).add(
     "welcome",
     None,
-    "Get saved welcome message for current chat.",
+    "Preview the saved welcome message for the current chat.",
     "welcome",
-    "A welcome message will be sent to the chat when a new user joins.",
+    "The welcome message is sent automatically when a new user joins the chat.",
 ).add(
     "setwelcome",
     "<reply to a message>",
-    "Set the replied message as welcome message for current chat.",
+    "Set the replied message as the welcome message for the current chat. Text, media, and buttons are all preserved.",
     "setwelcome",
-    "A welcome message will be sent to the chat when a new user joins.",
+    "The welcome message is sent automatically when a new user joins the chat.",
 ).add(
     "delwelcome",
     None,
-    "Delete the welcome message for current chat.",
+    "Remove the welcome message from the current chat. New members will no longer trigger a greeting.",
     "delwelcome",
 ).add(
     "goodbye",
     None,
-    "Get saved goodbye message for current chat.",
+    "Preview the saved goodbye message for the current chat.",
     "goodbye",
-    "A goodbye message will be sent to the chat when a user leaves.",
+    "The goodbye message is sent automatically when a member leaves the chat.",
 ).add(
     "setgoodbye",
-    None,
-    "Set the replied message as goodbye message for current chat.",
+    "<reply to a message>",
+    "Set the replied message as the goodbye message for the current chat.",
     "setgoodbye",
-    "A goodbye message will be sent to the chat when a user leaves.",
+    "The goodbye message is sent automatically when a member leaves the chat.",
 ).add(
     "delgoodbye",
     None,
-    "Delete the goodbye message for current chat.",
+    "Remove the goodbye message from the current chat. Departing members will no longer trigger a farewell.",
     "delgoodbye",
-    "A goodbye message will be sent to the chat when a user leaves.",
 ).info(
-    "Welcome and Goodbye Messages"
+    "Automated welcome and goodbye messages — greet new members and acknowledge departures."
 ).done()

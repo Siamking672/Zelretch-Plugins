@@ -1,9 +1,9 @@
 import datetime
 import time
 
-from pyrogram import Client
-from pyrogram.enums import ChatType
-from pyrogram.types import ChatPermissions, Message
+from kurigram import Client
+from kurigram.enums import ChatType
+from kurigram.types import ChatPermissions, Message
 
 from . import HelpMenu, Symbols, zelretch, on_message
 
@@ -141,17 +141,19 @@ async def lockTypes(_, message: Message):
 HelpMenu("locker").add(
     "lock",
     "<lock type> <duration (optional)>",
-    "Locks a permission for the group chat.",
-    "lock all 2d",
-    "Duration is optional and can be in days, hours or minutes.",
+    "Restrict a specific type of message (or all messages) in the current chat. The userbot must be an admin with restrict-member permission.",
+    "lock stickers 2d",
+    "Duration is optional. Use 'xd' (days), 'xh' (hours), or 'xm' (minutes). Use 'all' as the lock type to lock every permission at once.",
 ).add(
     "unlock",
     "<lock type>",
-    "Unlocks a permission for the group chat.",
-    "unlock all",
-    "Unlock all permissions for the group chat.",
+    "Restore a previously locked message type, or use 'all' to unlock every permission at once.",
+    "unlock stickers",
 ).add(
-    "locktypes", None, "Shows the available lock types.", "locktypes"
+    "locktypes",
+    None,
+    "List every lockable chat permission supported by the bot (messages, media, stickers, polls, etc.).",
+    "locktypes",
 ).info(
-    "Chat Permissions Locker"
+    "Lock and unlock chat permissions — control which message types members are allowed to send."
 ).done()

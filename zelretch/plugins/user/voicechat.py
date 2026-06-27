@@ -1,15 +1,15 @@
 import uuid
 
-from pyrogram import Client
-from pyrogram.raw import base
-from pyrogram.raw.functions.channels import GetFullChannel
-from pyrogram.raw.functions.phone import (
+from kurigram import Client
+from kurigram.raw import base
+from kurigram.raw.functions.channels import GetFullChannel
+from kurigram.raw.functions.phone import (
     CreateGroupCall,
     DiscardGroupCall,
     ExportGroupCallInvite,
     GetGroupParticipants,
 )
-from pyrogram.types import Message
+from kurigram.types import Message
 
 from . import HelpMenu, Symbols, group_only, zelretch, on_message
 
@@ -21,7 +21,7 @@ async def startvc(client: Client, message: Message):
     else:
         call_name = "Zelretch VC"
 
-    hell = await zelretch.edit(message, "Starting Voice Chat...")
+    kaleido = await zelretch.edit(message, "Starting Voice Chat...")
     try:
         await client.invoke(
             CreateGroupCall(
@@ -30,28 +30,28 @@ async def startvc(client: Client, message: Message):
                 title=call_name,
             )
         )
-        await zelretch.delete(hell, "Voice Chat started!")
+        await zelretch.delete(kaleido, "Voice Chat started!")
     except Exception as e:
-        await zelretch.error(hell, str(e))
+        await zelretch.error(kaleido, str(e))
 
 
 @on_message("endvc", chat_type=group_only, admin_only=True, allow_master=True)
 async def endvc(client: Client, message: Message):
-    hell = await zelretch.edit(message, "Ending Voice Chat...")
+    kaleido = await zelretch.edit(message, "Ending Voice Chat...")
 
     try:
         full_chat: base.messages.ChatFull = await client.invoke(
             GetFullChannel(channel=(await client.resolve_peer(message.chat.id)))
         )
         await client.invoke(DiscardGroupCall(call=full_chat.full_chat.call))
-        await zelretch.delete(hell, "Voice Chat ended!")
+        await zelretch.delete(kaleido, "Voice Chat ended!")
     except Exception as e:
-        await zelretch.error(hell, str(e))
+        await zelretch.error(kaleido, str(e))
 
 
 @on_message("vclink", chat_type=group_only, allow_master=True)
 async def vclink(client: Client, message: Message):
-    hell = await zelretch.edit(message, "Getting Voice Chat link...")
+    kaleido = await zelretch.edit(message, "Getting Voice Chat link...")
 
     try:
         full_chat: base.messages.ChatFull = await client.invoke(
@@ -61,14 +61,14 @@ async def vclink(client: Client, message: Message):
         invite: base.phone.ExportedGroupCallInvite = await client.invoke(
             ExportGroupCallInvite(call=full_chat.full_chat.call)
         )
-        await zelretch.delete(hell, f"Voice Chat Link: {invite.link}")
+        await zelretch.delete(kaleido, f"Voice Chat Link: {invite.link}")
     except Exception as e:
-        await zelretch.error(hell, f"`{e}`")
+        await zelretch.error(kaleido, f"`{e}`")
 
 
 @on_message("vcmembers", chat_type=group_only, admin_only=True, allow_master=True)
 async def vcmembers(client: Client, message: Message):
-    hell = await zelretch.edit(message, "Getting Voice Chat members...")
+    kaleido = await zelretch.edit(message, "Getting Voice Chat members...")
 
     try:
         full_chat: base.messages.ChatFull = await client.invoke(
@@ -88,34 +88,34 @@ async def vcmembers(client: Client, message: Message):
         for participant in participants.participants:
             text += f"{Symbols.bullet} `{participant.peer.user_id}`\n"
 
-        await hell.edit(text)
+        await kaleido.edit(text)
     except Exception as e:
-        await zelretch.error(hell, str(e))
+        await zelretch.error(kaleido, str(e))
 
 
 HelpMenu("voicechat").add(
     "startvc",
-    "<vc name (optional)>",
-    "Start a voice chat in the group with the given name (optional)",
-    "startvc Zelretch VC",
-    "Only admins with manage voice chats permission can use this command.",
+    "<voice chat name (optional)>",
+    "Start a new voice chat in the current group. A custom title can be assigned; otherwise a default name is used.",
+    "startvc Workshop VC",
+    "Only admins with the manage voice chats permission can use this command.",
 ).add(
     "endvc",
     None,
-    "End the voice chat in the group",
+    "End the active voice chat in the current group. All participants are disconnected.",
     "endvc",
-    "Only admins with manage voice chats permission can use this command.",
+    "Only admins with the manage voice chats permission can use this command.",
 ).add(
     "vclink",
     None,
-    "Get the invite link of currennt group's voice chat.",
+    "Generate and share an invite link for the current group's active voice chat so external users can join.",
     "vclink",
 ).add(
     "vcmembers",
     None,
-    "Get the list of members in current group's voice chat.",
+    "List every participant currently in the group's voice chat, including their user IDs.",
     "vcmembers",
-    "Only admins with manage voice chats permission can use this command.",
+    "Only admins with the manage voice chats permission can use this command.",
 ).info(
-    "Manage Voice Chats",
+    "Voice chat management — start, end, share links to, and inspect members of group voice chats."
 ).done()

@@ -1,7 +1,7 @@
 import os
 
-from pyrogram.errors import ChatSendMediaForbidden
-from pyrogram.types import Message
+from kurigram.errors import ChatSendMediaForbidden
+from kurigram.types import Message
 
 from zelretch.core import zelretch
 from zelretch.functions.scraping import (
@@ -23,14 +23,14 @@ async def anime(_, message: Message):
         return await zelretch.delete(message, "Give me an anime name to search!")
 
     query = await zelretch.input(message)
-    hell = await zelretch.edit(message, "Searching ...")
+    kaleido = await zelretch.edit(message, "Searching ...")
     caption, photo = await get_anime_info(query)
 
     try:
         await message.reply_photo(photo, caption=caption)
-        await hell.delete()
+        await kaleido.delete()
     except ChatSendMediaForbidden:
-        await hell.edit(caption, disable_web_page_preview=True)
+        await kaleido.edit(caption, disable_web_page_preview=True)
 
     if os.path.exists(photo):
         os.remove(photo)
@@ -42,14 +42,14 @@ async def manga(_, message: Message):
         return await zelretch.delete(message, "Give me a manga name to search!")
 
     query = await zelretch.input(message)
-    hell = await zelretch.edit(message, "Searching ...")
+    kaleido = await zelretch.edit(message, "Searching ...")
     caption, photo = await get_manga_info(query)
 
     try:
         await message.reply_photo(photo, caption=caption)
-        await hell.delete()
+        await kaleido.delete()
     except ChatSendMediaForbidden:
-        await hell.edit(caption, disable_web_page_preview=True)
+        await kaleido.edit(caption, disable_web_page_preview=True)
 
     if os.path.exists(photo):
         os.remove(photo)
@@ -61,14 +61,14 @@ async def character(_, message: Message):
         return await zelretch.delete(message, "Give me a character name to search!")
 
     query = await zelretch.input(message)
-    hell = await zelretch.edit(message, "Searching ...")
+    kaleido = await zelretch.edit(message, "Searching ...")
     caption, photo = await get_character_info(query)
 
     try:
         await message.reply_photo(photo, caption=caption)
-        await hell.delete()
+        await kaleido.delete()
     except ChatSendMediaForbidden:
-        await hell.edit(caption, disable_web_page_preview=True)
+        await kaleido.edit(caption, disable_web_page_preview=True)
 
     if os.path.exists(photo):
         os.remove(photo)
@@ -80,14 +80,14 @@ async def airing(_, message: Message):
         return await zelretch.delete(message, "Give me an anime name to search!")
 
     query = await zelretch.input(message)
-    hell = await zelretch.edit(message, "Searching ...")
+    kaleido = await zelretch.edit(message, "Searching ...")
     caption, photo = await get_airing_info(query)
 
     try:
         await message.reply_photo(photo, caption=caption)
-        await hell.delete()
+        await kaleido.delete()
     except ChatSendMediaForbidden:
-        await hell.edit(caption, disable_web_page_preview=True)
+        await kaleido.edit(caption, disable_web_page_preview=True)
 
     if os.path.exists(photo):
         os.remove(photo)
@@ -99,14 +99,14 @@ async def anilist_user(_, message: Message):
         return await zelretch.delete(message, "Give me an anilist username to search!")
 
     query = await zelretch.input(message)
-    hell = await zelretch.edit(message, "Searching ...")
+    kaleido = await zelretch.edit(message, "Searching ...")
     caption, photo = await get_anilist_user_info(query)
 
     try:
         await message.reply_photo(photo, caption=caption)
-        await hell.delete()
+        await kaleido.delete()
     except ChatSendMediaForbidden:
-        await hell.edit(caption, disable_web_page_preview=True)
+        await kaleido.edit(caption, disable_web_page_preview=True)
 
     if os.path.exists(photo):
         os.remove(photo)
@@ -118,13 +118,13 @@ async def fillers(_, message: Message):
         return await zelretch.delete(message, "Give me an anime name to search!")
 
     query = await zelretch.input(message)
-    hell = await zelretch.edit(message, "Searching ...")
+    kaleido = await zelretch.edit(message, "Searching ...")
 
     caption = await get_filler_info(query)
     if caption == "":
-        return await zelretch.delete(hell, "No results found!")
+        return await zelretch.delete(kaleido, "No results found!")
 
-    await hell.edit(caption, disable_web_page_preview=True)
+    await kaleido.edit(caption, disable_web_page_preview=True)
 
 
 @on_message("watchorder", allow_master=True)
@@ -133,52 +133,52 @@ async def watch_order(_, message: Message):
         return await zelretch.delete(message, "Give me an anime name to search!")
 
     query = await zelretch.input(message)
-    hell = await zelretch.edit(message, "Searching ...")
+    kaleido = await zelretch.edit(message, "Searching ...")
 
     caption = await get_watch_order(query)
     if caption == "":
-        return await zelretch.delete(hell, "No results found!")
+        return await zelretch.delete(kaleido, "No results found!")
 
-    await hell.edit(caption, disable_web_page_preview=True)
+    await kaleido.edit(caption, disable_web_page_preview=True)
 
 
 HelpMenu("anime").add(
     "anime",
     "<name>",
-    "Get a detailed information about the mentioned anime.",
+    "Look up an anime on AniList and show its score, episodes, studio, genres, trailer, and synopsis.",
     "anime one piece",
 ).add(
     "manga",
     "<name>",
-    "Get a detailed information about the mentioned manga.",
+    "Look up a manga on AniList and show its score, chapters, volumes, status, and synopsis.",
     "manga one piece",
 ).add(
     "character",
     "<name>",
-    "Get a detailed information about the mentioned character.",
+    "Look up a character on AniList and show their age, gender, birthday, and biography.",
     "character monkey d luffy",
 ).add(
     "airing",
     "<name>",
-    "Get a detailed airing information about the mentioned anime.",
+    "Show the next airing episode and countdown for an ongoing anime.",
     "airing one piece",
 ).add(
     "anilistuser",
     "<username>",
-    "Get a detailed information about the mentioned anilist user.",
+    "Fetch the AniList profile of a user, including anime and manga statistics.",
     "anilistuser meizhellboy",
-    "You can also use 'aniuser' as alias",
+    "Alias 'aniuser' can also be used.",
 ).add(
     "filler",
     "<name>",
-    "Get the list of filler/canon episodes about the mentioned anime.",
+    "List the filler and canon episodes of an anime so you can skip the non-canon arcs.",
     "filler one piece",
-    "You can also use 'canon' as alias",
+    "Alias 'canon' can also be used.",
 ).add(
     "watchorder",
     "<name>",
-    "Get the watch order about the mentioned anime.",
+    "Show the recommended watch order for an anime franchise, including sequels, movies, and OVAs.",
     "watchorder one piece",
 ).info(
-    "Anime Menu"
+    "AniList-powered anime, manga, and character lookups plus filler guides and watch orders."
 ).done()

@@ -6,8 +6,8 @@ from shutil import rmtree
 import requests
 from glitch_this import ImageGlitcher
 from PIL import Image
-from pyrogram.enums import MessageMediaType
-from pyrogram.types import InputMediaDocument, InputMediaPhoto, Message
+from kurigram.enums import MessageMediaType
+from kurigram.types import InputMediaDocument, InputMediaPhoto, Message
 
 from zelretch.core import ENV
 from zelretch.functions.images import deep_fry, download_images, get_wallpapers
@@ -27,7 +27,7 @@ async def searchImage(_, message: Message):
 
     limit = 5
     query = await zelretch.input(message)
-    hell = await zelretch.edit(message, "Searching...")
+    kaleido = await zelretch.edit(message, "Searching...")
 
     if ";" in query:
         try:
@@ -44,13 +44,13 @@ async def searchImage(_, message: Message):
     if to_send:
         if len(to_send) > 10:
             for chunk in _chunk(to_send):
-                await hell.reply_media_group(chunk)
+                await kaleido.reply_media_group(chunk)
         else:
-            await hell.reply_media_group(to_send)
+            await kaleido.reply_media_group(to_send)
 
-        await zelretch.delete(hell, "Uploaded!")
+        await zelretch.delete(kaleido, "Uploaded!")
     else:
-        await zelretch.delete(hell, "No images found.")
+        await zelretch.delete(kaleido, "No images found.")
 
     try:
         rmtree("./images")
@@ -69,11 +69,11 @@ async def searchWallpaper(_, message: Message):
 
     to_send = []
     limit = 10
-    hell = await zelretch.edit(message, "Processing...")
+    kaleido = await zelretch.edit(message, "Processing...")
 
     access = await db.get_env(ENV.unsplash_api)
     if not access:
-        return await zelretch.delete(hell, "Unsplash API not found.")
+        return await zelretch.delete(kaleido, "Unsplash API not found.")
 
     if ";" in query:
         try:
@@ -83,13 +83,13 @@ async def searchWallpaper(_, message: Message):
             pass
 
     if limit > 30:
-        return await zelretch.delete(hell, "Limit should be less than 30.")
+        return await zelretch.delete(kaleido, "Limit should be less than 30.")
     elif limit < 1:
-        return await zelretch.delete(hell, "Limit should be greater than 0.")
+        return await zelretch.delete(kaleido, "Limit should be greater than 0.")
 
     wallpapers = await get_wallpapers(access, limit, query, random)
     if not wallpapers:
-        return await zelretch.delete(hell, "No wallpapers found.")
+        return await zelretch.delete(kaleido, "No wallpapers found.")
 
     trash = []
     for i, wallpaper in enumerate(wallpapers):
@@ -99,8 +99,8 @@ async def searchWallpaper(_, message: Message):
         to_send.append(InputMediaDocument(file_name))
         trash.append(file_name)
 
-    await hell.reply_media_group(to_send)
-    await zelretch.delete(hell, "Uploaded!")
+    await kaleido.reply_media_group(to_send)
+    await zelretch.delete(kaleido, "Uploaded!")
     [os.remove(trash_file) for trash_file in trash]
 
 
@@ -109,7 +109,7 @@ async def glitcher(_, message: Message):
     if not message.reply_to_message or not message.reply_to_message.media:
         return await zelretch.delete(message, "Reply to a media message to glitch it.")
 
-    hell = await zelretch.edit(message, "Glitching...")
+    kaleido = await zelretch.edit(message, "Glitching...")
     media = message.reply_to_message.media
 
     intensity = 2
@@ -117,7 +117,7 @@ async def glitcher(_, message: Message):
         intensity = int(message.command[1]) if message.command[1].isdigit() else 2
 
     if not 0 < intensity < 9:
-        await hell.edit("intensity should be between 1 and 8... now glitching at 8")
+        await kaleido.edit("intensity should be between 1 and 8... now glitching at 8")
 
     if media and media not in [
         MessageMediaType.ANIMATION,
@@ -125,7 +125,7 @@ async def glitcher(_, message: Message):
         MessageMediaType.PHOTO,
         MessageMediaType.STICKER,
     ]:
-        return await zelretch.delete(hell, "Only media messages are supported.")
+        return await zelretch.delete(kaleido, "Only media messages are supported.")
 
     glitch_img = os.path.join(Config.TEMP_DIR, "glitch.png")
     dwl_path = await message.reply_to_message.download(Config.DWL_DIR)
@@ -134,20 +134,20 @@ async def glitcher(_, message: Message):
         cmd = f"lottie_convert.py --frame 0 -if lottie -of png {dwl_path} {glitch_img}"
         stdout, stderr, _, _ = await runcmd(cmd)
         if not os.path.lexists(glitch_img):
-            return await zelretch.error(hell, f"`{stdout}`\n`{stderr}`")
+            return await zelretch.error(kaleido, f"`{stdout}`\n`{stderr}`")
     elif dwl_path.endswith(".webp"):
         os.rename(dwl_path, glitch_img)
         if not os.path.lexists(glitch_img):
-            return await zelretch.error(hell, "File not found.")
+            return await zelretch.error(kaleido, "File not found.")
     elif media in [MessageMediaType.VIDEO, MessageMediaType.ANIMATION]:
         cmd = f"ffmpeg -ss 0 -i {dwl_path} -vframes 1 {glitch_img}"
         stdout, stderr, _, _ = await runcmd(cmd)
         if not os.path.lexists(glitch_img):
-            return await zelretch.error(hell, f"`{stdout}`\n`{stderr}`")
+            return await zelretch.error(kaleido, f"`{stdout}`\n`{stderr}`")
     else:
         os.rename(dwl_path, glitch_img)
         if not os.path.lexists(glitch_img):
-            return await zelretch.error(hell, "File not found.")
+            return await zelretch.error(kaleido, "File not found.")
 
     glitcher = ImageGlitcher()
     img = Image.open(glitch_img)
@@ -164,7 +164,7 @@ async def glitcher(_, message: Message):
     )
 
     await message.reply_animation(output_path)
-    await zelretch.delete(hell, f"Glitched at intensity {intensity}")
+    await zelretch.delete(kaleido, f"Glitched at intensity {intensity}")
     os.remove(output_path)
     os.remove(glitch_img)
     try:
@@ -186,7 +186,7 @@ async def deepfry(_, message: Message):
     else:
         quality = 2
 
-    hell = await zelretch.edit(message, "Deepfrying...")
+    kaleido = await zelretch.edit(message, "Deepfrying...")
     photo = await message.reply_to_message.download(Config.DWL_DIR)
 
     if quality > 9:
@@ -203,34 +203,36 @@ async def deepfry(_, message: Message):
     image.save(fried, "JPEG")
     fried.seek(0)
 
-    await hell.reply_photo(fried)
-    await zelretch.delete(hell, "Deepfried!")
+    await kaleido.reply_photo(fried)
+    await zelretch.delete(kaleido, "Deepfried!")
 
     os.remove(photo)
 
 
 HelpMenu("images").add(
     "image",
-    "<query> ; <limit>",
-    "Search for x images on google and upload them to current chat,",
+    "<query> ; <limit (optional)>",
+    "Search Google Images for the query and upload the top results into the chat. Separate the query and the optional limit with a semicolon.",
     "image zelretch ; 5",
-    "An alias of 'img' can also be used.",
+    "Alias 'img' can also be used. Default limit is 3 images when omitted.",
 ).add(
     "wallpaper",
-    "<query> ; <limit>",
-    "Search for x wallpapers on unsplash and upload them to current chat. If no query is given, random wallpapers will be uploaded.",
-    "wallpaper supra ; 5",
-    "Need to setup Unsplash Api key from https://unsplash.com/join",
+    "<query> ; <limit (optional)>",
+    "Search Unsplash for high-quality wallpapers matching the query. If no query is given, random wallpapers are uploaded.",
+    "wallpaper tokyo street ; 5",
+    "Requires the UNSPLASH_API variable. Get a free key from https://unsplash.com/join.",
 ).add(
     "glitch",
-    "<reply to media> <intensity>",
-    "Glitch a media message. It includes sticker, gif, photo, video. The intensity can be changed by passing an integer between 1 and 8. Default is 2.",
+    "<reply to media> <intensity (1-8, optional)>",
+    "Apply a glitch-art effect to the replied sticker, GIF, photo, or video. Higher intensity produces more distortion.",
     "glitch 4",
+    "Intensity defaults to 2. Accepts integers from 1 to 8.",
 ).add(
     "deepfry",
-    "<reply to photo> <quality>",
-    "Deepfry a photo. The quality can be changed by passing an integer between 1 and 9. Default is 2.",
+    "<reply to photo> <quality (1-9, optional)>",
+    "Apply a deep-fried meme effect to the replied photo — oversaturated, noisy, and crunchy. Higher quality values intensify the effect.",
     "deepfry 5",
+    "Quality defaults to 2. Accepts integers from 1 to 9.",
 ).info(
-    "Image Tools"
+    "Image search and manipulation — Google Images, Unsplash wallpapers, glitch art, and deep-fry effects."
 ).done()

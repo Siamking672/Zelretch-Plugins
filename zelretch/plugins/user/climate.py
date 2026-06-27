@@ -1,4 +1,4 @@
-from pyrogram.types import Message
+from kurigram.types import Message
 
 from zelretch.core import ENV
 from zelretch.functions.driver import Climate
@@ -15,17 +15,17 @@ async def climate(_, message: Message):
     else:
         city = await zelretch.input(message)
 
-    hell = await zelretch.edit(message, f"**Fetching climate data for `{city}`**")
+    kaleido = await zelretch.edit(message, f"**Fetching climate data for `{city}`**")
 
     apiKey = await db.get_env(ENV.climate_api)
     if not apiKey:
         return await zelretch.delete(
-            hell, f"**Climate API not found!** Setup `{ENV.climate_api}` first."
+            kaleido, f"**Climate API not found!** Setup `{ENV.climate_api}` first."
         )
 
     data = await Climate.fetchWeather(city, apiKey)
     if not data:
-        return await zelretch.delete(hell, f"**Climate data not found for `{city}`**")
+        return await zelretch.delete(kaleido, f"**Climate data not found for `{city}`**")
 
     city_name = data["name"]
     country = Climate.getCountry(data["sys"]["country"])
@@ -43,7 +43,7 @@ async def climate(_, message: Message):
     visibility = data["visibility"]
     clouds = data["clouds"]["all"]
 
-    await hell.edit(
+    await kaleido.edit(
         await climate_templates(
             city_name=city_name,
             country=country,
@@ -72,18 +72,18 @@ async def airpollution(_, message: Message):
     else:
         city = await zelretch.input(message)
 
-    hell = await zelretch.edit(message, f"**Fetching air pollution data for `{city}`**")
+    kaleido = await zelretch.edit(message, f"**Fetching air pollution data for `{city}`**")
 
     apiKey = await db.get_env(ENV.climate_api)
     if not apiKey:
         return await zelretch.delete(
-            hell, f"**Climate API not found!** Setup `{ENV.climate_api}` first."
+            kaleido, f"**Climate API not found!** Setup `{ENV.climate_api}` first."
         )
 
     data = await Climate.fetchAirPollution(city, apiKey)
     if not data:
         return await zelretch.delete(
-            hell, f"**Air pollution data not found for `{city}`**"
+            kaleido, f"**Air pollution data not found for `{city}`**"
         )
 
     data = data["list"][0]
@@ -104,7 +104,7 @@ async def airpollution(_, message: Message):
     pm2_5 = data["components"]["pm2_5"]
     pm10 = data["components"]["pm10"]
 
-    await hell.edit(
+    await kaleido.edit(
         await airpollution_templates(
             city_name=city_name,
             aqi=aqi,
@@ -125,16 +125,16 @@ async def airpollution(_, message: Message):
 
 HelpMenu("climate").add(
     "climate",
-    "<city name>",
-    "Get climate data of a city.",
-    "climate Delhi",
-    "City name is optional. Bydefault Delhi's climate data will be fetched.",
+    "<city name (optional)>",
+    "Fetch the current weather for a city, including temperature, humidity, wind, and conditions.",
+    "climate Tokyo",
+    "If no city is given, the default configured via the CLIMATE_API variable is used.",
 ).add(
     "airpollution",
-    "<city name>",
-    "Get air pollution data of a city.",
-    "airpollution Delhi",
-    "City name is optional. Bydefault Delhi's air pollution data will be fetched.",
+    "<city name (optional)>",
+    "Fetch air quality data for a city, including PM2.5, PM10, and AQI components.",
+    "airpollution Tokyo",
+    "If no city is given, the default configured via the CLIMATE_API variable is used.",
 ).info(
-    "Get the API Key from [here](https://openweathermap.org/price)"
+    "Weather and air quality lookups powered by OpenWeatherMap. Set the CLIMATE_API variable with a free API key from https://openweathermap.org/price."
 ).done()

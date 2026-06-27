@@ -1,6 +1,6 @@
-from pyrogram import Client
-from pyrogram.enums import ParseMode
-from pyrogram.types import Message
+from kurigram import Client
+from kurigram.enums import ParseMode
+from kurigram.types import Message
 
 from zelretch.functions.utility import Gcast
 
@@ -29,24 +29,26 @@ async def broadcast(client: Client, message: Message):
         is_copy = message.command[2].lower()
         tag = False if is_copy == "copy" else True
 
-    hell = await zelretch.edit(message, "Processing...")
+    kaleido = await zelretch.edit(message, "Processing...")
     msg = await gcast.start(
         message.reply_to_message, client, message.command[1].strip(), tag
     )
 
     if msg:
-        await hell.edit(
+        await kaleido.edit(
             msg[1], parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True
         )
         await zelretch.check_and_log("gcast", msg[1], msg[0])
     else:
-        await hell.edit("No user or group found!")
+        await kaleido.edit("No user or group found!")
 
 
 HelpMenu("gcast").add(
     "gcast",
-    "<target> <copy>",
-    "Broadcast the replied message to selected target. If 'copy' is also passed the gcast will be without forward tag. Bydefault gcast is done with a forward tag.",
+    "<target> <copy (optional)>",
+    "Broadcast the replied message to every chat of the chosen type. By default the message is forwarded with a forward tag; pass 'copy' to send it as a fresh message instead.",
     "gcast groups copy",
-    "Target: all, groups, users",
-).info("Broadcast Module").done()
+    "Target must be one of: 'all' (every chat), 'groups' (supergroups only), or 'users' (private chats only). A log of failed deliveries is generated as a text file.",
+).info(
+    "Global broadcast — send one message to every group, user, or chat the userbot is in."
+).done()

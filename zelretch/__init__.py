@@ -2,7 +2,7 @@ import os
 import time
 from platform import python_version
 
-from pyrogram import __version__ as kurigram_version
+from kurigram import __version__ as kurigram_version
 
 from .core import LOGS, Config
 

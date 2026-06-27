@@ -1,8 +1,8 @@
 import asyncio
 
-from pyrogram import Client
-from pyrogram.errors.exceptions import FloodWait
-from pyrogram.types import Message
+from kurigram import Client
+from kurigram.errors.exceptions import FloodWait
+from kurigram.types import Message
 
 from . import HelpMenu, zelretch, on_message
 
@@ -25,7 +25,7 @@ async def purgeMsg(client: Client, message: Message):
     deleted = 0
     from_msg = message.reply_to_message
 
-    hell = await zelretch.edit(message, "__Purging...__")
+    kaleido = await zelretch.edit(message, "__Purging...__")
     for msg_ids in range(from_msg.id, message.id + 1):
         try:
             status = await client.delete_messages(message.chat.id, msg_ids)
@@ -37,7 +37,7 @@ async def purgeMsg(client: Client, message: Message):
         except:
             pass
 
-    await zelretch.delete(hell, f"__🧹 Purged {deleted} messages.__")
+    await zelretch.delete(kaleido, f"__🧹 Purged {deleted} messages.__")
 
 
 @on_message("purgeme", allow_master=True)
@@ -51,7 +51,7 @@ async def purgeMe(client: Client, message: Message):
     except:
         return await zelretch.delete(message, "Argument must be an integer.")
 
-    hell = await zelretch.edit(message, "__Purging...__")
+    kaleido = await zelretch.edit(message, "__Purging...__")
     async for msgs in client.search_messages(
         message.chat.id, limit=count, from_user="me"
     ):
@@ -60,7 +60,7 @@ async def purgeMe(client: Client, message: Message):
         except:
             pass
 
-    await zelretch.delete(hell, f"__🧹 Purged {count} messages.__")
+    await zelretch.delete(kaleido, f"__🧹 Purged {count} messages.__")
 
 
 @on_message("purgeuser", allow_master=True)
@@ -77,7 +77,7 @@ async def purgeUser(client: Client, message: Message):
         except:
             return await zelretch.delete(message, "Argument must be an integer.")
 
-    hell = await zelretch.edit(message, "__Purging...__")
+    kaleido = await zelretch.edit(message, "__Purging...__")
     async for msgs in client.search_messages(
         message.chat.id, limit=count, from_user=message.reply_to_message.from_user.id
     ):
@@ -87,7 +87,7 @@ async def purgeUser(client: Client, message: Message):
             pass
 
     await zelretch.delete(
-        hell,
+        kaleido,
         f"__🧹 Purged {count} messages of {message.reply_to_message.from_user.mention}.__,,"
     )
 
@@ -125,29 +125,29 @@ async def selfdestruct(client: Client, message: Message):
 HelpMenu("purge").add(
     "purge",
     "<reply to message>",
-    "Deletes all messages after the replied message.",
+    "Delete every message in the current chat starting from the replied message up to the most recent one. The userbot must be an admin with delete-message permission.",
     "purge",
 ).add(
     "purgeme",
     "<count>",
-    "Deletes last x number of your messages.",
-    "purgeme 69",
+    "Delete your own last N messages from the current chat.",
+    "purgeme 20",
 ).add(
     "purgeuser",
     "<reply to user> <count>",
-    "Deletes last x number of messages of replied user.",
-    "purgeuser @ForGo10God 69",
+    "Delete the last N messages sent by the replied user in the current chat.",
+    "purgeuser @ZelretchUser 20",
 ).add(
     "del",
     "<reply to message>",
-    "Deletes the replied message.",
+    "Delete the single replied message.",
     "del",
 ).add(
     "selfdestruct",
-    "<seconds> <message>",
-    "Sends a message and deletes it after x seconds.",
-    "selfdestruct 10 Hello World!",
-    "An alias of 'sd' is also available.",
+    "<seconds> <message text>",
+    "Send a message that automatically deletes itself after the specified number of seconds.",
+    "selfdestruct 10 This message will vanish.",
+    "Alias 'sd' can also be used.",
 ).info(
-    "Bulk delete messages."
+    "Message deletion tools — purge ranges, delete singles, clean up your own messages, or send self-destructing notes."
 ).done()

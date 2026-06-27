@@ -13,8 +13,8 @@ from geopy.location import Location
 from googlesearch import search
 from googletrans import LANGCODES, LANGUAGES, Translator
 from imdb import Cinemagoer, Movie
-from pyrogram import Client
-from pyrogram.types import InputMediaPhoto, Message
+from kurigram import Client
+from kurigram.types import InputMediaPhoto, Message
 from wikipedia import exceptions, summary
 
 from zelretch.functions.driver import Driver
@@ -74,7 +74,7 @@ async def google_search(client: Client, message: Message):
         return await zelretch.edit(message, "Give some text to search on wikipedia.")
 
     search_query = await zelretch.input(message)
-    hell = await zelretch.edit(
+    kaleido = await zelretch.edit(
         message, f"Searching for `{search_query}` on wikipedia..."
     )
 
@@ -86,11 +86,11 @@ async def google_search(client: Client, message: Message):
             f"`{i}`\n" if lineno > 1 else f"**{i}**\n"
             for lineno, i in enumerate(error, start=1)
         )
-        return await hell.edit(f"**DisambiguationError:**\n\n{result}")
+        return await kaleido.edit(f"**DisambiguationError:**\n\n{result}")
     except exceptions.PageError:
-        return await zelretch.delete(hell, "**Page not found.**")
+        return await zelretch.delete(kaleido, "**Page not found.**")
 
-    await hell.edit(
+    await kaleido.edit(
         f"**𝖲𝖾𝖺𝗋𝖼𝗁:** `{search_query}`\n**𝖱𝖾𝗌𝗎𝗅𝗍:**\n{data}",
         disable_web_page_preview=True,
     )
@@ -102,19 +102,19 @@ async def googleSearch(_, message: Message):
         return await zelretch.edit(message, "Give some text to search on google.")
 
     search_query = await zelretch.input(message)
-    hell = await zelretch.edit(message, f"Searching for `{search_query}` on google...")
+    kaleido = await zelretch.edit(message, f"Searching for `{search_query}` on google...")
 
     try:
         results = search(search_query, 7, advanced=True)
     except Exception as error:
-        return await zelretch.error(hell, f"`{str(error)}`")
+        return await zelretch.error(kaleido, f"`{str(error)}`")
 
     outStr = f"**🔍 𝖲𝖾𝖺𝗋𝖼𝗁:** `{search_query}`\n\n"
     for result in results:
         outStr += f"**🌐 𝖱𝖾𝗌𝗎𝗅𝗍:** [{result.title}]({result.url})\n"
         outStr += f"**📖 𝖣𝖾𝗌𝖼:** {str(result.description)[:50]}...\n\n"
 
-    await hell.edit(outStr, disable_web_page_preview=True)
+    await kaleido.edit(outStr, disable_web_page_preview=True)
 
 
 @on_message("reverse", allow_master=True)
@@ -124,7 +124,7 @@ async def reverseSearch(_, message: Message):
             message, "Reply to an image/sticker to reverse search it."
         )
 
-    hell = await zelretch.edit(message, "Processing...")
+    kaleido = await zelretch.edit(message, "Processing...")
     if message.reply_to_message.sticker or message.reply_to_message.photo:
         dl_path = await message.reply_to_message.download(
             Config.DWL_DIR + "reverse.jpg"
@@ -132,10 +132,10 @@ async def reverseSearch(_, message: Message):
         file = {"encoded_image": (dl_path, open(dl_path, "rb"))}
     else:
         return await zelretch.error(
-            hell, "Reply to an image/sticker to reverse search it."
+            kaleido, "Reply to an image/sticker to reverse search it."
         )
 
-    await hell.edit("Searching on google...")
+    await kaleido.edit("Searching on google...")
 
     resp = requests.post(
         "https://www.google.com/searchbyimage/upload", files=file, allow_redirects=False
@@ -156,11 +156,11 @@ async def reverseSearch(_, message: Message):
         link = alls["href"]
         text = alls.text
 
-        await hell.edit(
+        await kaleido.edit(
             f"**𝖯𝗈𝗌𝗌𝗂𝖻𝗅𝖾 𝖱𝖾𝗌𝗎𝗅𝗍:** [{text}]({link})", disable_web_page_preview=True
         )
     else:
-        return await hell.edit("No results found.")
+        return await kaleido.edit("No results found.")
 
     try:
         to_send = []
@@ -169,7 +169,7 @@ async def reverseSearch(_, message: Message):
         for image in images:
             to_send.append(InputMediaPhoto(image))
         if to_send:
-            await hell.reply_media_group(to_send)
+            await kaleido.reply_media_group(to_send)
 
         try:
             rmtree("./images")
@@ -185,7 +185,7 @@ async def gpsLocation(_, message: Message):
         return await zelretch.edit(message, "Give some place name to search.")
 
     search_query = await zelretch.input(message)
-    hell = await zelretch.edit(
+    kaleido = await zelretch.edit(
         message, f"Searching for `{search_query}` on google maps..."
     )
 
@@ -193,14 +193,14 @@ async def gpsLocation(_, message: Message):
     location: Location = geolocator.geocode(search_query)
 
     if not location:
-        return await zelretch.delete(hell, "Location not found.")
+        return await zelretch.delete(kaleido, "Location not found.")
 
     latitiude = location.latitude
     longitude = location.longitude
     address = location.address
 
-    await hell.reply_location(latitiude, longitude)
-    await zelretch.delete(hell, f"**🌐 𝖯𝗅𝖺𝖼𝖾:** {address}")
+    await kaleido.reply_location(latitiude, longitude)
+    await zelretch.delete(kaleido, f"**🌐 𝖯𝗅𝖺𝖼𝖾:** {address}")
 
 
 @on_message("webshot", allow_master=True)
@@ -212,10 +212,10 @@ async def webScreenshot(_, message: Message):
     if not is_valid_url(search_query):
         return await zelretch.edit(message, "Invalid url.")
 
-    hell = await zelretch.edit(message, f"Taking screenshot of `{search_query}`...")
+    kaleido = await zelretch.edit(message, f"Taking screenshot of `{search_query}`...")
     driver, resp = Driver.get()
     if not driver:
-        return await zelretch.error(hell, resp)
+        return await zelretch.error(kaleido, resp)
 
     driver.get(search_query)
     height = driver.execute_script(
@@ -231,8 +231,8 @@ async def webScreenshot(_, message: Message):
 
     with io.BytesIO(image) as result:
         result.name = "Zelretch_Webshot.png"
-        await hell.reply_document(result)
-        await hell.delete()
+        await kaleido.reply_document(result)
+        await kaleido.delete()
 
     try:
         os.remove("Zelretch_Webshot.png")
@@ -262,11 +262,11 @@ async def wordMeaning(_, message: Message):
         return await zelretch.edit(message, "Give some word to search.")
 
     search_query = await zelretch.input(message)
-    hell = await zelretch.edit(message, f"Searching for `{search_query}`...")
+    kaleido = await zelretch.edit(message, f"Searching for `{search_query}`...")
 
     response = requests.get(BASE.format(search_query))
     if response.status_code == 404:
-        return await zelretch.delete(hell, "Word not found.")
+        return await zelretch.delete(kaleido, "Word not found.")
 
     data: dict = response.json()[0]
 
@@ -287,10 +287,10 @@ async def wordMeaning(_, message: Message):
 
     audio = data.get("phonetics", [])[0].get("audio", "")
     if audio:
-        await hell.reply_audio(audio, caption=outStr)
-        await hell.delete()
+        await kaleido.reply_audio(audio, caption=outStr)
+        await kaleido.delete()
     else:
-        await hell.edit(outStr)
+        await kaleido.edit(outStr)
 
 
 @on_message(["translate", "tr"], allow_master=True)
@@ -311,7 +311,7 @@ async def translateHandler(_, message: Message):
             15,
         )
 
-    hell = await zelretch.edit(message, f"Translating to `{toLang}`...")
+    kaleido = await zelretch.edit(message, f"Translating to `{toLang}`...")
     text = emoji.demojize(text.strip())
     translator = Translator(http2=False)
 
@@ -319,9 +319,9 @@ async def translateHandler(_, message: Message):
         translated = translator.translate(text, toLang)
         outStr = f"**🌐 𝖳𝗋𝖺𝗇𝗌𝗅𝖺𝗍𝖾𝖽 𝖿𝗋𝗈𝗆** __{translated.src}__ **𝗍𝗈** __{translated.dest}__**:**"
         outStr += f"\n\n`{translated.text}`"
-        await hell.edit(outStr)
+        await kaleido.edit(outStr)
     except Exception as e:
-        return await zelretch.error(hell, f"`{str(e)}`")
+        return await zelretch.error(kaleido, f"`{str(e)}`")
 
 
 @on_message("trcode", allow_master=True)
@@ -361,7 +361,7 @@ async def textToSpeech(_, message: Message):
             15,
         )
 
-    hell = await zelretch.edit(message, "Processing...")
+    kaleido = await zelretch.edit(message, "Processing...")
     text = emoji.demojize(text.strip())
 
     try:
@@ -378,13 +378,13 @@ async def textToSpeech(_, message: Message):
         await message.reply_audio(
             path,
             caption=f"**🔊 𝖵𝗈𝗂𝖼𝖾:** `{text[:100]}...`",
-            performer="HellyAI",
+            performer="ZelretchAI",
             title="Zelretch TTS",
             thumb="./zelretch/resources/images/zelretch_logo.png",
         )
-        await hell.delete()
+        await kaleido.delete()
     except Exception as e:
-        return await zelretch.error(hell, f"`{str(e)}`")
+        return await zelretch.error(kaleido, f"`{str(e)}`")
 
 
 @on_message("movie", allow_master=True)
@@ -393,7 +393,7 @@ async def movieSearch(_, message: Message):
         return await zelretch.edit(message, "Give a movie name to search on IMDb.")
 
     query = await zelretch.input(message)
-    hell = await zelretch.edit(message, "Searching...")
+    kaleido = await zelretch.edit(message, "Searching...")
     try:
         movieObj: Movie.Movie = imdb.search_movie(query)[0]
         movieId = movieObj.movieID
@@ -461,63 +461,72 @@ async def movieSearch(_, message: Message):
             ),
             parse_mode="html",
         )
-        await hell.delete()
+        await kaleido.delete()
     except IndexError:
-        await zelretch.delete(hell, "No results found.")
+        await zelretch.delete(kaleido, "No results found.")
     except Exception as e:
-        await zelretch.error(hell, str(e))
+        await zelretch.error(kaleido, str(e))
 
 
 HelpMenu("google").add(
     "wikipedia",
     "<query>",
-    "Searches for the given query on wikipedia.",
+    "Search Wikipedia and return a summary of the most relevant article.",
     "wikipedia keanu reeves",
 ).add(
-    "google", "<query>", "Searches for the given query on google.", "google the zelretch"
+    "google",
+    "<query>",
+    "Run a Google web search and return the top result links with snippets.",
+    "google Zelretch userbot",
 ).add(
     "reverse",
-    "<reply to image/sticker>",
-    "Reverse searches the given image/sticker.",
+    "<reply to image or sticker>",
+    "Perform a reverse image search (Google Lens) on the replied image or sticker and return matching results.",
     "reverse",
 ).add(
-    "gps", "<place name>", "Sends the pin location of the given place.", "gps new york"
+    "gps",
+    "<place name>",
+    "Geocode a place name and send its location as a live map pin.",
+    "gps New York",
 ).add(
     "webshot",
     "<url>",
-    "Takes a screenshot of the given url.",
-    "webshot https://google.com",
+    "Capture a full-page screenshot of a website using a headless Chromium instance.",
+    "webshot https://example.com",
 ).add(
-    "cricket", None, "Sends the live cricket scores.", "cricket"
+    "cricket",
+    None,
+    "Fetch current live cricket match scores from espncricinfo.",
+    "cricket",
 ).add(
     "dictionary",
     "<word>",
-    "Sends the meaning of the given word.",
+    "Look up the definition, part of speech, and pronunciation of an English word.",
     "dictionary loyalty",
-    "An alias of 'meaning' can also be used.",
+    "Alias 'meaning' can also be used.",
 ).add(
     "translate",
-    "<lannguage code> <text/reply to message>",
-    "Translates the given text to the given language code.",
+    "<language code> <text or reply to message>",
+    "Translate text into the target language. Accepts a reply to a message instead of inline text.",
     "translate en こんにちは世界",
-    "An alias of 'tr' can also be used.",
+    "Alias 'tr' can also be used. Use 'trcode' to list valid language codes.",
 ).add(
     "trcode",
-    "<language / code>",
-    "Sends the language code and language name if found.",
+    "<language code or name (optional)>",
+    "Look up the ISO language code for a given language name, or list every supported language when no argument is provided.",
     "trcode en",
-    "If no language code is given, sends all the language codes.",
 ).add(
     "voice",
-    "<text/reply to message>",
-    "Sends the text as a voice message.",
-    "voice I'm Helly and this is an Text to Speech Example.",
-    "An alias of 'tts' can also be used.",
+    "<text or reply to message>",
+    "Synthesize a voice note from text using Microsoft Edge TTS and send it as an audio message.",
+    "voice This is a text to speech example.",
+    "Alias 'tts' can also be used.",
 ).add(
-    "movie",  # Bugged: to-be-fixed
+    "movie",
     "<movie name>",
-    "Sends the details of the given movie.",
-    "movie the shawshak redemption",
+    "Look up a movie on IMDb and show its title, rating, genres, runtime, director, and plot summary.",
+    "movie the shawshank redemption",
+    "Currently disabled — the IMDb template needs to be regenerated after a cinemagoer package update.",
 ).info(
-    "Every Google command you need."
+    "Search and reference toolkit — Google, Wikipedia, reverse image search, maps, screenshots, dictionary, translation, TTS, IMDb, and live cricket scores."
 ).done()

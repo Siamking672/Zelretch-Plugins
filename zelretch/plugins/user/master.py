@@ -1,16 +1,16 @@
-from pyrogram import Client
-from pyrogram.types import Message
+from kurigram import Client
+from kurigram.types import Message
 
 from . import Config, HelpMenu, db, zelretch, on_message
 
 
 @on_message("master", allow_master=True)
 async def masterUsers(client: Client, message: Message):
-    hell = await zelretch.edit(message, "__Fetching users...__")
+    kaleido = await zelretch.edit(message, "__Fetching users...__")
 
     users = await db.get_masters(client.me.id)
     if not users:
-        return await zelretch.delete(hell, "__No masters found!__")
+        return await zelretch.delete(kaleido, "__No masters found!__")
 
     text = f"**Total masters:** `{len(users)}`\n\n"
     for user in users:
@@ -23,7 +23,7 @@ async def masterUsers(client: Client, message: Message):
             mention = "Unknown Peer"
         text += f"• {mention} (`{userid}`)\n"
 
-    await hell.edit(text)
+    await kaleido.edit(text)
 
 
 @on_message("addmaster", allow_master=False)
@@ -86,20 +86,19 @@ async def delmaster(client: Client, message: Message):
 HelpMenu("master").add(
     "master",
     None,
-    "Get a list of masters for your client.",
+    "List every user registered as a master on your userbot account. Masters can trigger commands that accept the allow_master flag.",
     "master",
-    "A master can access some of the commands of your client.",
 ).add(
     "addmaster",
-    "<reply/username/userid>",
-    "Add a master in your client.",
-    "addmaster",
-    "Be careful while adding a master.",
+    "<reply to user> or <username/id>",
+    "Register a user as a master on your userbot account, granting them access to master-allowed commands.",
+    "addmaster @ZelretchUser",
+    "Be selective — masters can run administrative and potentially destructive commands.",
 ).add(
     "delmaster",
-    "<reply/username/userid>",
-    "Remove a master from your client.",
-    "delmaster",
+    "<reply to user> or <username/id>",
+    "Revoke a user's master privileges on your userbot account.",
+    "delmaster @ZelretchUser",
 ).info(
-    "Bound Masters"
+    "Manage Bound Masters — trusted users who can invoke your userbot's commands remotely."
 ).done()

@@ -1,7 +1,7 @@
-from pyrogram import Client, filters
-from pyrogram.enums import ChatType
-from pyrogram.handlers import MessageHandler
-from pyrogram.types import Message
+from kurigram import Client, filters
+from kurigram.enums import ChatType
+from kurigram.handlers import MessageHandler
+from kurigram.types import Message
 
 from zelretch.core import Config, db, zelretch
 from zelretch.functions.admins import is_user_admin

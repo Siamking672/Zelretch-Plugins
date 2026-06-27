@@ -1,4 +1,4 @@
-from pyrogram.enums import ChatType
+from kurigram.enums import ChatType
 
 from zelretch.core.clients import zelretch
 from zelretch.core.config import Config, Symbols

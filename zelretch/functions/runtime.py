@@ -11,7 +11,7 @@ from pathlib import Path
 
 from git import Repo
 from git.exc import GitCommandError, InvalidGitRepositoryError, NoSuchPathError
-from pyrogram.types import Message
+from kurigram.types import Message
 
 from zelretch.core import Config, Symbols
 

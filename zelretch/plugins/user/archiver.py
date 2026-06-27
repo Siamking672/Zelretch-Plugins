@@ -2,7 +2,7 @@ import os
 import time
 import zipfile
 
-from pyrogram.types import Message
+from kurigram.types import Message
 
 from zelretch.functions.formatter import readable_time
 from zelretch.functions.runtime import get_files_from_directory, progress
@@ -19,24 +19,24 @@ async def zip_files(_, message: Message):
     if not media:
         return await zelretch.delete(message, "Reply to a media message to zip it.")
 
-    hell = await zelretch.edit(message, "`Zipping...`")
+    kaleido = await zelretch.edit(message, "`Zipping...`")
     start = time.time()
     download_path = await message.reply_to_message.download(
         f"{Config.TEMP_DIR}temp_{round(time.time())}",
         progress=progress,
-        progress_args=(hell, start, "📦 Zipping"),
+        progress_args=(kaleido, start, "📦 Zipping"),
     )
 
     zip_path = Config.TEMP_DIR + f"zipped_{int(time.time())}.zip"
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zip_file:
         zip_file.write(download_path)
 
-    await zelretch.delete(hell, "Zipped Successfully.")
+    await zelretch.delete(kaleido, "Zipped Successfully.")
     await message.reply_document(
         zip_path,
         caption=f"**Zipped in {readable_time(time.time() - start)}.**",
         progress=progress,
-        progress_args=(hell, start, "⬆️ Uploading"),
+        progress_args=(kaleido, start, "⬆️ Uploading"),
     )
 
     os.remove(zip_path)
@@ -52,12 +52,12 @@ async def unzip_file(_, message: Message):
     if not media:
         return await zelretch.delete(message, "Reply to a media message to unzip it.")
 
-    hell = await zelretch.edit(message, "`Unzipping...`")
+    kaleido = await zelretch.edit(message, "`Unzipping...`")
     start = time.time()
     download_path = await message.reply_to_message.download(
         f"{Config.TEMP_DIR}temp_{round(time.time())}",
         progress=progress,
-        progress_args=(hell, start, "📦 Unzipping"),
+        progress_args=(kaleido, start, "📦 Unzipping"),
     )
 
     with zipfile.ZipFile(download_path, "r") as zip_file:
@@ -65,7 +65,7 @@ async def unzip_file(_, message: Message):
             os.mkdir(Config.TEMP_DIR + "unzipped/")
         zip_file.extractall(Config.TEMP_DIR + "unzipped/")
 
-    await zelretch.delete(hell, "Unzipped Successfully.")
+    await zelretch.delete(kaleido, "Unzipped Successfully.")
     files = await get_files_from_directory(Config.TEMP_DIR + "unzipped/")
 
     for file in files:
@@ -76,7 +76,7 @@ async def unzip_file(_, message: Message):
                     caption=f"**Unzipped {os.path.basename(file)}.**",
                     force_document=True,
                     progress=progress,
-                    progress_args=(hell, start, "⬆️ Uploading"),
+                    progress_args=(kaleido, start, "⬆️ Uploading"),
                 )
             except Exception as e:
                 await message.reply_text(f"**{file}:** `{e}`")
@@ -88,12 +88,14 @@ async def unzip_file(_, message: Message):
 
 HelpMenu("archiver").add(
     "zip",
-    "<reply to a media>",
-    "Zip the replied media and upload it in the chat.",
+    "<reply to media>",
+    "Compress the replied media file into a .zip archive and upload it back to the chat.",
+    "zip",
 ).add(
     "unzip",
     "<reply to a zip file>",
-    "Unzip the replied zip file and upload it in the chat.",
+    "Extract the contents of a replied .zip archive and upload each file individually.",
+    "unzip",
 ).info(
-    "Manage Archives"
+    "Compress and extract .zip archives directly inside Telegram."
 ).done()

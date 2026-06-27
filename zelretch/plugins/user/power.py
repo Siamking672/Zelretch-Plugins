@@ -71,27 +71,30 @@ async def update_bot(_, message):
 
 
 HelpMenu("power").add(
-    "restart", None, "Restart the bot.", "restart"
+    "restart",
+    None,
+    "Restart the bot process in-place. The wizard replaces the running Python process via execv so no duplicate instances are spawned.",
+    "restart",
 ).add(
     "shutdown",
     None,
-    "Shutdown the bot. Start the Docker container again to bring it back online.",
+    "Stop the bot and exit the process. The bot will not restart automatically — start the Docker container or run the wizard again to bring it back online.",
     "shutdown",
 ).add(
     "cleanup",
     None,
-    "Delete downloaded files and temp files.",
+    "Delete every file in the downloads and temp directories to reclaim disk space, then recreate the empty directories.",
     "cleanup",
 ).add(
     "update",
     None,
-    "Check whether plugin updates are available.",
+    "Check the upstream plugin repository for new commits since the last update and show the changelog.",
     "update",
 ).add(
     "update plugins",
     None,
-    "Update plugins to the latest code and restart.",
+    "Pull the latest plugin code from the configured GitHub repository, install any new dependencies, and restart the bot to apply the changes.",
     "update plugins",
 ).info(
-    "Commands to manage the running bot."
+    "Bot lifecycle controls — restart, shut down, clean up temp files, and update plugins from the upstream repository."
 ).done()

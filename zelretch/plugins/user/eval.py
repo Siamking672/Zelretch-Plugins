@@ -6,9 +6,9 @@ import traceback
 
 import bs4
 import requests
-from pyrogram import Client
-from pyrogram.errors import MessageTooLong
-from pyrogram.types import Message
+from kurigram import Client
+from kurigram.errors import MessageTooLong
+from kurigram.types import Message
 from speedtest import Speedtest
 
 from . import HelpMenu, zelretch, on_message
@@ -30,7 +30,7 @@ async def runeval(client: Client, message: Message):
     reply_to = message.reply_to_message or message
 
     code = await zelretch.input(message)
-    hell = await zelretch.edit(message, "`running...`")
+    kaleido = await zelretch.edit(message, "`running...`")
 
     old_stderr = sys.stderr
     old_stdout = sys.stdout
@@ -69,7 +69,7 @@ async def runeval(client: Client, message: Message):
             out_file.name = "eval.txt"
             await reply_to.reply_document(out_file, caption=heading)
 
-    await hell.delete()
+    await kaleido.delete()
 
 
 @on_message(["exec", "term"], allow_master=True)
@@ -80,7 +80,7 @@ async def runterm(client: Client, message: Message):
     reply_to = message.reply_to_message or message
 
     cmd = await zelretch.input(message)
-    hell = await zelretch.edit(message, "`running...`")
+    kaleido = await zelretch.edit(message, "`running...`")
 
     if "\n" in cmd:
         code = cmd.split("\n")
@@ -93,7 +93,7 @@ async def runterm(client: Client, message: Message):
                 )
             except Exception as err:
                 print(err)
-                await hell.edit(f"**Error:** \n`{err}`")
+                await kaleido.edit(f"**Error:** \n`{err}`")
             output += f"**{code}**\n"
             output += process.stdout.read()[:-1].decode("utf-8")
             output += "\n"
@@ -108,12 +108,12 @@ async def runterm(client: Client, message: Message):
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             errors = traceback.format_exception(exc_type, exc_obj, exc_tb)
-            await hell.edit("**Error:**\n`{}`".format("".join(errors)))
+            await kaleido.edit("**Error:**\n`{}`".format("".join(errors)))
             return
         output = process.stdout.read()[:-1].decode("utf-8")
 
     if str(output) == "\n":
-        return await hell.edit(f"**𝖮𝗎𝗍𝗉𝗎𝗍:** __𝖭𝗈 𝗈𝗎𝗍𝗉𝗎𝗍!__")
+        return await kaleido.edit(f"**𝖮𝗎𝗍𝗉𝗎𝗍:** __𝖭𝗈 𝗈𝗎𝗍𝗉𝗎𝗍!__")
     else:
         try:
             await reply_to.reply_text(
@@ -127,7 +127,7 @@ async def runterm(client: Client, message: Message):
                     caption=f"**{client.me.id}@zelretch:~$** `{cmd}`",
                 )
 
-    await hell.delete()
+    await kaleido.delete()
 
 
 @on_message(["sh", "shell"], allow_master=True)
@@ -136,7 +136,7 @@ async def runshell(_, message: Message):
         return await zelretch.delete(message, "No shell code provided!")
 
     code = await zelretch.input(message)
-    hell = await zelretch.edit(message, "`executing...`")
+    kaleido = await zelretch.edit(message, "`executing...`")
 
     result = subprocess.run(code, shell=True, capture_output=True, text=True)
     output = result.stdout + result.stderr
@@ -152,7 +152,7 @@ async def runshell(_, message: Message):
             out_file.name = "shell.txt"
             await message.reply_document(out_file, caption=heading)
 
-    await hell.delete()
+    await kaleido.delete()
 
 
 @on_message("fext", allow_master=True)
@@ -162,15 +162,15 @@ async def file_extention(_, message: Message):
         return await zelretch.delete(message, "No file extention provided!")
 
     extention = message.command[1]
-    hell = await zelretch.edit(message, "`getting information...`")
+    kaleido = await zelretch.edit(message, "`getting information...`")
 
     response = requests.get(BASE_URL.format(extention))
     if response.status_code == 200:
         soup = bs4.BeautifulSoup(response.content, "html.parser")
         details = soup.find_all("td", {"colspan": "3"})[-1].text
-        await hell.edit(f"**𝖥𝗂𝗅𝖾 𝖤𝗑𝗍𝖾𝗇𝗍𝗂𝗈𝗇:** `{extention}`\n\n**𝖣𝖾𝗍𝖺𝗂𝗅𝗌:**\n`{details}`")
+        await kaleido.edit(f"**𝖥𝗂𝗅𝖾 𝖤𝗑𝗍𝖾𝗇𝗍𝗂𝗈𝗇:** `{extention}`\n\n**𝖣𝖾𝗍𝖺𝗂𝗅𝗌:**\n`{details}`")
     else:
-        await hell.edit(f"**𝖥𝗂𝗅𝖾 𝖤𝗑𝗍𝖾𝗇𝗍𝗂𝗈𝗇:** `{extention}`\n\n**𝖣𝖾𝗍𝖺𝗂𝗅𝗌:**\n`Not Found`")
+        await kaleido.edit(f"**𝖥𝗂𝗅𝖾 𝖤𝗑𝗍𝖾𝗇𝗍𝗂𝗈𝗇:** `{extention}`\n\n**𝖣𝖾𝗍𝖺𝗂𝗅𝗌:**\n`Not Found`")
 
 
 @on_message("pypi", allow_master=True)
@@ -180,7 +180,7 @@ async def pypi(_, message: Message):
         return await zelretch.delete(message, "No package name provided!")
 
     package = message.command[1]
-    hell = await zelretch.edit(message, "`getting information...`")
+    kaleido = await zelretch.edit(message, "`getting information...`")
 
     response = requests.get(BASE_URL.format(package))
     if response.status_code == 200:
@@ -190,25 +190,25 @@ async def pypi(_, message: Message):
         url = info["package_url"]
         version = info["version"]
         summary = info["summary"]
-        await hell.edit(f"**𝖯𝖺𝖼𝗄𝖺𝗀𝖾:** [{name}]({url}) (`{version}`)\n\n**𝖣𝖾𝗍𝖺𝗂𝗅𝗌:** `{summary}`")
+        await kaleido.edit(f"**𝖯𝖺𝖼𝗄𝖺𝗀𝖾:** [{name}]({url}) (`{version}`)\n\n**𝖣𝖾𝗍𝖺𝗂𝗅𝗌:** `{summary}`")
     else:
-        await hell.edit(f"**𝖯𝖺𝖼𝗄𝖺𝗀𝖾:** `{package}`\n\n**𝖣𝖾𝗍𝖺𝗂𝗅𝗌:** `Not Found`")
+        await kaleido.edit(f"**𝖯𝖺𝖼𝗄𝖺𝗀𝖾:** `{package}`\n\n**𝖣𝖾𝗍𝖺𝗂𝗅𝗌:** `Not Found`")
 
 
 @on_message("speedtest", allow_master=True)
 async def speed_test(_, message: Message):
-    hell = await zelretch.edit(message, "`testing speed...`")
+    kaleido = await zelretch.edit(message, "`testing speed...`")
 
     speed = Speedtest()
     speed.get_best_server()
 
-    await hell.edit("`calculating download speed...`")
+    await kaleido.edit("`calculating download speed...`")
     speed.download()
 
-    await hell.edit("`calculating upload speed...`")
+    await kaleido.edit("`calculating upload speed...`")
     speed.upload()
 
-    await hell.edit("`finising up...`")
+    await kaleido.edit("`finising up...`")
     speed.results.share()
     result = speed.results.dict()
 
@@ -231,42 +231,42 @@ async def speed_test(_, message: Message):
             result["server"]["sponsor"],
         )
     )
-    await hell.delete()
+    await kaleido.delete()
 
 
 HelpMenu("eval").add(
     "eval",
     "<python code>",
-    "Execute the python code and get results.",
+    "Execute arbitrary Python code on the server and return the output. The 'client' and 'message' objects are available inside the code.",
     "eval print('hello world')",
-    "Use this command with caution! Using this command senselessly and getting yourself in trouble is not Zelretch's responsibility!"
+    "Use with extreme caution. Executing untrusted code can compromise the server and your Telegram account. The Zelretch project is not responsible for any damage caused by misuse of this command.",
 ).add(
     "exec",
     "<linux command>",
-    "Execute the linux command and get results.",
+    "Run a Linux shell command on the server and return its stdout and stderr.",
     "exec ls -a",
-    "Use this command with caution! Using this command senselessly and getting yourself in trouble is not Zelretch's responsibility!"
+    "Use with extreme caution — this grants full shell access to the server running the bot.",
 ).add(
     "shell",
     "<shell script>",
-    "Execute the shell script and get results.",
+    "Execute a shell script (with shell expansion enabled) and return the combined stdout and stderr output.",
     "shell echo hello world",
-    "Use this command with caution! Using this command senselessly and getting yourself in trouble is not Zelretch's responsibility!"
+    "Use with extreme caution — shell=True is used, so shell injection is possible.",
 ).add(
     "fext",
-    "<file extention>",
-    "Get the details of the file extention.",
+    "<file extension>",
+    "Look up the description and typical use of a file extension via fileext.com.",
     "fext py",
 ).add(
     "pypi",
     "<package name>",
-    "Get the details of the package from pypi.",
+    "Fetch the version, summary, and project URL of a Python package from PyPI.",
     "pypi kurigram",
 ).add(
     "speedtest",
     None,
-    "Test the speed of server and client.",
+    "Run a full network speed test (download, upload, and ping) on the server and share the result image.",
     "speedtest",
 ).info(
-    "Execute python, linux and shell scripts."
+    "Developer and server tools — run Python, shell commands, look up file extensions, query PyPI, and test network speed."
 ).done()

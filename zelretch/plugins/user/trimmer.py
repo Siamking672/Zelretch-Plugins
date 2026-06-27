@@ -1,7 +1,7 @@
 import os
 import time
 
-from pyrogram.types import Message
+from kurigram.types import Message
 
 from zelretch.functions.formatter import readable_time
 from zelretch.functions.runtime import progress, runcmd
@@ -30,15 +30,15 @@ async def videotrim(_, message: Message):
         end = message.command[2].strip()
 
     dl_start = time.time()
-    hell = await zelretch.edit(message, "Downloading...")
+    kaleido = await zelretch.edit(message, "Downloading...")
     file = await message.reply_to_message.download(
         Config.DWL_DIR,
         progress=progress,
-        progress_args=(hell, dl_start, "⬇️ Downloading..."),
+        progress_args=(kaleido, dl_start, "⬇️ Downloading..."),
     )
 
     dl_time = readable_time(int(time.time() - dl_start))
-    await hell.edit(f"**Downloaded in {dl_time}!** __Starting to trim video...__")
+    await kaleido.edit(f"**Downloaded in {dl_time}!** __Starting to trim video...__")
 
     if end:
         file_name = os.path.join(Config.TEMP_DIR, f"trim_{int(time.time())}.mp4")
@@ -51,19 +51,19 @@ async def videotrim(_, message: Message):
 
     _, err, _, _ = await runcmd(cmd)
     if not os.path.lexists(file_name):
-        return await zelretch.error(hell, f"**Error:** `{err}`")
+        return await zelretch.error(kaleido, f"**Error:** `{err}`")
 
     ul_start = time.time()
-    await hell.edit("**Trimmed!** __Uploading now...__")
+    await kaleido.edit("**Trimmed!** __Uploading now...__")
     await message.reply_document(
         file_name,
         caption=caption,
         progress=progress,
-        progress_args=(hell, ul_start, "**Trimmed!** __Uploading now...__"),
+        progress_args=(kaleido, ul_start, "**Trimmed!** __Uploading now...__"),
     )
 
     await zelretch.delete(
-        hell,
+        kaleido,
         f"**Trimmed!** __Uploaded in {readable_time(int(time.time() - ul_start))}!__",
     )
 
@@ -91,15 +91,15 @@ async def audiotrim(_, message: Message):
     end = message.command[2].strip()
 
     dl_start = time.time()
-    hell = await zelretch.edit(message, "Downloading...")
+    kaleido = await zelretch.edit(message, "Downloading...")
     file = await message.reply_to_message.download(
         Config.DWL_DIR,
         progress=progress,
-        progress_args=(hell, dl_start, "⬇️ Downloading..."),
+        progress_args=(kaleido, dl_start, "⬇️ Downloading..."),
     )
 
     dl_time = readable_time(int(time.time() - dl_start))
-    await hell.edit(f"**Downloaded in {dl_time}!** __Starting to trim audio...__")
+    await kaleido.edit(f"**Downloaded in {dl_time}!** __Starting to trim audio...__")
 
     file_name = os.path.join(Config.TEMP_DIR, f"trim_{int(time.time())}.mp3")
     cmd = f"ffmpeg -i {file} -ss {start} -to {end} -async 1 -strict -2 {file_name}"
@@ -109,19 +109,19 @@ async def audiotrim(_, message: Message):
 
     out, err, _, _ = await runcmd(cmd)
     if not os.path.lexists(file_name):
-        return await zelretch.error(hell, f"**Error:** `{err}`")
+        return await zelretch.error(kaleido, f"**Error:** `{err}`")
 
     ul_start = time.time()
-    await hell.edit("**Trimmed!** __Uploading now...__")
+    await kaleido.edit("**Trimmed!** __Uploading now...__")
     await message.reply_audio(
         file_name,
         caption=caption,
         progress=progress,
-        progress_args=(hell, ul_start, "**Trimmed!** __Uploading now...__"),
+        progress_args=(kaleido, ul_start, "**Trimmed!** __Uploading now...__"),
     )
 
     await zelretch.delete(
-        hell,
+        kaleido,
         f"**Trimmed!** __Uploaded in {readable_time(int(time.time() - ul_start))}!__",
     )
 
@@ -131,16 +131,16 @@ async def audiotrim(_, message: Message):
 
 HelpMenu("trimmer").add(
     "vtrim",
-    "<start> <end (optional)>",
-    "Trim a video from <start> to <end>.",
+    "<reply to video> <start timestamp> <end timestamp (optional)>",
+    "Cut the replied video down to the segment between the start and end timestamps using ffmpeg.",
     "vtrim 2:39 3:00",
-    "If only one timestamp is provided, it will take a screenshot of that frame.",
+    "If only a start timestamp is provided, a single screenshot of that frame is captured instead of a trimmed clip.",
 ).add(
     "atrim",
-    "<start> <end>",
-    "Trim an audio from <start> to <end>.",
+    "<reply to audio> <start timestamp> <end timestamp>",
+    "Cut the replied audio file down to the segment between the start and end timestamps using ffmpeg.",
     "atrim 2:39 3:00",
-    "Start and end time must be provided.",
+    "Both start and end timestamps are required.",
 ).info(
-    "Trim Audio & Video"
+    "Media trimming — cut video or audio clips to a specific time range, or capture a single video frame as a screenshot."
 ).done()

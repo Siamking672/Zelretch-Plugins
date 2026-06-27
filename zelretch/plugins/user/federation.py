@@ -1,7 +1,7 @@
 import re
 
-from pyrogram import Client
-from pyrogram.types import Message
+from kurigram import Client
+from kurigram.types import Message
 
 from . import HelpMenu, Symbols, handler, zelretch, on_message
 
@@ -15,7 +15,7 @@ async def newfed(client: Client, message: Message):
     await client.unblock_user(bot_un)
 
     fedname = await zelretch.input(message)
-    hell = await zelretch.edit(message, f"__Creating new federation__ **{fedname}**")
+    kaleido = await zelretch.edit(message, f"__Creating new federation__ **{fedname}**")
 
     extract_fedid = (
         lambda text: re.search(r"FedID: (\S+)", text).group(1)
@@ -26,14 +26,14 @@ async def newfed(client: Client, message: Message):
     try:
         msg1 = await client.ask(bot_un, f"/newfed {fedname}", timeout=60)
     except Exception as e:
-        return await zelretch.error(hell, f"`{e}`")
+        return await zelretch.error(kaleido, f"`{e}`")
 
     if "created new federation" in msg1.text.lower():
-        await hell.edit(
+        await kaleido.edit(
             f"**𝖭𝖾𝗐 𝖥𝖾𝖽𝖾𝗋𝖺𝗍𝗂𝗈𝗇 𝖼𝗋𝖾𝖺𝗍𝖾𝖽 𝗈𝗇 {bot_un}:** `{fedname}` \n**𝖥𝖾𝖽𝖨𝖽:** `{extract_fedid(msg1.text)[:-1]}`"
         )
     else:
-        await zelretch.delete(hell, f"**Failed to create federation!**\n\n`{msg1.text}`")
+        await zelretch.delete(kaleido, f"**Failed to create federation!**\n\n`{msg1.text}`")
 
     try:
         await msg1.request.delete()
@@ -51,17 +51,17 @@ async def renamefed(client: Client, message: Message):
     await client.unblock_user(bot_un)
 
     fedname = await zelretch.input(message)
-    hell = await zelretch.edit(message, f"__Renaming federation to__ **{fedname}**")
+    kaleido = await zelretch.edit(message, f"__Renaming federation to__ **{fedname}**")
 
     try:
         msg1 = await client.ask(bot_un, f"/renamefed {fedname}", timeout=60)
     except Exception as e:
-        return await zelretch.error(hell, f"`{e}`")
+        return await zelretch.error(kaleido, f"`{e}`")
 
     if "renamed your federation from" in msg1.text.lower():
-        await hell.edit(f"**𝖥𝖾𝖽𝖾𝗋𝖺𝗍𝗂𝗈𝗇 𝗋𝖾𝗇𝖺𝗆𝖾𝖽 𝗍𝗈** `{fedname}`")
+        await kaleido.edit(f"**𝖥𝖾𝖽𝖾𝗋𝖺𝗍𝗂𝗈𝗇 𝗋𝖾𝗇𝖺𝗆𝖾𝖽 𝗍𝗈** `{fedname}`")
     else:
-        await zelretch.delete(hell, f"**Failed to rename federation!**\n\n`{msg1.text}`")
+        await zelretch.delete(kaleido, f"**Failed to rename federation!**\n\n`{msg1.text}`")
 
     try:
         await msg1.request.delete()
@@ -81,12 +81,12 @@ async def fedinfo(client: Client, message: Message):
     await client.unblock_user(bot_un)
 
     get_value = lambda pattern: pattern.group(1) if pattern else None
-    hell = await zelretch.edit(message, "__Fetching federation info__")
+    kaleido = await zelretch.edit(message, "__Fetching federation info__")
 
     try:
         msg1 = await client.ask(bot_un, f"/fedinfo {fedid}", timeout=60)
     except Exception as e:
-        return await zelretch.error(hell, f"`{e}`")
+        return await zelretch.error(kaleido, f"`{e}`")
 
     if "fed info" in msg1.text.lower():
         fedid, name, creator, admins, bans, connected_chats, subscribed_feds = map(
@@ -102,7 +102,7 @@ async def fedinfo(client: Client, message: Message):
             ),
         )
 
-        await hell.edit(
+        await kaleido.edit(
             f"**{Symbols.anchor} 𝖥𝖾𝖽𝖨𝖽:** `{fedid}`\n"
             f"**{Symbols.anchor} 𝖭𝖺𝗆𝖾:** `{name}`\n"
             f"**{Symbols.anchor} 𝖢𝗋𝖾𝖺𝗍𝗈𝗋:** {creator}\n"
@@ -112,7 +112,7 @@ async def fedinfo(client: Client, message: Message):
             f"**{Symbols.anchor} 𝖲𝗎𝖻𝗌𝖼𝗋𝗂𝖻𝖾𝖽 𝖥𝖾𝖽𝖲:** `{subscribed_feds}`\n"
         )
     else:
-        await zelretch.delete(hell, f"**Failed to fetch federation info!**\n\n`{msg1.text}`")
+        await zelretch.delete(kaleido, f"**Failed to fetch federation info!**\n\n`{msg1.text}`")
 
     try:
         await msg1.request.delete()
@@ -122,11 +122,20 @@ async def fedinfo(client: Client, message: Message):
 
 
 HelpMenu("federation").add(
-    "newfed", "<name>", "Create a new federation on Rose Bot.", "newfed Example Name",  
+    "newfed",
+    "<name>",
+    "Create a new federation on MissRose Bot. Federations let you ban a user across multiple chats at once via Rose.",
+    "newfed Workshop Alliance",
 ).add(
-    "renamefed", "<name>", "Rename your federation on Rose Bot.", "renamefed Example Name",
+    "renamefed",
+    "<name>",
+    "Rename an existing federation you own on MissRose Bot.",
+    "renamefed Workshop Alliance v2",
 ).add(
-    "fedinfo", "<fedid>", "Get info about a federation on Rose Bot.", "fedinfo fed-id",
+    "fedinfo",
+    "<fed id (optional)>",
+    "Show information about a federation on MissRose Bot. Omit the ID to view your own federation.",
+    "fedinfo fed-id",
 ).info(
-    "MissRose Federation"
+    "Manage MissRose Bot federations — cross-chat ban networks controlled via the userbot."
 ).done()

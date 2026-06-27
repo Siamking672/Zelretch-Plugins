@@ -3,8 +3,8 @@ import os
 import time
 
 import requests
-from pyrogram import Client
-from pyrogram.types import Message
+from kurigram import Client
+from kurigram.types import Message
 
 from . import HelpMenu, zelretch, on_message
 
@@ -66,11 +66,11 @@ async def quotely(client: Client, message: Message):
     if len(message.command) > 1:
         cmd = message.command[1].lower()
 
-    hell = await zelretch.edit(message, "__Generating quote...__")
+    kaleido = await zelretch.edit(message, "__Generating quote...__")
 
     msg_data = []
     if cmd and cmd == "r":
-        await hell.edit("__Generating quote with reply...__")
+        await kaleido.edit("__Generating quote with reply...__")
         reply_msg_id = message.reply_to_message.reply_to_message_id
         if reply_msg_id:
             reply_msg = await client.get_messages(message.chat.id, reply_msg_id)
@@ -119,22 +119,22 @@ async def quotely(client: Client, message: Message):
         return await zelretch.error(message, f"`{path}`")
 
     await message.reply_sticker(path)
-    await hell.delete()
+    await kaleido.delete()
     os.remove(path)
 
 
 HelpMenu("quote").add(
     "q",
-    "<reply>",
-    "Generate a quote sticker of the replied message.",
+    "<reply to message>",
+    "Render the replied message as a stylised quote sticker image using the Quotly API.",
     "q",
-    "An alias of 'ss' can also be used.",
+    "Alias 'ss' can also be used.",
 ).add(
     "q r",
-    "<reply>",
-    "Generate a quote sticker of the replied message with it's reply message.",
+    "<reply to message>",
+    "Render the replied message together with its quoted reply as a combined quote sticker, preserving the reply chain.",
     "q r",
-    "An alias of 'ss r' can also be used.",
+    "Alias 'ss r' can also be used.",
 ).info(
-    "Quotely Module"
+    "Generate shareable quote stickers from messages via the Quotly API."
 ).done()

@@ -1,7 +1,7 @@
 import datetime
 
-from pyrogram import Client, filters
-from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
+from kurigram import Client, filters
+from kurigram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 
 from zelretch.core import ENV, LOGS
 

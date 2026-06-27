@@ -6,9 +6,9 @@ import sys
 from pathlib import Path
 
 import pyroaddon  # pylint: disable=unused-import
-from pyrogram import Client
-from pyrogram.enums import ParseMode
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from kurigram import Client
+from kurigram.enums import ParseMode
+from kurigram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from .config import ENV, Config, Symbols
 from .database import db

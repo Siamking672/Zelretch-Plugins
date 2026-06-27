@@ -1,10 +1,10 @@
 import asyncio
 import datetime
 
-from pyrogram import Client, filters
-from pyrogram.enums import ChatType, ChatMemberStatus as CMS
-from pyrogram.errors import FloodWait
-from pyrogram.types import ChatMemberUpdated, ChatPermissions, ChatPrivileges, Message
+from kurigram import Client, filters
+from kurigram.enums import ChatType, ChatMemberStatus as CMS
+from kurigram.errors import FloodWait
+from kurigram.types import ChatMemberUpdated, ChatPermissions, ChatPrivileges, Message
 
 from zelretch.functions.templates import gban_templates
 
@@ -48,7 +48,7 @@ async def globalpromote(client: Client, message: Message):
 
     success = 0
     failed = 0
-    hell = await zelretch.edit(message, f"Gpromote initiated on {user.mention}...")
+    kaleido = await zelretch.edit(message, f"Gpromote initiated on {user.mention}...")
 
     async for dialog in client.get_dialogs:
         if dialog.chat.type in [
@@ -60,17 +60,17 @@ async def globalpromote(client: Client, message: Message):
                 await dialog.chat.promote_member(user.id, privileges)
                 success += 1
             except FloodWait as e:
-                await hell.edit(
+                await kaleido.edit(
                     f"Gpromote initiated on {user.mention}...\nSleeping for {e.x} seconds due to floodwait..."
                 )
                 await asyncio.sleep(e.x)
                 await dialog.chat.ban_member(user.id)
                 success += 1
-                await hell.edit(f"Gpromote initiated on {user.mention}...")
+                await kaleido.edit(f"Gpromote initiated on {user.mention}...")
             except BaseException:
                 failed += 1
 
-    await hell.edit(
+    await kaleido.edit(
         await gban_templates(
             gtype="𝖦-𝖯𝗋𝗈𝗆𝗈𝗍𝖾",
             name=user.mention,
@@ -123,7 +123,7 @@ async def globaldemote(client: Client, message: Message):
 
     success = 0
     failed = 0
-    hell = await zelretch.edit(message, f"Gdemote initiated on {user.mention}...")
+    kaleido = await zelretch.edit(message, f"Gdemote initiated on {user.mention}...")
 
     async for dialog in client.get_dialogs:
         if dialog.chat.type in [
@@ -135,17 +135,17 @@ async def globaldemote(client: Client, message: Message):
                 await dialog.chat.promote_member(user.id, privileges)
                 success += 1
             except FloodWait as e:
-                await hell.edit(
+                await kaleido.edit(
                     f"Gdemote initiated on {user.mention}...\nSleeping for {e.x} seconds due to floodwait..."
                 )
                 await asyncio.sleep(e.x)
                 await dialog.chat.ban_member(user.id)
                 success += 1
-                await hell.edit(f"Gdemote initiated on {user.mention}...")
+                await kaleido.edit(f"Gdemote initiated on {user.mention}...")
             except BaseException:
                 failed += 1
 
-    await hell.edit(
+    await kaleido.edit(
         await gban_templates(
             gtype="𝖦-𝖣𝖾𝗆𝗈𝗍𝖾",
             name=user.mention,
@@ -195,7 +195,7 @@ async def globalban(client: Client, message: Message):
 
     success = 0
     failed = 0
-    hell = await zelretch.edit(message, f"Gban initiated on {user.mention}...")
+    kaleido = await zelretch.edit(message, f"Gban initiated on {user.mention}...")
 
     await db.add_gban(user.id, reason)
     Config.BANNED_USERS.add(user.id)
@@ -210,17 +210,17 @@ async def globalban(client: Client, message: Message):
                 await dialog.chat.ban_member(user.id)
                 success += 1
             except FloodWait as e:
-                await hell.edit(
+                await kaleido.edit(
                     f"Gban initiated on {user.mention}...\nSleeping for {e.x} seconds due to floodwait..."
                 )
                 await asyncio.sleep(e.x)
                 await dialog.chat.ban_member(user.id)
                 success += 1
-                await hell.edit(f"Gban initiated on {user.mention}...")
+                await kaleido.edit(f"Gban initiated on {user.mention}...")
             except BaseException:
                 failed += 1
 
-    await hell.edit(
+    await kaleido.edit(
         await gban_templates(
             gtype="𝖦-𝖡𝖺𝗇",
             name=user.mention,
@@ -319,7 +319,7 @@ async def globalkick(client: Client, message: Message):
 
     success = 0
     failed = 0
-    hell = await zelretch.edit(message, f"Gkick initiated on {user.mention}...")
+    kaleido = await zelretch.edit(message, f"Gkick initiated on {user.mention}...")
 
     async for dialog in client.get_dialogs():
         if dialog.chat.type in [
@@ -333,7 +333,7 @@ async def globalkick(client: Client, message: Message):
                 )
                 success += 1
             except FloodWait as e:
-                await hell.edit(
+                await kaleido.edit(
                     f"Gkick initiated on {user.mention}...\nSleeping for {e.x} seconds due to floodwait..."
                 )
                 await asyncio.sleep(e.x)
@@ -341,11 +341,11 @@ async def globalkick(client: Client, message: Message):
                     user.id, datetime.datetime.now() + datetime.timedelta(seconds=35)
                 )
                 success += 1
-                await hell.edit(f"Gkick initiated on {user.mention}...")
+                await kaleido.edit(f"Gkick initiated on {user.mention}...")
             except BaseException:
                 failed += 1
 
-    await hell.edit(
+    await kaleido.edit(
         await gban_templates(
             gtype="𝖦-𝖪𝗂𝖼𝗄",
             name=user.mention,
@@ -396,7 +396,7 @@ async def globalmute(client: Client, message: Message):
     permissions = ChatPermissions(can_send_messages=False)
     success = 0
     failed = 0
-    hell = await zelretch.edit(message, f"Gmute initiated on {user.mention}...")
+    kaleido = await zelretch.edit(message, f"Gmute initiated on {user.mention}...")
 
     await db.add_gmute(user.id, reason)
     Config.MUTED_USERS.add(user.id)
@@ -411,17 +411,17 @@ async def globalmute(client: Client, message: Message):
                 await dialog.chat.restrict_member(user.id, permissions)
                 success += 1
             except FloodWait as e:
-                await hell.edit(
+                await kaleido.edit(
                     f"Gmute initiated on {user.mention}...\nSleeping for {e.x} seconds due to floodwait..."
                 )
                 await asyncio.sleep(e.x)
                 await dialog.chat.restrict_member(user.id, permissions)
                 success += 1
-                await hell.edit(f"Gmute initiated on {user.mention}...")
+                await kaleido.edit(f"Gmute initiated on {user.mention}...")
             except BaseException:
                 failed += 1
 
-    await hell.edit(
+    await kaleido.edit(
         await gban_templates(
             gtype="𝖦-𝖬𝗎𝗍𝖾",
             name=user.mention,
@@ -491,13 +491,13 @@ async def gbanlist(_, message: Message):
     if not gban_users:
         return await zelretch.delete(message, "No gbanned users.")
 
-    hell = await zelretch.edit(message, "Fetching gbanned users...")
+    kaleido = await zelretch.edit(message, "Fetching gbanned users...")
     text = f"**💥 𝖦𝖻𝖺𝗇𝗇𝖾𝖽 𝖴𝗌𝖾𝗋𝗌:** __{len(gban_users)}__\n\n"
 
     for user in gban_users:
         text += f"{Symbols.bullet} `{user['user_id']}` | __{user['reason']}__\n\n"
 
-    await hell.edit(text)
+    await kaleido.edit(text)
 
 
 @on_message("gmutelist", allow_master=True)
@@ -506,13 +506,13 @@ async def gmutelist(_, message: Message):
     if not gmute_users:
         return await zelretch.delete(message, "No gmuted users.")
 
-    hell = await zelretch.edit(message, "Fetching gmuted users...")
+    kaleido = await zelretch.edit(message, "Fetching gmuted users...")
     text = f"**😶 𝖦𝗆𝗎𝗍𝖾𝖽 𝖴𝗌𝖾𝗋𝗌:** __{len(gmute_users)}__\n\n"
 
     for user in gmute_users:
         text += f"{Symbols.bullet} `{user['user_id']}` | __{user['reason']}__\n\n"
 
-    await hell.edit(text)
+    await kaleido.edit(text)
 
 
 @Client.on_chat_member_updated()
@@ -537,43 +537,49 @@ async def globalbanwatcher(_, u: ChatMemberUpdated):
 
 HelpMenu("superpowers").add(
     "gpromote",
-    "<reply/username/id> <reason (optional)>",
-    "Promote a user in all the chats where you have add admin right.",
-    "gpromote @ForGo10God Why not?",
+    "<reply to user> or <username/id> <reason (optional)>",
+    "Promote a user to admin in every chat where the userbot has promote-member permission.",
+    "gpromote @ZelretchUser trusted moderator",
 ).add(
     "gdemote",
-    "<reply/username/id> <reason (optional)>",
-    "Demotes a user in all the chats where you are on top level from the user.",
-    "gdemote @ForGo10God Why?",
+    "<reply to user> or <username/id> <reason (optional)>",
+    "Remove admin privileges from a user in every chat where the userbot has promote-member permission.",
+    "gdemote @ZelretchUser no longer needed",
 ).add(
     "gban",
-    "<reply/username/id> <reason (optional)>",
-    "Ban a user in all the chats where you have ban rights.",
-    "gban @ForGo10God :)",
+    "<reply to user> or <username/id> <reason (optional)>",
+    "Ban a user from every chat where the userbot has ban permission. The ban is recorded so new chats the userbot joins will also apply it.",
+    "gban @ZelretchUser repeated spam",
 ).add(
     "ungban",
-    "<reply/username/id>",
-    "Unban a user in all the chats where you have ban rights.",
-    "ungban @ForGo10God",
+    "<reply to user> or <username/id>",
+    "Lift a global ban. The user is unbanned from every chat where the userbot has ban permission and removed from the gban list.",
+    "ungban @ZelretchUser",
 ).add(
     "gkick",
-    "<reply/username/id> <reason (optional)>",
-    "Kick a user in all the chats where you have ban rights.",
-    "gkick @ForGo10God :)",
+    "<reply to user> or <username/id> <reason (optional)>",
+    "Kick a user from every chat where the userbot has ban permission. The user can rejoin if they have an invite link.",
+    "gkick @ZelretchUser warning issued",
 ).add(
     "gmute",
-    "<reply/username/id> <reason (optional)>",
-    "Mute a user in all the chats where you have mute rights.",
-    "gmute @ForGo10God :)",
+    "<reply to user> or <username/id> <reason (optional)>",
+    "Mute a user in every chat where the userbot has restrict permission. The mute is recorded so new chats the userbot joins will also apply it.",
+    "gmute @ZelretchUser excessive mentions",
 ).add(
     "ungmute",
-    "<reply/username/id>",
-    "Unmute a user in all the chats where you have mute rights.",
-    "ungmute @ForGo10God",
+    "<reply to user> or <username/id>",
+    "Lift a global mute. The user is unmuted in every chat where the userbot has restrict permission and removed from the gmute list.",
+    "ungmute @ZelretchUser",
 ).add(
-    "gbanlist", None, "List all the gbanned users.", "gbanlist"
+    "gbanlist",
+    None,
+    "List every user currently on the global ban list, along with the recorded reason and date.",
+    "gbanlist",
 ).add(
-    "gmutelist", None, "List all the gmuted users.", "gmutelist"
+    "gmutelist",
+    None,
+    "List every user currently on the global mute list, along with the recorded reason and date.",
+    "gmutelist",
 ).info(
-    "Grants you superpowers!"
+    "Global administrative actions — apply a single ban, mute, kick, promote, or demote across every chat the userbot administers."
 ).done()

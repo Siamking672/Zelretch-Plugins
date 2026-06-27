@@ -1,5 +1,5 @@
-from pyrogram.enums import ChatMembersFilter, ChatMemberStatus, ChatType
-from pyrogram.types import Chat
+from kurigram.enums import ChatMembersFilter, ChatMemberStatus, ChatType
+from kurigram.types import Chat
 
 from zelretch.core import zelretch
 

@@ -2,7 +2,7 @@
 
 from math import ceil
 
-from pyrogram.types import InlineKeyboardButton
+from kurigram.types import InlineKeyboardButton
 
 from zelretch.core import ENV, Symbols, db, Config
 

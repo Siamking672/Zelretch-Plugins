@@ -1,7 +1,7 @@
 import os
 
 import psutil
-from pyrogram.types import Message
+from kurigram.types import Message
 
 from zelretch.core.config import all_env, os_configs
 from zelretch.functions.paste import spaceBin
@@ -166,30 +166,34 @@ async def getLogs(_, message: Message):
 
 HelpMenu("manager").add(
     "getvar",
-    "<varname>",
-    "Get value of a variable from env or database.",
-    "getvar handler",
+    "<variable name>",
+    "Read the current value of a configuration variable. Checks the OS environment first, then the database.",
+    "getvar HANDLER",
 ).add(
     "getallvar",
     None,
-    "Get the name of every env and database variable.",
+    "List the name of every configurable variable, grouped by OS environment and database-backed.",
+    "getallvar",
 ).add(
     "setvar",
-    "<varname> <value>",
-    "Set value of a variable in env or database.",
-    "setvar handler !",
+    "<variable name> <value>",
+    "Update a configuration variable. OS-level variables trigger an automatic restart; database variables take effect immediately.",
+    "setvar HANDLER !",
 ).add(
-    "delvar", "<varname>", "Delete a database variable.", "delvar handler"
+    "delvar",
+    "<variable name>",
+    "Delete a database-backed variable. OS environment variables cannot be deleted for safety reasons.",
+    "delvar CUSTOM_PMPERMIT",
 ).add(
     "usage",
     None,
-    "Get disk and RAM usage of the bot server.",
+    "Report the server's current CPU load, RAM usage, and disk consumption.",
     "usage",
 ).add(
     "logs",
-    "<limit>",
-    "Get last 'n' lines of the log file. Default limit is 100.",
-    "logs 69",
+    "<line count (optional)>",
+    "Fetch the last N lines of the bot's log file. Defaults to 100 lines when no count is given.",
+    "logs 50",
 ).info(
-    "Manage your bot configuration and server usage."
+    "Configuration and server management — read, set, and delete variables; monitor CPU, RAM, and disk; and tail the log file."
 ).done()

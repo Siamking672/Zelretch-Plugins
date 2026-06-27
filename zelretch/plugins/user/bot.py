@@ -2,8 +2,8 @@ import os
 import random
 import time
 
-from pyrogram import Client
-from pyrogram.types import Message
+from kurigram import Client
+from kurigram.types import Message
 
 from zelretch import START_TIME
 from zelretch.core import ENV
@@ -16,7 +16,7 @@ from . import Config, HelpMenu, db, zelretch, on_message
 
 @on_message("alive", allow_master=True)
 async def alive(client: Client, message: Message):
-    hell = await zelretch.edit(message, "Charging mana...")
+    kaleido = await zelretch.edit(message, "Charging mana...")
 
     img = await db.get_env(ENV.alive_pic)
     if not img:
@@ -42,7 +42,7 @@ async def alive(client: Client, message: Message):
         await message.reply_video(img, caption=caption)
     else:
         await message.reply_photo(img, caption=caption)
-    await hell.delete()
+    await kaleido.delete()
 
     try:
         os.remove(img)
@@ -53,7 +53,7 @@ async def alive(client: Client, message: Message):
 @on_message("ping", allow_master=True)
 async def ping(client: Client, message: Message):
     start_time = time.time()
-    hell = await zelretch.edit(message, "**Gandr fired...**")
+    kaleido = await zelretch.edit(message, "**Gandr fired...**")
     uptime = readable_time(time.time() - START_TIME)
     img = await db.get_env(ENV.ping_pic)
     end_time = time.time()
@@ -71,9 +71,9 @@ async def ping(client: Client, message: Message):
                 img,
                 caption=caption,
             )
-            await hell.delete()
+            await kaleido.delete()
         return
-    await zelretch.edit(hell, caption, no_link_preview=True)
+    await zelretch.edit(kaleido, caption, no_link_preview=True)
 
 
 @on_message("history", allow_master=True)
@@ -90,16 +90,16 @@ async def history(client: Client, message: Message):
     else:
         user = message.reply_to_message.from_user
 
-    hell = await zelretch.edit(message, "Charging mana...")
+    kaleido = await zelretch.edit(message, "Charging mana...")
 
     try:
         response = await client.ask("@SangMata_BOT", f"{user.id}", timeout=60)
     except Exception as e:
-        return await zelretch.error(hell, f"`{str(e)}`")
+        return await zelretch.error(kaleido, f"`{str(e)}`")
 
     if "you have used up your quota for today" in response.text:
         return await zelretch.delete(
-            hell,
+            kaleido,
             f"Your quota of using SangMata Bot is over. Wait till 00:00 UTC before using it again.",
         )
 
@@ -109,7 +109,7 @@ async def history(client: Client, message: Message):
     except:
         pass
 
-    await zelretch.edit(hell, response.text)
+    await zelretch.edit(kaleido, response.text)
 
 
 @on_message("template", allow_master=True)
@@ -138,27 +138,27 @@ async def template_example(_, message: Message):
 HelpMenu("bot").add(
     "alive",
     None,
-    "Show the Rin-themed alive card for Zelretch.",
+    "Display the Rin Tohsaka-themed alive card showing the bot's version, uptime, and bound masters.",
     "alive",
-    "You can also customize alive message with suitable variables for it.",
+    "Customise the picture and text using the 'ALIVE_PIC' and 'ALIVE_TEMPLATE' variables via the setvar command.",
 ).add(
     "ping",
     None,
-    "Fire a Gandr ping and show latency plus uptime.",
+    "Fire a Gandr shot and report the response latency and current uptime.",
     "ping",
-    "You can also customize ping message by adding a media to it.",
+    "Customise the picture and text using the 'PING_PIC' and 'PING_TEMPLATE' variables.",
 ).add(
     "history",
-    "<reply to user>/<username/id>",
-    "Get the username, name history of an user.",
-    "history @ForGo10_God",
-    "This command uses SangMata Bot to get the history.",
+    "<reply to user> or <username/id>",
+    "Fetch the username and display-name history of a user via the SangMata info bot.",
+    "history @ZelretchUser",
+    "SangMata must be running and reachable for this command to work.",
 ).add(
     "template",
-    "<template name>",
-    "Get the example of a template.",
+    "<template name (optional)>",
+    "Show the layout of a customisable template, or list every available template name when no argument is given.",
     "template alive_templates",
-    "This command is used to get the example of a template and a list of customisable templates.",
+    "Use this to preview the placeholders you can use with the setvar command.",
 ).info(
-    "Kaleidoscope Core"
+    "Core Kaleidoscope commands — status, latency, user history, and template preview."
 ).done()

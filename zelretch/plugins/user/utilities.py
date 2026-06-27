@@ -1,7 +1,7 @@
 import os
 
 import requests
-from pyrogram.types import Message
+from kurigram.types import Message
 
 from zelretch.core import ENV
 from zelretch.functions.images import remove_bg
@@ -46,7 +46,7 @@ async def removeBg(_, message: Message):
             message, "Reply to an image or give the url to remove background."
         )
 
-    hell = await zelretch.edit(message, "Removing background...")
+    kaleido = await zelretch.edit(message, "Removing background...")
 
     try:
         removed_img = await remove_bg(api_key, filename)
@@ -59,11 +59,11 @@ async def removeBg(_, message: Message):
         os.remove(filename)
         os.remove(removed_img)
     except Exception as e:
-        await zelretch.error(hell, f"`{e}`")
+        await zelretch.error(kaleido, f"`{e}`")
 
 @on_message("paste", allow_master=True)
 async def paste_text(_, message: Message):
-    hell = await zelretch.edit(message, "Pasting text...")
+    kaleido = await zelretch.edit(message, "Pasting text...")
     text_to_paste = ""
     extention = "none"
 
@@ -81,24 +81,24 @@ async def paste_text(_, message: Message):
         return await zelretch.delete(message, "Reply to a text to paste it.")
 
     try:
-        await hell.edit(
+        await kaleido.edit(
             f"**📝 Pasted to:** {spaceBin(text_to_paste, extention)}",
             disable_web_page_preview=True,
         )
     except Exception as e:
-        await zelretch.error(hell, f"`{e}`")
+        await zelretch.error(kaleido, f"`{e}`")
 
 HelpMenu("utilities").add(
     "removebg",
     "<reply to image> or <image url>",
-    "Remove the background of the image and send it as a document. You will need to setup Remove BG Api key.",
-    "removebg https://example.com/image.png",
-    "An alias of 'rmbg' is also available.\nNeed to setup Remove BG Api key from https://www.remove.bg/api",
+    "Remove the background from an image using the remove.bg API and upload the transparent PNG as a document, followed by a preview photo.",
+    "removebg https://example.com/photo.png",
+    "Alias 'rmbg' can also be used. Requires the REMOVE_BG_API variable — get a free key from https://www.remove.bg/api.",
 ).add(
     "paste",
     "<reply to message> or <text>",
-    "Paste the text to spaceb.in and send the link.",
+    "Upload text to spaceb.in (or a fallback pastebin) and return a shareable URL. Accepts inline text, a reply to a text message, or a reply to a text file.",
     "paste",
 ).info(
-    "Some utilities command!"
+    "Miscellaneous utilities — AI background removal and quick text pasting for code or notes."
 ).done()

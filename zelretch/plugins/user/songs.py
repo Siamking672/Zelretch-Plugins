@@ -1,6 +1,6 @@
 from lyricsgenius import Genius
-from pyrogram.errors import MessageTooLong
-from pyrogram.types import Message
+from kurigram.errors import MessageTooLong
+from kurigram.types import Message
 
 from zelretch.core import ENV
 from zelretch.functions.paste import post_to_telegraph
@@ -23,7 +23,7 @@ async def getlyrics(_, message: Message):
     else:
         artist, song = "", query
 
-    hell = await zelretch.edit(message, f"🔎 __𝖫𝗒𝗋𝗂𝖼𝗌 𝖲𝗈𝗇𝗀__ `{query}`...")
+    kaleido = await zelretch.edit(message, f"🔎 __𝖫𝗒𝗋𝗂𝖼𝗌 𝖲𝗈𝗇𝗀__ `{query}`...")
 
     genius = Genius(
         api,
@@ -35,7 +35,7 @@ async def getlyrics(_, message: Message):
 
     song = genius.search_song(song, artist)
     if not song:
-        return await zelretch.delete(hell, "No results found.")
+        return await zelretch.delete(kaleido, "No results found.")
 
     title = song.full_title
     image = song.song_art_image_url
@@ -44,11 +44,11 @@ async def getlyrics(_, message: Message):
 
     outStr = f"<b>{Symbols.anchor} Title:</b> <code>{title}</code>\n<b>{Symbols.anchor} Artist:</b> <code>{artist}</code>\n\n<code>{lyrics}</code>"
     try:
-        await hell.edit(outStr, disable_web_page_preview=True)
+        await kaleido.edit(outStr, disable_web_page_preview=True)
     except MessageTooLong:
         content = f"<img src='{image}'/>\n\n{outStr}"
         url = post_to_telegraph(title, content)
-        await hell.edit(
+        await kaleido.edit(
             f"**{Symbols.anchor} Title:** `{title}`\n**{Symbols.anchor} Artist:** `{artist}`\n\n**{Symbols.anchor} Lyrics:** [Click Here]({url})",
             disable_web_page_preview=True,
         )
@@ -56,10 +56,10 @@ async def getlyrics(_, message: Message):
 
 HelpMenu("lyrics").add(
     "lyrics",
-    "<song name>",
-    "Get the lyrics of the given song! Give artist name after - to get accurate results.",
+    "<song name> - <artist name (optional)>",
+    "Fetch the full lyrics of a song from Genius. Append the artist name after a dash for more accurate matching.",
     "lyrics believer - imagine dragons",
-    "Need to setup Lyrics Api key from https://genius.com/developers",
+    "Requires the LYRICS_API variable. Get a free API key from https://genius.com/developers.",
 ).info(
-    "Lyrics lookup"
+    "Song lyrics lookup powered by the Genius API."
 ).done()

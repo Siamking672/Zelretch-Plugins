@@ -1,9 +1,9 @@
 import asyncio
 import re
 
-from pyrogram import Client, filters
-from pyrogram.enums import MessageMediaType
-from pyrogram.types import Message
+from kurigram import Client, filters
+from kurigram.enums import MessageMediaType
+from kurigram.types import Message
 
 from . import HelpMenu, custom_handler, db, handler, zelretch, on_message, Config
 
@@ -16,11 +16,11 @@ async def set_filter(client: Client, message: Message):
         )
 
     keyword = await zelretch.input(message)
-    hell = await zelretch.edit(message, f"Saving filter `{keyword}`")
+    kaleido = await zelretch.edit(message, f"Saving filter `{keyword}`")
     msg = await message.reply_to_message.forward(Config.LOGGER_ID)
 
     await db.set_filter(client.me.id, message.chat.id, keyword.lower(), msg.id)
-    await zelretch.delete(hell, f"**🍀 𝖭𝖾𝗐 𝖥𝗂𝗅𝗍𝖾𝗋 𝖲𝖺𝗏𝖾𝖽:** `{keyword}`")
+    await zelretch.delete(kaleido, f"**🍀 𝖭𝖾𝗐 𝖥𝗂𝗅𝗍𝖾𝗋 𝖲𝖺𝗏𝖾𝖽:** `{keyword}`")
     await msg.reply_text(
         f"**🍀 𝖭𝖾𝗐 𝖥𝗂𝗅𝗍𝖾𝗋 𝖲𝖺𝗏𝖾𝖽:** `{keyword}`\n\n**DO NOT DELETE THIS MESSAGE!!!**",
     )
@@ -33,25 +33,25 @@ async def rmfilter(client: Client, message: Message):
             return await zelretch.delete(message, "Give a filter name to remove.")
 
         keyword = await zelretch.input(message)
-        hell = await zelretch.edit(message, f"Removing filter `{keyword}`")
+        kaleido = await zelretch.edit(message, f"Removing filter `{keyword}`")
 
         if await db.is_filter(client.me.id, message.chat.id, keyword.lower()):
             await db.rm_filter(client.me.id, message.chat.id, keyword.lower())
-            await zelretch.delete(hell, f"**🍀 𝖥𝗂𝗅𝗍𝖾𝗋 𝖱𝖾𝗆𝗈𝗏𝖾𝖽:** `{keyword}`")
+            await zelretch.delete(kaleido, f"**🍀 𝖥𝗂𝗅𝗍𝖾𝗋 𝖱𝖾𝗆𝗈𝗏𝖾𝖽:** `{keyword}`")
         else:
-            await zelretch.delete(hell, f"**🍀 𝖥𝗂𝗅𝗍𝖾𝗋 𝖽𝗈𝖾𝗌 𝗇𝗈𝗍 𝖾𝗑𝗂𝗌𝗍𝗌:** `{keyword}`")
+            await zelretch.delete(kaleido, f"**🍀 𝖥𝗂𝗅𝗍𝖾𝗋 𝖽𝗈𝖾𝗌 𝗇𝗈𝗍 𝖾𝗑𝗂𝗌𝗍𝗌:** `{keyword}`")
     else:
-        hell = await zelretch.edit(message, "Removing all filters...")
+        kaleido = await zelretch.edit(message, "Removing all filters...")
 
         await db.rm_all_filters(client.me.id, message.chat.id)
-        await zelretch.delete(hell, "All filters have been removed.")
+        await zelretch.delete(kaleido, "All filters have been removed.")
 
 
 @on_message(["getfilter", "getfilters"], allow_master=True)
 async def allfilters(client: Client, message: Message):
     if len(message.command) > 1:
         keyword = await zelretch.input(message)
-        hell = await zelretch.edit(message, f"Getting filter `{keyword}`")
+        kaleido = await zelretch.edit(message, f"Getting filter `{keyword}`")
 
         if await db.is_filter(client.me.id, message.chat.id, keyword.lower()):
             data = await db.get_filter(client.me.id, message.chat.id, keyword.lower())
@@ -59,13 +59,13 @@ async def allfilters(client: Client, message: Message):
             sent = await client.copy_message(message.chat.id, Config.LOGGER_ID, msgid)
 
             await sent.reply_text(f"**🍀 𝖥𝗂𝗅𝗍𝖾𝗋:** `{keyword}`")
-            await hell.delete()
+            await kaleido.delete()
 
         else:
-            await zelretch.delete(hell, f"**🍀 𝖥𝗂𝗅𝗍𝖾𝗋 𝖽𝗈𝖾𝗌 𝗇𝗈𝗍 𝖾𝗑𝗂𝗌𝗍𝗌:** `{keyword}`")
+            await zelretch.delete(kaleido, f"**🍀 𝖥𝗂𝗅𝗍𝖾𝗋 𝖽𝗈𝖾𝗌 𝗇𝗈𝗍 𝖾𝗑𝗂𝗌𝗍𝗌:** `{keyword}`")
 
     else:
-        hell = await zelretch.edit(message, "Getting all filters...")
+        kaleido = await zelretch.edit(message, "Getting all filters...")
         filters = await db.get_all_filters(client.me.id, message.chat.id)
 
         if filters:
@@ -74,10 +74,10 @@ async def allfilters(client: Client, message: Message):
             for i, filter in enumerate(filters, 1):
                 text += f"** {'0' if i < 10 else ''}{i}:** `{filter['keyword']}`\n"
 
-            await hell.edit(text)
+            await kaleido.edit(text)
 
         else:
-            await zelretch.delete(hell, "No filters in this chat.")
+            await zelretch.delete(kaleido, "No filters in this chat.")
 
 
 @custom_handler(filters.incoming & ~filters.service)
@@ -101,26 +101,29 @@ async def handle_filters(client: Client, message: Message):
 HelpMenu("filters").add(
     "filter",
     "<keyword> <reply to a message>",
-    "Saves the replied message as a filter to given keyword along the command.",
-    "filter zelretch",
-    "You need to reply to the message you want to save as filter. You can also save media as filters alonng with captions.",
+    "Bind a keyword to the replied message. Whenever anyone sends the keyword in this chat, the userbot replies with the saved message.",
+    "filter rules",
+    "Reply to the message you want to save. Text, photos, videos, stickers, and documents with captions are all supported.",
 ).add(
     "rmfilter",
     "<keyword>",
-    "Removes the filter with given keyword.",
-    "rmfilter zelretch",
+    "Remove a single filter by its keyword.",
+    "rmfilter rules",
 ).add(
     "rmallfilter",
     None,
-    "Removes all the filters in current chat.",
+    "Delete every filter configured in the current chat in one go.",
     "rmallfilter",
 ).add(
     "getfilter",
     "<keyword>",
-    "Gives the filter data associated with given keyword.",
-    "getfilter zelretch",
+    "Preview the saved message for a specific filter keyword.",
+    "getfilter rules",
 ).add(
-    "getfilters", None, "Gets all filters in the chat.", "getfilters"
+    "getfilters",
+    None,
+    "List every filter keyword currently active in the chat.",
+    "getfilters",
 ).info(
-    "Filter Module"
+    "Auto-reply filters — when a keyword is mentioned, the bot replies with the saved message."
 ).done()

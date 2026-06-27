@@ -1,6 +1,6 @@
-from pyrogram import Client, filters
-from pyrogram.errors import SessionPasswordNeeded
-from pyrogram.types import (
+from kurigram import Client, filters
+from kurigram.errors import SessionPasswordNeeded
+from kurigram.types import (
     CallbackQuery,
     InlineKeyboardButton,
     InlineKeyboardMarkup,

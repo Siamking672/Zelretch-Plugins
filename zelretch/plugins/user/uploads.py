@@ -1,8 +1,8 @@
 import os
 import time
 
-from pyrogram import Client
-from pyrogram.types import Message
+from kurigram import Client
+from kurigram.types import Message
 
 from zelretch.functions.formatter import readable_time
 from zelretch.functions.runtime import progress
@@ -16,22 +16,22 @@ async def uploadfiles(_, message: Message):
         return await zelretch.delete(message, "Provide a valid file path.")
 
     query = await zelretch.input(message)
-    hell = await zelretch.edit(message, f"**Uploading...** `{query}`")
+    kaleido = await zelretch.edit(message, f"**Uploading...** `{query}`")
 
     if not os.path.exists(query):
-        return await zelretch.error(hell, f"**Error:** `{query}` **not found.**")
+        return await zelretch.error(kaleido, f"**Error:** `{query}` **not found.**")
 
     try:
         ul_start = time.time()
         await message.reply_document(
             query,
             progress=progress,
-            progress_args=(hell, ul_start, f"**Uploading...** `{query}`"),
+            progress_args=(kaleido, ul_start, f"**Uploading...** `{query}`"),
         )
         ul_time = readable_time(int(time.time() - ul_start))
-        await zelretch.delete(hell, f"**Uploaded** `{query}` **in** `{ul_time}`")
+        await zelretch.delete(kaleido, f"**Uploaded** `{query}` **in** `{ul_time}`")
     except Exception as e:
-        return await zelretch.error(hell, f"**Error:** `{e}`")
+        return await zelretch.error(kaleido, f"**Error:** `{e}`")
 
 
 @on_message("uploaddir", allow_master=True)
@@ -40,10 +40,10 @@ async def uploadDir(_, message: Message):
         return await zelretch.delete(message, "Provide a valid directory path.")
 
     query = await zelretch.input(message)
-    hell = await zelretch.edit(message, f"**Uploading...** `{query}`")
+    kaleido = await zelretch.edit(message, f"**Uploading...** `{query}`")
 
     if not os.path.exists(query):
-        return await zelretch.error(hell, f"**Error:** `{query}` **not found.**")
+        return await zelretch.error(kaleido, f"**Error:** `{query}` **not found.**")
 
     files_list = []
     for root, dirs, files in os.walk(query):
@@ -53,7 +53,7 @@ async def uploadDir(_, message: Message):
             files_list.append(os.path.join(root, dir))
 
     uploaded = 0
-    await hell.edit(f"**Uploading...** `{len(files_list)} files...`")
+    await kaleido.edit(f"**Uploading...** `{len(files_list)} files...`")
 
     ul_start = time.time()
     for file in files_list:
@@ -63,30 +63,30 @@ async def uploadDir(_, message: Message):
                 file,
                 caption=f"**📂 File:** `{os.path.basename(file)}`",
                 progress=progress,
-                progress_args=(hell, ul_start_file, f"**Uploading...** `{file}`"),
+                progress_args=(kaleido, ul_start_file, f"**Uploading...** `{file}`"),
             )
             uploaded += 1
         except Exception:
             continue
 
     ul_time = readable_time(int(time.time() - ul_start))
-    await hell.edit(
+    await kaleido.edit(
         f"**Uploaded** `{uploaded}/{len(files_list)}` **files in** `{ul_time}`"
     )
 
 
 HelpMenu("uploads").add(
     "upload",
-    "<filepath>",
-    "Uploads the mentioned file from the local server to current chat.",
-    "upload README.md",
-    "Be cautious while uploading files.",
+    "<server file path>",
+    "Upload a single file from the server's filesystem into the current chat. Useful for fetching logs, downloaded media, or generated files.",
+    "upload /app/.zelretch_plugins/requirements.txt",
+    "Be cautious — only upload files you are comfortable sharing with the chat.",
 ).add(
     "uploaddir",
-    "<dirpath>",
-    "Uploads all the files from the mentioned directory to current chat.",
+    "<server directory path>",
+    "Upload every file inside the specified server directory into the current chat, one by one.",
     "uploaddir ./downloads/",
-    "Be cautious while uploading files.",
+    "Be cautious — large directories will produce many messages and may hit Telegram's rate limits.",
 ).info(
-    "Upload Manager"
+    "Server file uploader — push files from the bot's filesystem directly into Telegram chats."
 ).done()

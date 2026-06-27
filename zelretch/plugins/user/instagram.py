@@ -4,7 +4,7 @@ import shutil
 import time
 
 import requests
-from pyrogram.types import InputMediaPhoto, InputMediaVideo, Message
+from kurigram.types import InputMediaPhoto, InputMediaVideo, Message
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.expected_conditions import (
     presence_of_element_located, visibility_of_element_located)
@@ -31,7 +31,7 @@ async def instagramReels(_, message: Message):
             message, "Give an instagram reels link to download."
         )
 
-    hell = await zelretch.edit(message, "Searching...")
+    kaleido = await zelretch.edit(message, "Searching...")
 
     query = await zelretch.input(message)
     isInstagramLink = lambda link: bool(
@@ -39,12 +39,12 @@ async def instagramReels(_, message: Message):
     )
 
     if not isInstagramLink(query):
-        return await zelretch.error(hell, "Give a valid instagram reels link.")
+        return await zelretch.error(kaleido, "Give a valid instagram reels link.")
 
     try:
         driver, _ = Driver.get()
         if not driver:
-            return await zelretch.error(hell, _)
+            return await zelretch.error(kaleido, _)
 
         driver.get(query)
         wait = WebDriverWait(driver, 10)
@@ -53,27 +53,27 @@ async def instagramReels(_, message: Message):
         driver.quit()
 
         if reels:
-            await hell.edit("Found the reel. **Downloading...**")
+            await kaleido.edit("Found the reel. **Downloading...**")
 
             binary = requests.get(reels).content
             fileName = f"reels_{int(time.time())}.mp4"
             with open(fileName, "wb") as file:
                 file.write(binary)
 
-            await hell.edit("Uploading...")
+            await kaleido.edit("Uploading...")
             await message.reply_video(
                 fileName,
                 caption=f"__💫 Downloaded Instagram Reels!__ \n\n",
             )
-            await hell.delete()
+            await kaleido.delete()
             os.remove(fileName)
         else:
             await zelretch.error(
-                hell,
+                kaleido,
                 "Unable to download the reel. Make sure the link is valid or the reel is not from a private account.",
             )
     except Exception as e:
-        await zelretch.error(hell, f"**Error:** `{e}`")
+        await zelretch.error(kaleido, f"**Error:** `{e}`")
 
 
 @on_message("igpost", allow_master=True)
@@ -81,7 +81,7 @@ async def instagramPost(_, message: Message):
     if len(message.command) < 2:
         return await zelretch.delete(message, "Give an instagram post link to download.")
 
-    hell = await zelretch.edit(message, "Searching...")
+    kaleido = await zelretch.edit(message, "Searching...")
 
     query = await zelretch.input(message)
 
@@ -90,13 +90,13 @@ async def instagramPost(_, message: Message):
     )
 
     if not isInstagramLink(query):
-        return await zelretch.error(hell, "Give a valid instagram post link.")
+        return await zelretch.error(kaleido, "Give a valid instagram post link.")
 
     try:
         posts = INSTAGRAM(query).get_all()
         if type(posts) == str:
             await zelretch.error(
-                hell,
+                kaleido,
                 f"Got an error\n{posts}"
             )
             return
@@ -114,14 +114,14 @@ async def instagramPost(_, message: Message):
             for i in downloaded:
                 all_media.append(InputMediaVideo(i))
 
-        await hell.edit_text("Uploading...")
+        await kaleido.edit_text("Uploading...")
         path = "./scrapped/"
         await message.reply_media_group(all_media)
-        await hell.delete()
+        await kaleido.delete()
         shutil.rmtree(path)
 
     except Exception as e:
-        await zelretch.error(hell, f"`{e}`")
+        await zelretch.error(kaleido, f"`{e}`")
 
 
 
@@ -133,7 +133,7 @@ async def instagramUser(_, message: Message):
     BASE_URL = "https://i.instagram.com/api/v1/users/web_profile_info/"
 
     query = (await zelretch.input(message)).replace("@", "").strip()
-    hell = await zelretch.edit(message, f"**Searching** `{query}` **on instagram**...")
+    kaleido = await zelretch.edit(message, f"**Searching** `{query}` **on instagram**...")
 
     appid, serverid = obtain_ids(query)
 
@@ -163,7 +163,7 @@ async def instagramUser(_, message: Message):
 
         if response["status"] != "ok":
             return await zelretch.error(
-                hell,
+                kaleido,
                 f"**Message:** `{response['message']}`\n**Required Login:** `{response['require_login']}`"
             )
 
@@ -195,27 +195,27 @@ async def instagramUser(_, message: Message):
                 ""
             ),
         )
-        await hell.delete()
+        await kaleido.delete()
         os.remove(profile_pic)
     except Exception as e:
-        return await zelretch.error(hell, f"`{e}`")
+        return await zelretch.error(kaleido, f"`{e}`")
 
 HelpMenu("instagram").add(
     "reels",
-    "<instagram reels link>",
-    "Download instagram reels.",
+    "<instagram reel url>",
+    "Download an Instagram reel and upload the video into the chat.",
     "reels https://www.instagram.com/reel/Cr24EiKNTL7/",
 ).add(
     "igpost",
-    "<instagram post link>",
-    "Download instagram post.",
+    "<instagram post url>",
+    "Download an Instagram post. Supports both single-media and carousel posts — every media item in a carousel is uploaded individually.",
     "igpost https://www.instagram.com/p/C06rAjDJlJs/",
-    "If the post has multiple videos, it will download all of them one by one.",
+    "For carousels with multiple videos, each video is downloaded and uploaded sequentially.",
 ).add(
     "iguser",
     "<instagram username>",
-    "Get instagram user info.",
+    "Fetch the public profile information of an Instagram user, including follower count, bio, and profile picture.",
     "iguser therock",
 ).info(
-    "Instagram Scrapper"
+    "Instagram scraper — download reels, posts, and carousels, and look up public user profiles via Selenium."
 ).done()

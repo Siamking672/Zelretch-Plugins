@@ -1,6 +1,6 @@
 import time
 
-from pyrogram.types import Message
+from kurigram.types import Message
 from pySmartDL import SmartDL
 
 from zelretch.core import LOGS, Symbols
@@ -12,7 +12,7 @@ from . import Config, HelpMenu, zelretch, on_message
 
 @on_message("download", allow_master=True)
 async def download(_, message: Message):
-    hell = await zelretch.edit(message, "Starting to download...")
+    kaleido = await zelretch.edit(message, "Starting to download...")
     if message.reply_to_message and message.reply_to_message.media:
         start_time = time.time()
         try:
@@ -20,15 +20,15 @@ async def download(_, message: Message):
                 Config.DWL_DIR,
                 progress=progress,
                 progress_args=(
-                    hell,
+                    kaleido,
                     start_time,
                     "⬇️ Downloading",
                 ),
             )
         except Exception as e:
-            return await zelretch.error(hell, f"`{e}`", 10)
+            return await zelretch.error(kaleido, f"`{e}`", 10)
 
-        await hell.edit(
+        await kaleido.edit(
             f"**Downloaded to** `{dwl_path}` **in** {readable_time(round(time.time() - start_time))} seconds.**"
         )
 
@@ -56,20 +56,20 @@ async def download(_, message: Message):
                         f"**{Symbols.anchor} Progress:** `{dl_percentage}%`"
                     )
                     if round(diff % 10.00) == 0 and current_msg != display_msg:
-                        await hell.edit(current_msg)
+                        await kaleido.edit(current_msg)
                         display_msg = current_msg
                 except Exception as e:
                     LOGS.warning(f"PySmartDl: {str(e)}")
 
             end_time = readable_time(round(time.time() - start_time))
             if dl.isSuccessful():
-                await hell.edit(
+                await kaleido.edit(
                     f"**Downloaded to** `{dl.get_dest()}` **in** `{end_time}` **seconds.**"
                 )
             else:
-                await zelretch.error(hell, f"**Failed to download** `{len(dwl_url)} url(s)`")
+                await zelretch.error(kaleido, f"**Failed to download** `{len(dwl_url)} url(s)`")
         except Exception as e:
-            return await zelretch.error(hell, f"`{e}`", 10)
+            return await zelretch.error(kaleido, f"`{e}`", 10)
     else:
         return await zelretch.delete(
             message, "Reply to a media message or pass direct urls to download it."
@@ -79,7 +79,9 @@ async def download(_, message: Message):
 HelpMenu("downloads").add(
     "download",
     "<reply to media> or <direct link>",
-    "Download media to server.",
+    "Download a media file to the server and then re-upload it into the chat. Accepts direct HTTP(S) links or a reply to a Telegram media message.",
     "download https://example.com/file.mp4",
-    "You can pass multiple urls to download it on my server.",
-).info("Downloader").done()
+    "Multiple URLs can be passed separated by spaces to download several files at once.",
+).info(
+    "Download media from direct links or Telegram messages and re-upload it into the chat."
+).done()

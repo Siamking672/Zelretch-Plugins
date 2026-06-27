@@ -1,15 +1,15 @@
 import os
 from typing import Union
 
-from pyrogram import Client
-from pyrogram.file_id import FileId
-from pyrogram.raw.functions.messages import UploadMedia
-from pyrogram.raw.types import (
+from kurigram import Client
+from kurigram.file_id import FileId
+from kurigram.raw.functions.messages import UploadMedia
+from kurigram.raw.types import (
     DocumentAttributeFilename,
     InputDocument,
     InputMediaUploadedDocument,
 )
-from pyrogram.types import Animation, Audio, Document, Message, Photo, Sticker, Video
+from kurigram.types import Animation, Audio, Document, Message, Photo, Sticker, Video
 
 from zelretch.core import Symbols
 

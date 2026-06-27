@@ -3,9 +3,9 @@ import os
 import sys
 from pathlib import Path
 
-from pyrogram import Client
-from pyrogram.enums import MessagesFilter, ParseMode
-from pyrogram.types import Message
+from kurigram import Client
+from kurigram.enums import MessagesFilter, ParseMode
+from kurigram.types import Message
 
 from zelretch.core import ENV, Config, Symbols
 
@@ -14,7 +14,7 @@ from . import HelpMenu, bot, db, handler, zelretch, on_message
 
 @on_message("help", allow_master=True)
 async def help(client: Client, message: Message):
-    hell = await zelretch.edit(message, "**Charging mana...**")
+    kaleido = await zelretch.edit(message, "**Charging mana...**")
     if len(message.command) == 1:
         try:
             result = await client.get_inline_bot_results(bot.me.username, "help_menu")
@@ -24,20 +24,20 @@ async def help(client: Client, message: Message):
                 result.results[0].id,
                 True,
             )
-            return await hell.delete()
+            return await kaleido.delete()
         except Exception as e:
-            await zelretch.error(hell, str(e), 20)
+            await zelretch.error(kaleido, str(e), 20)
             return
 
     plugin = await zelretch.input(message)
     if plugin.lower() in Config.CMD_MENU:
         try:
             await zelretch.edit(
-                hell, Config.CMD_MENU[plugin.lower()], ParseMode.MARKDOWN
+                kaleido, Config.CMD_MENU[plugin.lower()], ParseMode.MARKDOWN
             )
             return
         except Exception as e:
-            await zelretch.error(hell, str(e), 20)
+            await zelretch.error(kaleido, str(e), 20)
             return
 
     available_plugins = f"{Symbols.bullet} **𝖠𝗏𝖺𝗂𝗅𝖺𝖻𝗅𝖾 𝗉𝗅𝗎𝗀𝗂𝗇𝗌:**\n\n"
@@ -47,7 +47,7 @@ async def help(client: Client, message: Message):
     available_plugins += (
         f"\n\n𝖣𝗈 `{handler}help <plugin name>` 𝗍𝗈 𝗀𝖾𝗍 detailed archive notes for that Mystic Code."
     )
-    await zelretch.edit(hell, available_plugins, ParseMode.MARKDOWN)
+    await zelretch.edit(kaleido, available_plugins, ParseMode.MARKDOWN)
 
 
 @on_message("repo", allow_master=True)
@@ -120,24 +120,24 @@ async def install_plugins(_, message: Message):
     if not message.reply_to_message or not message.reply_to_message.document:
         return await zelretch.delete(message, "Reply to a plugin to install it.")
 
-    hell = await zelretch.edit(message, "**Installing...**")
+    kaleido = await zelretch.edit(message, "**Installing...**")
     plugin_path = await message.reply_to_message.download("./zelretch/plugins/user/")
 
     if not plugin_path.endswith(".py"):
         os.remove(plugin_path)
-        return await zelretch.error(hell, "**Invalid Plugin:** Not a python file.", 20)
+        return await zelretch.error(kaleido, "**Invalid Plugin:** Not a python file.", 20)
 
     plugin = plugin_path.split("/")[-1].replace(".py", "").strip()
     if plugin in Config.CMD_MENU:
         os.remove(plugin_path)
         return await zelretch.error(
-            hell, f"**Plugin Already Installed:** `{plugin}.py`", 20
+            kaleido, f"**Plugin Already Installed:** `{plugin}.py`", 20
         )
 
     if "(" in plugin:
         os.remove(plugin_path)
         return await zelretch.error(
-            hell, f"**Plugin Already Installed:** `{plugin}.py`", 20
+            kaleido, f"**Plugin Already Installed:** `{plugin}.py`", 20
         )
 
     try:
@@ -148,9 +148,9 @@ async def install_plugins(_, message: Message):
         load = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(load)
         sys.modules["zelretch.plugins.user." + shortname] = load
-        await zelretch.edit(hell, f"**Installed:** `{plugin}.py`")
+        await zelretch.edit(kaleido, f"**Installed:** `{plugin}.py`")
     except Exception as e:
-        await zelretch.error(hell, str(e), 20)
+        await zelretch.error(kaleido, str(e), 20)
         os.remove(plugin_path)
 
 
@@ -189,7 +189,7 @@ async def installall(client: Client, message: Message):
     except Exception as e:
         return await zelretch.delete(message, f"**Invalid Channel Username:** `{e}`")
 
-    hell = await zelretch.edit(message, f"**Installing plugins from {chat.title}...**")
+    kaleido = await zelretch.edit(message, f"**Installing plugins from {chat.title}...**")
     finalStr = f"{Symbols.check_mark} **𝖯𝗅𝗎𝗀𝗂𝗇𝗌 𝖨𝗇𝗌𝗍𝖺𝗅𝗅𝖾𝖽: {chat.title}**\n\n"
     count = 0
 
@@ -227,7 +227,7 @@ async def installall(client: Client, message: Message):
                 continue
 
     finalStr += f"\n**🍀 𝖳𝗈𝗍𝖺𝗅 𝖯𝗅𝗎𝗀𝗂𝗇𝗌 𝖨𝗇𝗌𝗍𝖺𝗅𝗅𝖾𝖽:** `{count}`"
-    await hell.edit(finalStr, ParseMode.MARKDOWN, disable_web_page_preview=True)
+    await kaleido.edit(finalStr, ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 
 @on_message("unload", allow_master=True)
@@ -271,49 +271,58 @@ async def load_plugins(_, message: Message):
 
 HelpMenu("help").add(
     "help",
-    "<plugin name>",
-    "Get the detailed help menu for that mentioned plugin or get the whole help menu instead.",
+    "<plugin name (optional)>",
+    "Open the inline help menu listing every loaded plugin. Pass a plugin name to jump straight to its commands.",
     "help alive",
-).add("repo", None, "Get the repo link of the bot.", "repo").add(
+).add(
+    "repo",
+    None,
+    "Show the GitHub links to the main wrapper repository and the plugin archive.",
+    "repo",
+).add(
     "plinfo",
     "<plugin name>",
-    "Get the detailed info of the mentioned plugin.",
+    "Display the full help card for a single plugin, including every command it provides.",
     "plinfo alive",
 ).add(
     "cmdinfo",
     "<command name>",
-    "Get the detailed info of the mentioned command.",
+    "Display the description, parameters, example, and notes for a single command.",
     "cmdinfo alive",
 ).add(
-    "send", "<plugin name>", "Send the mentioned plugin.", "send alive"
+    "send",
+    "<plugin name>",
+    "Send the plugin's Python source file into the chat so others can install it.",
+    "send alive",
 ).add(
     "install",
-    "<reply to plugin>",
-    "Install the replied plugin.",
+    "<reply to a .py file>",
+    "Install a plugin by replying to a Python file. The plugin is loaded immediately without a restart.",
     None,
-    "Do not install plugins from untrusted sources, they can be a malware. We're not responsible for any damage caused by them.",
+    "Only install plugins from sources you trust. Malicious plugins can read your session string and take over your account. The Zelretch project is not responsible for any damage caused by third-party plugins.",
 ).add(
     "uninstall",
     "<plugin name>",
-    "Uninstall the mentioned plugin.",
+    "Remove a plugin and all of its commands from the bot until the next restart.",
     "uninstall alive",
-    "This will remove all the commands of that plugin from the bot till a restart is initiated.",
+    "The plugin file is deleted from disk, so it will not reload after a restart either.",
 ).add(
     "installall",
     "<channel username>",
-    "Install all the plugins from the mentioned channel.",
+    "Install every .py file posted in a Telegram channel as a plugin. Useful for bulk-loading a plugin repository channel.",
     "installall @plugins_for_zelretch",
-    "Do not install plugins from untrusted sources, they can be a malware. We're not responsible for any damage caused by them.",
+    "Only install plugins from channels you trust. Malicious plugins can compromise your account.",
 ).add(
     "unload",
     "<plugin name>",
-    "Unload the mentioned plugin.",
+    "Disable a plugin so its commands no longer work, without deleting the file. The plugin stays unloaded across restarts.",
     "unload alive",
-    "This will remove all the commands of that plugin from the bot permanently.",
+    "Use the 'load' command to re-enable an unloaded plugin.",
 ).add(
     "load",
     "<plugin name>",
-    "Load the mentioned plugin.",
+    "Re-enable a plugin that was previously unloaded with the 'unload' command.",
     "load alive",
-    "This will load all the commands of that plugin to the bot that was previously unloaded permanently.",
-)
+).info(
+    "Help system and plugin lifecycle — browse, install, uninstall, load, and unload Mystic Codes."
+).done()

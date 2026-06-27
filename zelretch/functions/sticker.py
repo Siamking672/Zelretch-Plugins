@@ -1,11 +1,11 @@
 from typing import Tuple
 
 from emoji import EMOJI_DATA
-from pyrogram import Client
-from pyrogram.raw.functions.messages import GetStickerSet
-from pyrogram.raw.functions.stickers import AddStickerToSet, CreateStickerSet, RemoveStickerFromSet
-from pyrogram.raw import base, types
-from pyrogram.types import Message
+from kurigram import Client
+from kurigram.raw.functions.messages import GetStickerSet
+from kurigram.raw.functions.stickers import AddStickerToSet, CreateStickerSet, RemoveStickerFromSet
+from kurigram.raw import base, types
+from kurigram.types import Message
 
 from .media import get_media_from_id, upload_media
 

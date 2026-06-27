@@ -1,5 +1,5 @@
-from pyrogram import Client, filters
-from pyrogram.types import Message
+from kurigram import Client, filters
+from kurigram.types import Message
 
 from . import Config, HelpMenu, custom_handler, db, handler, zelretch, on_message
 
@@ -13,11 +13,11 @@ async def addsnip(client: Client, message: Message):
         )
 
     keyword = (await zelretch.input(message)).replace("#", "")
-    hell = await zelretch.edit(message, f"Saving snip `#{keyword}`")
+    kaleido = await zelretch.edit(message, f"Saving snip `#{keyword}`")
     msg = await message.reply_to_message.forward(Config.LOGGER_ID)
 
     await db.set_snip(client.me.id, message.chat.id, keyword.lower(), msg.id)
-    await zelretch.delete(hell, f"**📌 𝖭𝖾𝗐 𝖲𝗇𝗂𝗉 𝖭𝗈𝗍𝖾 𝖲𝖺𝗏𝖾𝖽:** `#{keyword}`")
+    await zelretch.delete(kaleido, f"**📌 𝖭𝖾𝗐 𝖲𝗇𝗂𝗉 𝖭𝗈𝗍𝖾 𝖲𝖺𝗏𝖾𝖽:** `#{keyword}`")
     await msg.reply_text(
         f"**📌 𝖭𝖾𝗐 𝖲𝗇𝗂𝗉 𝖭𝗈𝗍𝖾 𝖲𝖺𝗏𝖾𝖽:** `#{keyword}`\n\n**DO NOT DELETE THIS MESSAGE!!!**",
     )
@@ -30,17 +30,17 @@ async def rmsnip(client: Client, message: Message):
             return await zelretch.delete(message, "Give a snip note name to remove.")
 
         keyword = (await zelretch.input(message)).replace("#", "")
-        hell = await zelretch.edit(message, f"Removing snip `#{keyword}`")
+        kaleido = await zelretch.edit(message, f"Removing snip `#{keyword}`")
 
         if await db.is_snip(client.me.id, message.chat.id, keyword.lower()):
             await db.rm_snip(client.me.id, message.chat.id, keyword.lower())
-            await zelretch.delete(hell, f"**🍀 𝖲𝗇𝗂𝗉 𝖭𝗈𝗍𝖾 𝖱𝖾𝗆𝗈𝗏𝖾𝖽:** `#{keyword}`")
+            await zelretch.delete(kaleido, f"**🍀 𝖲𝗇𝗂𝗉 𝖭𝗈𝗍𝖾 𝖱𝖾𝗆𝗈𝗏𝖾𝖽:** `#{keyword}`")
         else:
-            await zelretch.delete(hell, f"**🍀 𝖲𝗇𝗂𝗉 𝖭𝗈𝗍𝖾 𝖽𝗈𝖾𝗌 𝗇𝗈𝗍 𝖾𝗑𝗂𝗌𝗍𝗌:** `#{keyword}`")
+            await zelretch.delete(kaleido, f"**🍀 𝖲𝗇𝗂𝗉 𝖭𝗈𝗍𝖾 𝖽𝗈𝖾𝗌 𝗇𝗈𝗍 𝖾𝗑𝗂𝗌𝗍𝗌:** `#{keyword}`")
     else:
-        hell = await zelretch.edit(message, "Removing all filters...")
+        kaleido = await zelretch.edit(message, "Removing all filters...")
         await db.rm_all_snips(client.me.id, message.chat.id)
-        await zelretch.delete(hell, "All snips have been removed.")
+        await zelretch.delete(kaleido, "All snips have been removed.")
 
 
 @on_message(["getsnip", "snips"], allow_master=True)
@@ -50,7 +50,7 @@ async def snips(client: Client, message: Message):
             return await zelretch.delete(message, "Give a snip note name to get.")
 
         keyword = await zelretch.input(message)
-        hell = await zelretch.edit(message, f"Getting snip `#{keyword}`")
+        kaleido = await zelretch.edit(message, f"Getting snip `#{keyword}`")
 
         if await db.is_snip(client.me.id, message.chat.id, keyword.lower()):
             data = await db.get_snip(client.me.id, message.chat.id, keyword.lower())
@@ -58,12 +58,12 @@ async def snips(client: Client, message: Message):
             sent = await client.copy_message(message.chat.id, Config.LOGGER_ID, msgid)
 
             await sent.reply_text(f"**🍀 𝖲𝗇𝗂𝗉 𝖭𝗈𝗍𝖾:** `#{keyword}`")
-            await hell.delete()
+            await kaleido.delete()
         else:
-            await zelretch.delete(hell, f"**🍀 𝖲𝗇𝗂𝗉 𝖭𝗈𝗍𝖾 𝖽𝗈𝖾𝗌 𝗇𝗈𝗍 𝖾𝗑𝗂𝗌𝗍𝗌:** `#{keyword}`")
+            await zelretch.delete(kaleido, f"**🍀 𝖲𝗇𝗂𝗉 𝖭𝗈𝗍𝖾 𝖽𝗈𝖾𝗌 𝗇𝗈𝗍 𝖾𝗑𝗂𝗌𝗍𝗌:** `#{keyword}`")
 
     else:
-        hell = await zelretch.edit(message, "Getting all snips...")
+        kaleido = await zelretch.edit(message, "Getting all snips...")
         snips = await db.get_all_snips(client.me.id, message.chat.id)
         if snips:
             text = f"**🍀 𝖭𝗈. 𝗈𝖿 𝖲𝗇𝗂𝗉 𝖭𝗈𝗍𝖾 𝗂𝗇 𝗍𝗁𝗂𝗌 𝖼𝗁𝖺𝗍:** `{len(snips)}`\n\n"
@@ -71,9 +71,9 @@ async def snips(client: Client, message: Message):
             for i, snip in enumerate(snips, 1):
                 text += f"** {'0' if i < 10 else ''}{i}:** `#{snip['keyword']}`\n"
 
-            await hell.edit(text)
+            await kaleido.edit(text)
         else:
-            await zelretch.delete(hell, "No snip note saved in this chat.")
+            await zelretch.delete(kaleido, "No snip note saved in this chat.")
 
 
 @custom_handler(
@@ -95,22 +95,30 @@ async def snipHandler(client: Client, message: Message):
 
 HelpMenu("snips").add(
     "snip",
-    "<keyword> <reply to message>",
-    "Save the replied message as a snip note.",
-    "snip hello",
-    "An alias of 'note' is also available.",
-).add("rmsnip", "<keyword>", "Remove the snip note.", "rmsnip hello").add(
-    "rmallsnip", None, "Remove all snip notes.", "rmallsnip"
+    "<keyword> <reply to a message>",
+    "Save the replied message as a snip (saved note). Anyone in the chat can trigger it by sending #<keyword>.",
+    "snip rules",
+    "Alias 'note' can also be used. Text, media, and documents are supported.",
+).add(
+    "rmsnip",
+    "<keyword>",
+    "Delete a single snip by its keyword.",
+    "rmsnip rules",
+).add(
+    "rmallsnip",
+    None,
+    "Delete every saved snip in the current chat in one go.",
+    "rmallsnip",
 ).add(
     "getsnip",
     "<keyword>",
-    "Get the snip note.",
-    "getsnip hello",
+    "Preview the saved snip message for a specific keyword without triggering the hashtag.",
+    "getsnip rules",
 ).add(
     "snips",
     None,
-    "Get all snip notes.",
+    "List every snip keyword currently saved in the chat.",
     "snips",
 ).info(
-    "Snips are triggered when # is used before the keyword."
+    "Saved notes (snips) — store messages that can be recalled by sending #<keyword> in the chat."
 ).done()

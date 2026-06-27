@@ -2,7 +2,7 @@ import os
 import time
 
 import requests
-from pyrogram.types import Message
+from kurigram.types import Message
 
 from zelretch.core import ENV
 from zelretch.functions.formatter import readable_time
@@ -17,7 +17,7 @@ async def makeLogo(_, message: Message):
         return await zelretch.delete(message, "Provide a text to make a logo.")
 
     start_time = time.time()
-    hell = await zelretch.edit(message, "Processing...")
+    kaleido = await zelretch.edit(message, "Processing...")
     query = await zelretch.input(message)
 
     if message.reply_to_message and message.reply_to_message.photo:
@@ -34,12 +34,12 @@ async def makeLogo(_, message: Message):
         access = await db.get_env(ENV.unsplash_api)
         if not access:
             return await zelretch.delete(
-                hell, "Unsplash API not found. Either set it or reply to an image."
+                kaleido, "Unsplash API not found. Either set it or reply to an image."
             )
 
         photo = await get_wallpapers(access, 1, theme.strip(), isRandom)
         if not photo:
-            return await zelretch.delete(hell, "No wallpapers found.")
+            return await zelretch.delete(kaleido, "No wallpapers found.")
 
         binary = requests.get(photo[0]).content
         with open(Config.TEMP_DIR + "temp_bg.jpg", "wb") as f:
@@ -52,7 +52,7 @@ async def makeLogo(_, message: Message):
         logo_path,
         caption=f"**𝖫𝗈𝗀𝗈 𝖬𝖺𝖽𝖾 𝗂𝗇:** `{time_taken}`",
     )
-    await hell.delete()
+    await kaleido.delete()
     os.remove(logo_path)
 
 
@@ -61,17 +61,17 @@ async def setFont(_, message: Message):
     if not message.reply_to_message or not message.reply_to_message.document:
         return await zelretch.delete(message, "Reply to a font file to save it.")
 
-    hell = await zelretch.edit(message, "Processing...")
+    kaleido = await zelretch.edit(message, "Processing...")
     font = await message.reply_to_message.download(Config.DWL_DIR)
 
     if not font.endswith(".ttf"):
-        return await zelretch.delete(hell, "Invalid font file. Only .ttf is supported.")
+        return await zelretch.delete(kaleido, "Invalid font file. Only .ttf is supported.")
 
     if not os.path.exists(font):
-        return await zelretch.delete(hell, "Font not found.")
+        return await zelretch.delete(kaleido, "Font not found.")
 
     Config.FONT_PATH = font
-    await zelretch.delete(hell, "Font set successfully.")
+    await zelretch.delete(kaleido, "Font set successfully.")
 
 
 @on_message("resetfont", allow_master=True)
@@ -87,21 +87,21 @@ async def resetFont(_, message: Message):
 
 HelpMenu("logo").add(
     "logo",
-    "<reply to image (optional)> <text>",
-    "Make a logo with text. You can also reply to an image to use it as a background. You can also specify a theme by using `--` after the text.",
+    "<text> or <reply to image> <text>",
+    "Generate a stylised logo image from the given text. A background image is fetched from Unsplash matching the optional theme, then the text is rendered on top using the configured font.",
     "logo Zelretch --supra",
-    "This command uses Unsplash API to get images.",
+    "Append '--<theme>' after the text to bias the Unsplash search (e.g. --supra, --cyberpunk, --forest). Requires the UNSPLASH_API variable.",
 ).add(
     "setfont",
-    "<reply to font file>",
-    "Set a font file to use for logo making. This is not permanent option.",
+    "<reply to a .ttf file>",
+    "Override the default Montserrat font with a custom TrueType font for logo generation. The override lasts until the bot restarts.",
     "setfont",
     "Only .ttf files are supported.",
 ).add(
     "resetfont",
     None,
-    "Reset the font file to default.",
+    "Revert to the built-in default Montserrat font, discarding any custom font set via 'setfont'.",
     "resetfont",
 ).info(
-    "Make Logos"
+    "Generate text-on-background logo images with custom fonts and Unsplash-sourced backgrounds."
 ).done()

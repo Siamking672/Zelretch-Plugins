@@ -1,6 +1,6 @@
 import asyncio
 
-from pyrogram import idle
+from kurigram import idle
 
 from zelretch import __version__
 from zelretch.core import (

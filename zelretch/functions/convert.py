@@ -1,7 +1,7 @@
 import os
 import time
 
-from pyrogram.types import Message
+from kurigram.types import Message
 from PIL import Image
 from zelretch.core import Config
 

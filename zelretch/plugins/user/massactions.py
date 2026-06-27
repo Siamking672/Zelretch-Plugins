@@ -2,10 +2,10 @@ import asyncio
 import datetime
 import time
 
-from pyrogram import Client
-from pyrogram.enums import ChatMembersFilter
-from pyrogram.errors import FloodWait
-from pyrogram.types import Message
+from kurigram import Client
+from kurigram.enums import ChatMembersFilter
+from kurigram.errors import FloodWait
+from kurigram.types import Message
 
 from . import HelpMenu, group_n_channel, group_only, zelretch, on_message
 
@@ -29,7 +29,7 @@ async def banall(client: Client, message: Message):
             f"__I don't have enough rights to ban users in {chat_name}.__\n\n__Give me permission to ban users and try again.__",
         )
 
-    hell = await zelretch.edit(message, f"__Banning all users in {chat_name}.__")
+    kaleido = await zelretch.edit(message, f"__Banning all users in {chat_name}.__")
 
     total = 0
     success = 0
@@ -44,7 +44,7 @@ async def banall(client: Client, message: Message):
             pass
 
     await zelretch.delete(
-        hell,
+        kaleido,
         f"Banall Executed! \n\n__Total:__ {total} \n__Banned:__ {success} \n__Failed:__ {total - success}",
     )
     await zelretch.check_and_log(
@@ -73,7 +73,7 @@ async def unbanall(client: Client, message: Message):
             f"__I don't have enough rights to unban users in {chat_name}.__\n\n__Give me permission to ban users and try again.__",
         )
 
-    hell = await zelretch.edit(message, f"__Unbanning all users in {chat_name}.__")
+    kaleido = await zelretch.edit(message, f"__Unbanning all users in {chat_name}.__")
 
     total = 0
     success = 0
@@ -90,7 +90,7 @@ async def unbanall(client: Client, message: Message):
             pass
 
     await zelretch.delete(
-        hell,
+        kaleido,
         f"Unbanall Executed! \n\n__Total:__ {total} \n__Unbanned:__ {success} \n__Failed:__ {total - success}",
     )
     await zelretch.check_and_log(
@@ -118,7 +118,7 @@ async def kickall(client: Client, message: Message):
             f"__I don't have enough rights to kick users in {chat_name}.__\n\n__Give me permission to ban users and try again.__",
         )
 
-    hell = await zelretch.edit(message, f"__Kicking all users in {chat_name}.__")
+    kaleido = await zelretch.edit(message, f"__Kicking all users in {chat_name}.__")
 
     total = 0
     success = 0
@@ -137,7 +137,7 @@ async def kickall(client: Client, message: Message):
             pass
 
     await zelretch.delete(
-        hell,
+        kaleido,
         f"Kickall Executed! \n\n__Total:__ {total} \n__Kicked:__ {success} \n__Failed:__ {total - success}",
     )
     await zelretch.check_and_log(
@@ -155,11 +155,11 @@ async def deleteall(client: Client, message: Message):
             message, "__Reply to a message to delete all messages from that user.__"
         )
 
-    hell = await zelretch.edit(message, "__Deleting all messages from this user.__")
+    kaleido = await zelretch.edit(message, "__Deleting all messages from this user.__")
     user = message.reply_to_message.from_user.id
 
     await client.delete_user_history(message.chat.id, user)
-    await zelretch.delete(hell, "__All messages from this user has been deleted.__")
+    await zelretch.delete(kaleido, "__All messages from this user has been deleted.__")
 
 
 @on_message("blockall", chat_type=group_only, allow_master=True)
@@ -175,7 +175,7 @@ async def blockall(client: Client, message: Message):
         except Exception as e:
             return await zelretch.error(message, f"__Invalid chatId.__\n\n`{e}`")
 
-    hell = await zelretch.edit(message, f"__Kicking all users in {chat_name}.__")
+    kaleido = await zelretch.edit(message, f"__Kicking all users in {chat_name}.__")
 
     total = 0
     success = 0
@@ -190,7 +190,7 @@ async def blockall(client: Client, message: Message):
             pass
 
     await zelretch.edit(
-        hell,
+        kaleido,
         f"__Blockall Executed!__ \n\n__Total:__ {total} \n__Blocked:__ {success} \n__Failed:__ {total - success}",
     )
     await zelretch.check_and_log(
@@ -212,7 +212,7 @@ async def unblockall(client: Client, message: Message):
         except Exception as e:
             return await zelretch.error(message, f"__Invalid chatId.__\n\n`{e}`")
 
-    hell = await zelretch.edit(message, f"__Unblocking all users in {chat_name}.__")
+    kaleido = await zelretch.edit(message, f"__Unblocking all users in {chat_name}.__")
 
     total = 0
     success = 0
@@ -227,7 +227,7 @@ async def unblockall(client: Client, message: Message):
             pass
 
     await zelretch.edit(
-        hell,
+        kaleido,
         f"__Unblockall Executed!__ \n\n__Total:__ {total} \n__Unblocked:__ {success} \n__Failed:__ {total - success}",
     )
     await zelretch.check_and_log(
@@ -269,39 +269,42 @@ async def inviteAll(client: Client, message: Message):
 
 HelpMenu("massactions").add(
     "banall",
-    "<chatId>",
-    "Ban all members from a group/channel. If no chatId is given, the command will be executed in the current chat.",
-    "banall -100xxxxxxxxx",
+    "<chat id (optional)>",
+    "Ban every member of a group or channel. If no chat id is given, the action runs against the current chat.",
+    "banall -1001234567890",
+    "The userbot must be an admin with ban permission in the target chat.",
 ).add(
     "unbanall",
-    "<chatId>",
-    "Unban all members from a group/channel. If no chatId is given, the command will be executed in the current chat.",
-    "unbanall -100xxxxxxxxx",
+    "<chat id (optional)>",
+    "Lift every ban in a group or channel at once. If no chat id is given, the action runs against the current chat.",
+    "unbanall -1001234567890",
 ).add(
     "kickall",
-    "<chatId>",
-    "Kick all members from a group/channel. If no chatId is given, the command will be executed in the current chat.",
-    "kickall -100xxxxxxxxx",
+    "<chat id (optional)>",
+    "Remove every member from a group or channel. If no chat id is given, the action runs against the current chat.",
+    "kickall -1001234567890",
 ).add(
     "deleteall",
     None,
-    "Delete all messages of the replied user in a group.",
+    "Delete every message sent by the replied user in the current chat. Reply to one of the target user's messages first.",
     "deleteall",
-    "You can also use the alias 'delall' for this command.",
+    "Alias 'delall' can also be used.",
 ).add(
     "blockall",
-    "<chatId>",
-    "Block all members from a group/channel. If no chatId is given, the command will be executed in the current chat.",
-    "blockall -100xxxxxxxxx",
+    "<chat id (optional)>",
+    "Block every member of a group or channel from contacting the userbot account. If no chat id is given, the action runs against the current chat.",
+    "blockall -1001234567890",
 ).add(
     "unblockall",
-    "<chatId>",
-    "Unblock all members from a group/channel. If no chatId is given, the command will be executed in the current chat.",
-    "unblockall -100xxxxxxxxx",
+    "<chat id (optional)>",
+    "Unblock every member of a group or channel. If no chat id is given, the action runs against the current chat.",
+    "unblockall -1001234567890",
 ).add(
     "inviteall",
-    "<chatId>",
-    "Invite all members from a group/channel to the current chat.",
-    "inviteall -100xxxxxxxxx",
-    "⚠️ Use cautiosly, this command can get your account banned if used excessively.",
-).info("Mass Actions").done()
+    "<source chat id>",
+    "Invite every member from the source chat into the current chat via invite links.",
+    "inviteall -1001234567890",
+    "Use with extreme caution. Mass-inviting users can trigger Telegram's anti-spam systems and get the userbot account restricted or banned.",
+).info(
+    "Bulk administrative actions — ban, unban, kick, block, unblock, invite, or delete across an entire chat at once."
+).done()

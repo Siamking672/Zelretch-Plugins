@@ -1,5 +1,5 @@
-from pyrogram import Client, filters
-from pyrogram.types import Message
+from kurigram import Client, filters
+from kurigram.types import Message
 
 from zelretch.core import Symbols
 
@@ -13,33 +13,33 @@ async def autopost(client: Client, message: Message):
             message, "Wrong usage of command.\nCheck help menu for more info."
         )
 
-    hell = await zelretch.edit(message, "Starting Autopost in this group/channel...")
+    kaleido = await zelretch.edit(message, "Starting Autopost in this group/channel...")
 
     post_from = message.command[1]
     _chat = await client.get_chat(post_from)
 
     if not _chat:
-        return await zelretch.delete(hell, "Invalid chat/channel id.")
+        return await zelretch.delete(kaleido, "Invalid chat/channel id.")
 
     if _chat.type not in group_n_channel:
         return await zelretch.delete(
-            hell, "You can only autopost in groups and channels."
+            kaleido, "You can only autopost in groups and channels."
         )
 
     if _chat.id == message.chat.id:
         return await zelretch.delete(
-            hell, "You can't autopost in the same group/channel."
+            kaleido, "You can't autopost in the same group/channel."
         )
 
     if _chat.id in await db.is_autopost(client.me.id, _chat.id, message.chat.id):
         return await zelretch.delete(
-            hell, "This group/channel is already in autopost list."
+            kaleido, "This group/channel is already in autopost list."
         )
 
     await db.set_autopost(client.me.id, _chat.id, message.chat.id)
 
     await zelretch.delete(
-        hell, f"Autopost started from {_chat.title} to {message.chat.title}."
+        kaleido, f"Autopost started from {_chat.title} to {message.chat.title}."
     )
     await zelretch.check_and_log(
         "autopost start",
@@ -54,26 +54,26 @@ async def stop_autopost(client: Client, message: Message):
             message, "Wrong usage of command.\nCheck help menu for more info."
         )
 
-    hell = await zelretch.edit(message, "Stopping Autopost in this group/channel...")
+    kaleido = await zelretch.edit(message, "Stopping Autopost in this group/channel...")
 
     post_from = message.command[1]
     _chat = await client.get_chat(post_from)
 
     if not _chat:
-        return await zelretch.delete(hell, "Invalid chat/channel id.")
+        return await zelretch.delete(kaleido, "Invalid chat/channel id.")
 
     if _chat.type not in group_n_channel:
         return await zelretch.delete(
-            hell, "You can only autopost in groups and channels."
+            kaleido, "You can only autopost in groups and channels."
         )
 
     if _chat.id not in await db.is_autopost(client.me.id, _chat.id, message.chat.id):
-        return await zelretch.delete(hell, "This group/channel is not in autopost list.")
+        return await zelretch.delete(kaleido, "This group/channel is not in autopost list.")
 
     await db.rm_autopost(client.me.id, _chat.id, message.chat.id)
 
     await zelretch.delete(
-        hell, f"Autopost stopped from {_chat.title} to {message.chat.title}."
+        kaleido, f"Autopost stopped from {_chat.title} to {message.chat.title}."
     )
     await zelretch.check_and_log(
         "autopost stop",
@@ -83,11 +83,11 @@ async def stop_autopost(client: Client, message: Message):
 
 @on_message("autoposts", chat_type=group_n_channel, allow_master=True)
 async def autoposts(client: Client, message: Message):
-    hell = await zelretch.edit(message, "Getting autopost list...")
+    kaleido = await zelretch.edit(message, "Getting autopost list...")
 
     data = await db.get_all_autoposts(client.me.id)
     if not data:
-        return await zelretch.delete(hell, "No autoposts found.")
+        return await zelretch.delete(kaleido, "No autoposts found.")
 
     text = f"**𝖠𝖼𝗍𝗂𝗏𝖾 𝖠𝗎𝗍𝗈𝗉𝗈𝗌𝗍𝗌 𝖿𝗈𝗋: {client.me.mention}**\n\n"
     for i in data:
@@ -103,7 +103,7 @@ async def autoposts(client: Client, message: Message):
         text += f"   {Symbols.anchor} **To:** {to_chat_name}\n"
         text += f"   {Symbols.anchor} **Date:** {i['date']}\n\n"
 
-    await zelretch.edit(hell, text)
+    await zelretch.edit(kaleido, text)
 
 
 @custom_handler(filters.incoming & filters.group & filters.channel & ~filters.service)
@@ -127,17 +127,20 @@ async def handle_autopost(client: Client, message: Message):
 
 HelpMenu("autopost").add(
     "autopost",
-    "<channel id>",
-    "Start autoposting in current group/channel from the mentioned chatid/username of channel.",
-    "autopost",
-    "This module will post all incoming post from the target channel to the current chat without forward tag!",
+    "<source channel id/username>",
+    "Forward every new post from the source channel into the current chat without a forward tag. The userbot must be a member of the source channel.",
+    "autopost @zelretch_news",
+    "Posts are copied as new messages, so they appear native to the destination chat.",
 ).add(
     "stopautopost",
-    "<channel id>",
-    "Stops autoposting in current chroup/channel from the mentioned chatid/username of channel.",
-    "stopautopost",
+    "<source channel id/username>",
+    "Stop forwarding posts from the specified source channel into the current chat.",
+    "stopautopost @zelretch_news",
 ).add(
-    "autoposts", None, "Get all active autoposts!", "autoposts"
+    "autoposts",
+    None,
+    "List every active autopost feed configured for the current chat.",
+    "autoposts",
 ).info(
-    "AutoPost Module"
+    "Mirror posts from one chat to another without forward tags."
 ).done()

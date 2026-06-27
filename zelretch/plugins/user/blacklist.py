@@ -1,7 +1,7 @@
 import re
 
-from pyrogram import Client, filters
-from pyrogram.types import Message
+from kurigram import Client, filters
+from kurigram.types import Message
 
 from zelretch.core import Config, Symbols
 from zelretch.functions.utility import BList
@@ -67,12 +67,18 @@ async def handle_blacklists(client: Client, message: Message):
 HelpMenu("blacklist").add(
     "blacklist",
     "<text>",
-    "Add the text to blacklist. If the text is sent in the chat it will be deleted.",
-    "blacklist hello",
+    "Add a word or phrase to the chat's blacklist. Any message containing the term will be automatically deleted.",
+    "blacklist spam",
 ).add(
-    "unblacklist", "<text>", "Remove the text from blacklist.", "unblacklist hello"
+    "unblacklist",
+    "<text>",
+    "Remove a previously blacklisted term so it is no longer auto-deleted.",
+    "unblacklist spam",
 ).add(
-    "blacklists", None, "List all the blacklisted words in the chat.", "blacklists"
+    "blacklists",
+    None,
+    "List every blacklisted term currently active in the chat.",
+    "blacklists",
 ).info(
-    "Blacklist Module"
+    "Automatically delete messages containing forbidden words or phrases."
 ).done()

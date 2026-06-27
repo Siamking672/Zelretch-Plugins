@@ -1,8 +1,8 @@
 import random
 
-from pyrogram import Client, filters
-from pyrogram.enums import ChatType
-from pyrogram.types import Message
+from kurigram import Client, filters
+from kurigram.enums import ChatType
+from kurigram.types import Message
 
 from zelretch.core import ENV
 
@@ -159,10 +159,10 @@ async def disallow_pm(client: Client, message: Message):
 
 @on_message(["allowlist", "approvelist"], allow_master=True)
 async def allowlist(client: Client, message: Message):
-    hell = await zelretch.edit(message, "`Fetching allowlist...`")
+    kaleido = await zelretch.edit(message, "`Fetching allowlist...`")
     users = await db.get_all_pmpermits(client.me.id)
     if not users:
-        return await zelretch.delete(hell, "`No users allowed to pm!`")
+        return await zelretch.delete(kaleido, "`No users allowed to pm!`")
 
     text = "**🍀 𝖠𝗉𝗉𝗋𝗈𝗏𝖾𝖽 𝖴𝗌𝖾𝗋'𝗌 𝖫𝗂𝗌𝗍:**\n\n"
     for user in users:
@@ -172,7 +172,7 @@ async def allowlist(client: Client, message: Message):
         except:
             text += f"    {Symbols.anchor} Unkown Peer (`{user['user']}`) | {user['date']}\n"
 
-    await hell.edit(text)
+    await kaleido.edit(text)
 
 
 @on_message("pmpermit", allow_master=True)
@@ -207,9 +207,9 @@ async def handler_outgoing_pm(client: Client, message: Message):
 
     if not await db.is_pmpermit(client.me.id, message.chat.id):
         await db.add_pmpermit(client.me.id, message.chat.id)
-        hell = await client.send_message(message.chat.id, "Approving ...")
+        kaleido = await client.send_message(message.chat.id, "Approving ...")
         await zelretch.delete(
-            hell,
+            kaleido,
             f"**{Symbols.check_mark} Auto-Approved Outgoing PM:** {message.chat.first_name}",
         )
 
@@ -288,32 +288,32 @@ async def handle_incoming_pm(client: Client, message: Message):
 
 HelpMenu("pmpermit").add(
     "block",
-    "<reply to user>/<userid/username>",
-    "Block a user from pm-ing you.",
-    "block @ForGo10God",
+    "<reply to user> or <user id/username>",
+    "Block a user from sending you private messages. Their future PMs will be silently rejected.",
+    "block @ZelretchUser",
 ).add(
     "unblock",
-    "<reply to user>/<userid/username>",
-    "Unblock a user from pm-ing you.",
-    "unblock @ForGo10God",
+    "<reply to user> or <user id/username>",
+    "Lift a block on a user so they can PM you again.",
+    "unblock @ZelretchUser",
 ).add(
     "allow",
-    "<reply to user>/<userid/username>",
-    "Allow a user to pm you.",
-    "allow @ForGo10God",
-    "An alias of 'approve' is also available.",
+    "<reply to user> or <user id/username>",
+    "Pre-approve a user so they bypass the PM-permit challenge entirely. Their messages will not trigger the auto-reply warning.",
+    "allow @ZelretchUser",
+    "Alias 'approve' can also be used.",
 ).add(
     "disallow",
-    "<reply to user>/<userid/username>",
-    "Disallow a user to pm you.",
-    "disallow @ForGo10God",
-    "An alias of 'disapprove' is also available.",
+    "<reply to user> or <user id/username>",
+    "Remove a user from the PM-permit allow list so they must pass the challenge again.",
+    "disallow @ZelretchUser",
+    "Alias 'disapprove' can also be used.",
 ).add(
     "allowlist",
     None,
-    "List all users allowed to pm you.",
+    "List every user currently on the PM-permit allow list.",
     "allowlist",
-    "An alias of 'approvelist' is also available.",
+    "Alias 'approvelist' can also be used.",
 ).info(
-    "Manage who can pm you."
+    "PM permit — control who can private-message the userbot, block spammers, and pre-approve trusted contacts."
 ).done()

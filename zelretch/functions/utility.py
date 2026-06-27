@@ -2,10 +2,10 @@ import asyncio
 import os
 import time
 
-from pyrogram import Client
-from pyrogram.enums import ChatType
-from pyrogram.errors import FloodWait
-from pyrogram.types import Message
+from kurigram import Client
+from kurigram.enums import ChatType
+from kurigram.errors import FloodWait
+from kurigram.types import Message
 from telegraph import Telegraph
 
 from zelretch.core import ENV, LOGS, db

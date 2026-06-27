@@ -1,10 +1,10 @@
 import time
 
-from pyrogram import Client
-from pyrogram.enums import ChatMemberStatus, ChatType
-from pyrogram.raw.functions.channels import GetAdminedPublicChannels
-from pyrogram.raw.functions.users import GetFullUser
-from pyrogram.types import Message
+from kurigram import Client
+from kurigram.enums import ChatMemberStatus, ChatType
+from kurigram.raw.functions.channels import GetAdminedPublicChannels
+from kurigram.raw.functions.users import GetFullUser
+from kurigram.types import Message
 
 from zelretch.functions.formatter import readable_time
 from zelretch.functions.templates import statistics_templates, user_info_templates
@@ -14,7 +14,7 @@ from . import HelpMenu, Symbols, zelretch, on_message
 
 @on_message("count", allow_master=True)
 async def count_stats(client: Client, message: Message):
-    hell = await zelretch.edit(message, "Processing...")
+    kaleido = await zelretch.edit(message, "Processing...")
     bots = 0
     users = 0
     groups = 0
@@ -36,7 +36,7 @@ async def count_stats(client: Client, message: Message):
             pass
 
     total = bots + users + groups + super_groups + channels
-    await hell.edit(
+    await kaleido.edit(
         f"**{client.me.mention}'𝗌 𝖼𝗁𝖺𝗍𝗌 𝖼𝗈𝗎𝗇𝗍:**\n\n"
         f"    **{Symbols.anchor} 𝖯𝗋𝗂𝗏𝖺𝗍𝖾:** `{users}`\n"
         f"    **{Symbols.anchor} 𝖦𝗋𝗈𝗎𝗉𝗌:** `{groups}`\n"
@@ -49,7 +49,7 @@ async def count_stats(client: Client, message: Message):
 
 @on_message("stats", allow_master=True)
 async def mystats(client: Client, message: Message):
-    hell = await zelretch.edit(message, "Processing...")
+    kaleido = await zelretch.edit(message, "Processing...")
     bots = 0
     ch_admin = 0
     ch_owner = 0
@@ -98,7 +98,7 @@ async def mystats(client: Client, message: Message):
 
     time_taken = readable_time(int(time.time() - start)) or "0 seconds"
 
-    await hell.edit(
+    await kaleido.edit(
         await statistics_templates(
             name=client.me.mention,
             channels=channels,
@@ -118,14 +118,14 @@ async def mystats(client: Client, message: Message):
 
 @on_message("reserved", allow_master=True)
 async def reserved(client: Client, message: Message):
-    hell = await zelretch.edit(message, "Processing...")
+    kaleido = await zelretch.edit(message, "Processing...")
     result = await client.invoke(GetAdminedPublicChannels())
 
     outStr = f"🍀 **{client.me.mention}'𝗌 𝗋𝖾𝗌𝖾𝗋𝗏𝖾𝖽 𝗎𝗌𝖾𝗋𝗇𝖺𝗆𝖾𝗌:**\n\n"
     for chat in result.chats:
         f"  {Symbols.bullet} {chat.title} - **{chat.username}**\n"
 
-    await hell.edit(outStr)
+    await kaleido.edit(outStr)
 
 
 @on_message("info", allow_master=True)
@@ -140,7 +140,7 @@ async def userInfo(client: Client, message: Message):
     else:
         user = message.reply_to_message.from_user
 
-    hell = await zelretch.edit(message, f"Getting info of {user.mention}...")
+    kaleido = await zelretch.edit(message, f"Getting info of {user.mention}...")
 
     try:
         resolved = await client.resolve_peer(user.id)
@@ -168,7 +168,7 @@ async def userInfo(client: Client, message: Message):
 
     if user.photo:
         async for photo in client.get_chat_photos(user.id, 1):
-            await hell.delete()
+            await kaleido.delete()
             await client.send_photo(
                 message.chat.id,
                 photo.file_id,
@@ -178,18 +178,30 @@ async def userInfo(client: Client, message: Message):
             )
             return
     else:
-        await hell.edit(user_info, disable_web_page_preview=True)
+        await kaleido.edit(user_info, disable_web_page_preview=True)
 
 
 
 HelpMenu("statistics").add(
-    "count", None, "A brief overview of the number of chats I am in."
+    "count",
+    None,
+    "Show a brief summary of how many groups, channels, private chats, and bots the userbot is a member of.",
+    "count",
 ).add(
-    "stats", None, "A detailed overview of the number of chats I am in."
+    "stats",
+    None,
+    "Show a detailed breakdown of the userbot's chat distribution, including types, last activity, and total message counts where available.",
+    "stats",
 ).add(
-    "reserved", None, "List of all the public usernames in my possession."
+    "reserved",
+    None,
+    "List every public username currently owned by the userbot's Telegram account.",
+    "reserved",
 ).add(
-    "info", "<reply> or <username/id>", "Get the user's detailed info.", "info @ForGo10God"
+    "info",
+    "<reply to user> or <username/id>",
+    "Display detailed information about a Telegram user — ID, first name, last name, username, bio, profile photo count, and chat type.",
+    "info @ZelretchUser",
 ).info(
-    "Statistics Module"
+    "Account statistics and user information — chat counts, owned usernames, and per-user profile inspection."
 ).done()

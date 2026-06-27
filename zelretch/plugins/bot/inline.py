@@ -1,5 +1,5 @@
-from pyrogram import filters
-from pyrogram.types import (
+from kurigram import filters
+from kurigram.types import (
     InlineKeyboardMarkup,
     InlineQuery,
     InlineQueryResultArticle,

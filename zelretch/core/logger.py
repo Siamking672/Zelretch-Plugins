@@ -14,6 +14,8 @@ logging.basicConfig(
 )
 
 
+# Kurigram 2.x registers its internal logger under the name "pyrogram"
+# (the package it ships as). Suppress its noisy INFO logs here.
 logging.getLogger("pyrogram").setLevel(logging.ERROR)
 
 LOGS = logging.getLogger("Zelretch")

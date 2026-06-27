@@ -1,9 +1,9 @@
 import os
 import uuid
 
-from pyrogram import Client
-from pyrogram.enums import MessageMediaType
-from pyrogram.types import Message
+from kurigram import Client
+from kurigram.enums import MessageMediaType
+from kurigram.types import Message
 
 from zelretch.functions.images import convert_to_png
 from zelretch.functions.utility import TGraph
@@ -16,7 +16,7 @@ async def telegraph_media(_, message: Message):
     if not message.reply_to_message or not message.reply_to_message.media:
         return await zelretch.edit(message, "__Reply to a media message!__")
 
-    hell = await zelretch.edit(message, "__Uploading to telegraph...__")
+    kaleido = await zelretch.edit(message, "__Uploading to telegraph...__")
 
     if message.reply_to_message.media in [
         MessageMediaType.ANIMATION,
@@ -30,7 +30,7 @@ async def telegraph_media(_, message: Message):
 
         if file_size >= 5242880:
             return await zelretch.delete(
-                hell,
+                kaleido,
                 "__This media is too big to upload to telegraph! You need to choose media below 5mb.__",
             )
 
@@ -51,7 +51,7 @@ async def telegraph_media(_, message: Message):
 
         if file_size >= 5242880:
             return await zelretch.delete(
-                hell,
+                kaleido,
                 "__This media is too big to upload to telegraph! You need to choose media below 5mb.__",
             )
 
@@ -62,16 +62,16 @@ async def telegraph_media(_, message: Message):
             ]:
                 path = await message.reply_to_message.download(Config.TEMP_DIR)
             else:
-                return await zelretch.delete(hell, "This media is not supported!")
+                return await zelretch.delete(kaleido, "This media is not supported!")
         else:
             path = await message.reply_to_message.download(Config.TEMP_DIR)
     else:
-        return await zelretch.delete(hell, "This media is not supported!")
+        return await zelretch.delete(kaleido, "This media is not supported!")
 
     if path.lower().endswith(".webp"):
         path = convert_to_png(path)
 
-    await hell.edit(
+    await kaleido.edit(
         f"**Media downloaded to local server.** __Now uploading to telegraph...__"
     )
 
@@ -79,9 +79,9 @@ async def telegraph_media(_, message: Message):
         media_url = TGraph.telegraph.upload_file(path)
         url = f"https://te.legra.ph{media_url[0]['src']}"
     except Exception as e:
-        await zelretch.error(hell, str(e))
+        await zelretch.error(kaleido, str(e))
     else:
-        await hell.edit(
+        await kaleido.edit(
             f"**💫 Uploaded to [telegraph]({url})!**\n\n**{Symbols.anchor} URL:** `{url}`",
             disable_web_page_preview=True,
         )
@@ -101,7 +101,7 @@ async def telegraph_text(client: Client, message: Message):
             message, "__Reply to a message to upload it on telegraph page!__"
         )
 
-    hell = await zelretch.edit(message, "__Uploading to telegraph...__")
+    kaleido = await zelretch.edit(message, "__Uploading to telegraph...__")
 
     page_content = (
         message.reply_to_message.text or message.reply_to_message.caption or ""
@@ -130,26 +130,26 @@ async def telegraph_text(client: Client, message: Message):
 
     try:
         url = f"https://te.legra.ph/{response['path']}"
-        await hell.edit(
+        await kaleido.edit(
             f"**💫 Uploaded to [telegraph]({url})!**\n\n**{Symbols.anchor} URL:** `{url}`",
             disable_web_page_preview=True,
         )
     except Exception as e:
-        await zelretch.error(hell, str(e))
+        await zelretch.error(kaleido, str(e))
 
 
 HelpMenu("telegraph").add(
     "tgm",
     "<reply to media>",
-    "Upload the replied media message to telegra.ph and returns a direct url.",
+    "Upload the replied photo or video to telegra.ph and return a direct URL that can be shared anywhere.",
     "tgm",
-    "An alias of 'tm' is also available.",
+    "Alias 'tm' can also be used. Only photos and videos under 5 MB are supported by Telegraph.",
 ).add(
     "tgt",
-    "<reply to message> <page title>",
-    "Upload the replied message content to telegra.ph!",
-    "tgt",
-    "An alias of 'tt' is also available.",
+    "<reply to message> <page title (optional)>",
+    "Upload the replied message's text content to telegra.ph as a formatted article page and return the URL.",
+    "tgt My Article Title",
+    "Alias 'tt' can also be used. Markdown and HTML formatting in the original message are preserved.",
 ).info(
-    "Telegraph Uploader"
+    "Telegraph uploader — host media and text articles on telegra.ph and share the direct links."
 ).done()
