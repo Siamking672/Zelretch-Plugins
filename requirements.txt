@@ -1,31 +1,17 @@
-# Wizard-only dependencies. The plugin repository's requirements.txt is
-# installed automatically by the orchestrator after it downloads the
-# plugins repo.
-#
-# Pin major versions to avoid surprise breakage; let patch upgrades flow.
-flask>=3.0,<4.0
-motor>=3.3,<4.0
-kurigram>=2.0
-python-dotenv>=1.0
-# Speeds up Kurigram/Pyrogram's MTProto crypto. Without it you get a
-# noisy "TgCrypto is missing!" warning at every startup.
-tgcrypto>=1.2
-# Optional: keep pyroaddon for runtime parity (the plugin repo expects it
-# to monkey-patch the Client class on import).
-pyroaddon>=1.0
-
-# ---------------------------------------------------------------------------
-# Pre-installed pins for packages known to break in recent releases.
-#
-# The plugin repo's requirements.txt lists these without version pins, so
-# pip would otherwise pull the latest (sometimes broken) version. By
-# pre-installing a known-good version here, pip sees the requirement is
-# already satisfied when it processes the plugin's requirements.txt and
-# skips the upgrade.
-# ---------------------------------------------------------------------------
-
-# cinemagoer >= 2026.6.27 uses an invalid SQLite URL
-# (sqlite://cinemagoer.db instead of sqlite:///cinemagoer.db) which
-# SQLAlchemy rejects at import time, crashing the bot on startup.
-# See: https://github.com/cinemagoer/cinemagoer/issues
-cinemagoer<2026
+bs4
+emoji
+git-python
+httpx
+lottie
+motor
+pillow
+psutil
+pyroaddon
+kurigram
+python-dotenv
+requests
+selenium
+speedtest-cli
+telegraph
+tgcrypto
+Unidecode

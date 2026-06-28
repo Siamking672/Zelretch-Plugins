@@ -1,18 +1,7 @@
 services:
-  zelretch:
+  zelretch-plugins:
     build: .
-    container_name: zelretch
-    ports:
-      # Wizard port for Hugging Face Spaces compatibility (HF only forwards port 7860).
-      - "7860:7860"
-      # Wizard port for local Docker / VPS usage.
-      - "8765:8765"
-    volumes:
-      # Persist the generated .env and plugin download across rebuilds.
-      - ./data:/app/data
-    environment:
-      # Bind to all interfaces so Docker's port mapping can reach the wizard.
-      - ZELRETCH_WIZARD_HOST=0.0.0.0
-      # Store downloaded plugins inside the persistent volume.
-      - ZELRETCH_PLUGINS_DIR=/app/data/.zelretch_plugins
+    container_name: zelretch-plugins
+    env_file:
+      - .env
     restart: unless-stopped
