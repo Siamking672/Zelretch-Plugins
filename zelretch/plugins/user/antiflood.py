@@ -76,6 +76,8 @@ async def setflood(client: Client, message: Message):
     & ~filters.service
 )
 async def antiflood(client: Client, message: Message):
+    if not message.from_user:
+        return
     mode, mtime, limit = Flood.getSettings(client.me.id, message.chat.id)
 
     if limit == 0:
@@ -143,7 +145,10 @@ async def antiflood(client: Client, message: Message):
                     client.me.id, message.chat.id, message.from_user.id, 0
                 )
                 await asyncio.sleep(5)
-                await client.unban_chat_member(message.chat.id, message.from_user.id)
+                try:
+                    await client.unban_chat_member(message.chat.id, message.from_user.id)
+                except Exception:
+                    pass
                 return
 
             elif mode == "ban":

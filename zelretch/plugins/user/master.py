@@ -64,7 +64,7 @@ async def delmaster(client: Client, message: Message):
                 message,
                 "__Reply to a user or give me a user id to remove them from masters!__",
             )
-        user = message.from_user
+        user = message.reply_to_message.from_user
     else:
         try:
             user = await client.get_users(message.command[1])

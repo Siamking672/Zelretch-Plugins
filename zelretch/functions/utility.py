@@ -123,7 +123,7 @@ class AntiFlood:
         mtime = data.get("time", 0)
         limit = data.get("limit", 5)
 
-        self.settings[client] = {chat: {"mode": mode, "time": mtime, "limit": limit}}
+        self.settings.setdefault(client, {})[chat] = {"mode": mode, "time": mtime, "limit": limit}
 
     def getSettings(self, client: int, chat: int) -> tuple[str, int, int]:
         mode = "mute"
@@ -141,7 +141,7 @@ class AntiFlood:
         return mode, int(mtime), limit
 
     def updateFlood(self, client: int, chat: int, user: int, count: int):
-        self.FloodCount[client] = {chat: {"last_user": user, "count": count}}
+        self.FloodCount.setdefault(client, {})[chat] = {"last_user": user, "count": count}
 
     def getLastUser(self, client: int, chat: int) -> tuple[int, int]:
         try:
@@ -200,13 +200,10 @@ class Blacklists:
             chats = data.get("chats", [])
             for chat in chats:
                 blacklists = data["blacklist"]
-                self.blacklists[client] = {chat: blacklists}
+                self.blacklists.setdefault(client, {})[chat] = blacklists
 
     async def addBlacklist(self, client: int, chat: int, text: str):
-        try:
-            self.blacklists[client][chat].append(text)
-        except KeyError:
-            self.blacklists[client] = {chat: [text]}
+        self.blacklists.setdefault(client, {}).setdefault(chat, []).append(text)
 
         await db.add_blacklist(client, chat, text)
 

@@ -117,10 +117,10 @@ async def welcomehandler(client: Client, message: Message):
         return
 
     msg = await client.get_messages(Config.LOGGER_ID, welcome["message"])
-    if message.media:
-        text = message.caption if message.caption else None
+    if msg.media:
+        text = msg.caption if msg.caption else None
     else:
-        text = message.text if message.text else None
+        text = msg.text if msg.text else None
 
     if text:
         first = message.new_chat_members[0].first_name
@@ -166,27 +166,27 @@ async def goodbyehandler(client: Client, message: Message):
         return
 
     msg = await client.get_messages(Config.LOGGER_ID, goodbye["message"])
-    if message.media:
-        text = message.caption if message.caption else None
+    if msg.media:
+        text = msg.caption if msg.caption else None
     else:
-        text = message.text if message.text else None
+        text = msg.text if msg.text else None
 
     if text:
-        first = message.new_chat_members[0].first_name
+        first = message.left_chat_member.first_name
         last = (
-            message.new_chat_members[0].last_name
-            if message.new_chat_members[0].last_name
+            message.left_chat_member.last_name
+            if message.left_chat_member.last_name
             else ""
         )
-        mention = message.new_chat_members[0].mention
-        username = message.new_chat_members[0].username
+        mention = message.left_chat_member.mention
+        username = message.left_chat_member.username
         text = text.format(
             first=first,
             last=last,
             fullname=f"{first} {last}",
             mention=mention,
             username=f"@{username}" if username else mention,
-            userid=message.new_chat_members[0].id,
+            userid=message.left_chat_member.id,
             chatname=message.chat.title,
             chatid=message.chat.id,
         )

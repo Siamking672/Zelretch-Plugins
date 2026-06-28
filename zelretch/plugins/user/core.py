@@ -137,7 +137,7 @@ async def install_plugins(_, message: Message):
     if "(" in plugin:
         os.remove(plugin_path)
         return await zelretch.error(
-            kaleido, f"**Plugin Already Installed:** `{plugin}.py`", 20
+            kaleido, f"**Invalid Plugin Name:** `{plugin}.py`", 20
         )
 
     try:
@@ -165,10 +165,7 @@ async def uninstall_plugins(_, message: Message):
 
     try:
         os.remove(f"./zelretch/plugins/user/{plugin}.py")
-        for i in Config.HELP_DICT[plugin]["commands"]:
-            cmd = i["command"]
-            for i in zelretch.users:
-                i.remove_handler(cmd)
+        for cmd in list(Config.HELP_DICT[plugin]["commands"].keys()):
             del Config.CMD_INFO[cmd]
         del Config.HELP_DICT[plugin]
         del Config.CMD_MENU[plugin]
@@ -206,7 +203,7 @@ async def installall(client: Client, message: Message):
             if "(" in plugin:
                 os.remove(dwl_path)
                 finalStr += (
-                    f"   {Symbols.anchor} `{plugin}.py` - **𝖠𝗅𝗋𝖾𝖺𝖽𝗒 𝖨𝗇𝗌𝗍𝖺𝗅𝗅𝖾𝖽!**\n"
+                    f"   {Symbols.anchor} `{plugin}.py` - **𝖨𝗇𝗏𝖺𝗅𝗂𝖽 𝖯𝗅𝗎𝗀𝗂𝗇 𝖭𝖺𝗆𝖾!**\n"
                 )
                 continue
             try:

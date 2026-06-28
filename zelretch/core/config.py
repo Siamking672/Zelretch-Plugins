@@ -31,7 +31,6 @@ class Config:
     # users config: do not edit
     AUTH_USERS = filters.user()
     BANNED_USERS = filters.user()
-    GACHA_BOTS = filters.user()
     MUTED_USERS = filters.user()
     DEVS = filters.user([1432756163, 1874070588, 1533682758])
     MASTER_USERS = filters.user()
@@ -51,7 +50,6 @@ class ENV:
     """Database ENV Names"""
 
     airing_template = "AIRING_TEMPLATE"
-    airpollution_template = "AIRPOLLUTION_TEMPLATE"
     alive_pic = "ALIVE_PIC"
     alive_template = "ALIVE_TEMPLATE"
     anilist_user_template = "ANILIST_USER_TEMPLATE"
@@ -59,8 +57,6 @@ class ENV:
     btn_in_help = "BUTTONS_IN_HELP"
     character_template = "CHARACTER_TEMPLATE"
     chat_info_template = "CHAT_INFO_TEMPLATE"
-    climate_api = "CLIMATE_API"
-    climate_template = "CLIMATE_TEMPLATE"
     command_template = "COMMAND_TEMPLATE"
     custom_pmpermit = "CUSTOM_PMPERMIT"
     gban_template = "GBAN_TEMPLATE"
@@ -68,7 +64,6 @@ class ENV:
     help_emoji = "HELP_EMOJI"
     help_template = "HELP_TEMPLATE"
     is_logger = "IS_LOGGER"
-    lyrics_api = "LYRICS_API"
     manga_template = "MANGA_TEMPLATE"
     ping_pic = "PING_PIC"
     ping_template = "PING_TEMPLATE"
@@ -82,9 +77,7 @@ class ENV:
     sticker_packname = "STICKER_PACKNAME"
     tag_logger = "TAG_LOGGER"
     telegraph_account = "TELEGRAPH_ACCOUNT"
-    time_zone = "TIME_ZONE"
     unload_plugins = "UNLOAD_PLUGINS"
-    unsplash_api = "UNSPLASH_API"
     usage_template = "USAGE_TEMPLATE"
     user_info_template = "USER_INFO_TEMPLATE"
 

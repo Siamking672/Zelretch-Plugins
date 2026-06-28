@@ -123,7 +123,7 @@ async def reserved(client: Client, message: Message):
 
     outStr = f"🍀 **{client.me.mention}'𝗌 𝗋𝖾𝗌𝖾𝗋𝗏𝖾𝖽 𝗎𝗌𝖾𝗋𝗇𝖺𝗆𝖾𝗌:**\n\n"
     for chat in result.chats:
-        f"  {Symbols.bullet} {chat.title} - **{chat.username}**\n"
+        outStr += f"  {Symbols.bullet} {chat.title} - **{chat.username}**\n"
 
     await kaleido.edit(outStr)
 
@@ -146,7 +146,7 @@ async def userInfo(client: Client, message: Message):
         resolved = await client.resolve_peer(user.id)
         fullUser = await client.invoke(GetFullUser(id=resolved))
         bio = fullUser.about
-    except:
+    except Exception:
         bio = None
 
     total_pfp = await client.get_chat_photos_count(user.id)

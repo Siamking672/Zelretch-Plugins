@@ -61,7 +61,7 @@ async def handle_blacklists(client: Client, message: Message):
                 try:
                     await message.delete()
                 except Exception:
-                    await BList.rmBlacklist(client.me.id, message.chat.id, blacklist)
+                    pass
 
 
 HelpMenu("blacklist").add(

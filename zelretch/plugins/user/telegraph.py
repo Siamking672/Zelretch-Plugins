@@ -108,16 +108,13 @@ async def telegraph_text(client: Client, message: Message):
     )
 
     media_list = None
-    if message.reply_to_message.media:
-        page_media = await message.reply_to_message.download(Config.TEMP_DIR)
-
-        with open(page_media, "rb") as f:
-            media_list = f.readlines()
-
-        for media in media_list:
-            page_content += media.decode("utf-8") + "\n"
-
-        os.remove(page_media)
+    if message.reply_to_message.document:
+        mime = message.reply_to_message.document.mime_type or ""
+        if mime.startswith("text/"):
+            page_media = await message.reply_to_message.download(Config.TEMP_DIR)
+            with open(page_media, "r", encoding="utf-8", errors="ignore") as f:
+                page_content += f.read() + "\n"
+            os.remove(page_media)
 
     page_content = page_content.replace("\n", "<br>")
 

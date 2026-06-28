@@ -27,7 +27,7 @@ async def shutdown_bot(_, message):
 
 @on_message("cleanup", allow_master=True)
 async def cleanup_bot(_, message):
-    await zelretch.edit(message, "**♻️ Cleanup completed.**")
+    await zelretch.edit(message, "**♻️ Cleaning up...**")
     await restart(clean_up=True)
 
 

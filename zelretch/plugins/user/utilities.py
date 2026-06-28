@@ -69,9 +69,9 @@ async def paste_text(_, message: Message):
 
     if len(message.command) >= 2:
         text_to_paste = await zelretch.input(message)
-    elif message.reply_to_message.text:
+    elif message.reply_to_message and message.reply_to_message.text:
         text_to_paste = message.reply_to_message.text
-    elif message.reply_to_message.document:
+    elif message.reply_to_message and message.reply_to_message.document:
         filename = await message.reply_to_message.download(Config.TEMP_DIR)
         with open(filename, "r") as f:
             text_to_paste = f.read()

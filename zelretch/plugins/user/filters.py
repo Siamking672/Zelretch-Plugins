@@ -10,7 +10,7 @@ from . import HelpMenu, custom_handler, db, handler, zelretch, on_message, Confi
 
 @on_message("filter", allow_master=True)
 async def set_filter(client: Client, message: Message):
-    if len(message.command) < 2 and not message.reply_to_message:
+    if len(message.command) < 2 or not message.reply_to_message:
         return await zelretch.delete(
             message, f"Reply to a message with {handler}filter <keyword> to save it as a filter."
         )
@@ -55,7 +55,13 @@ async def allfilters(client: Client, message: Message):
 
         if await db.is_filter(client.me.id, message.chat.id, keyword.lower()):
             data = await db.get_filter(client.me.id, message.chat.id, keyword.lower())
-            msgid = data["filter"][0]["msgid"]
+            msgid = None
+            for f in data["filter"]:
+                if f["keyword"] == keyword.lower():
+                    msgid = f["msgid"]
+                    break
+            if msgid is None:
+                return await zelretch.delete(kaleido, "Filter does not exist.")
             sent = await client.copy_message(message.chat.id, Config.LOGGER_ID, msgid)
 
             await sent.reply_text(f"**🍀 𝖥𝗂𝗅𝗍𝖾𝗋:** `{keyword}`")
@@ -94,7 +100,7 @@ async def handle_filters(client: Client, message: Message):
         pattern = r"( |^|[^\w])" + re.escape(filter["keyword"]) + r"( |$|[^\w])"
         if re.search(pattern, msg, flags=re.IGNORECASE):
             msgid = filter["msgid"]
-            await client.copy_message(message.chat.id, Config.LOGGER_ID, msgid)
+            await client.copy_message(message.chat.id, Config.LOGGER_ID, msgid, reply_to_message_id=message.id)
             await asyncio.sleep(1)
 
 

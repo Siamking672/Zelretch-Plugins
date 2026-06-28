@@ -65,7 +65,7 @@ async def runeval(client: Client, message: Message):
     try:
         await reply_to.reply_text(final_output, disable_web_page_preview=True)
     except MessageTooLong:
-        with io.BytesIO(str.encode(output)) as out_file:
+        with io.BytesIO(str.encode(evaluation)) as out_file:
             out_file.name = "eval.txt"
             await reply_to.reply_document(out_file, caption=heading)
 
@@ -94,8 +94,9 @@ async def runterm(client: Client, message: Message):
             except Exception as err:
                 print(err)
                 await kaleido.edit(f"**Error:** \n`{err}`")
-            output += f"**{code}**\n"
-            output += process.stdout.read()[:-1].decode("utf-8")
+                continue
+            output += f"**{x}**\n"
+            output += process.stdout.read().decode("utf-8", "replace").rstrip("\n")
             output += "\n"
     else:
         shell = re.split(""" (?=(?:[^'"]|'[^']*'|"[^"]*")*$)""", cmd)
@@ -110,7 +111,7 @@ async def runterm(client: Client, message: Message):
             errors = traceback.format_exception(exc_type, exc_obj, exc_tb)
             await kaleido.edit("**Error:**\n`{}`".format("".join(errors)))
             return
-        output = process.stdout.read()[:-1].decode("utf-8")
+        output = process.stdout.read().decode("utf-8", "replace").rstrip("\n")
 
     if str(output) == "\n":
         return await kaleido.edit(f"**𝖮𝗎𝗍𝗉𝗎𝗍:** __𝖭𝗈 𝗈𝗎𝗍𝗉𝗎𝗍!__")
@@ -139,16 +140,16 @@ async def runshell(_, message: Message):
     kaleido = await zelretch.edit(message, "`executing...`")
 
     result = subprocess.run(code, shell=True, capture_output=True, text=True)
-    output = result.stdout + result.stderr
+    raw_output = result.stdout + result.stderr
 
     heading = f"**𝖲𝗁𝖾𝗅𝗅:**\n```sh\n{code}```\n\n"
-    output = f"**𝖮𝗎𝗍𝗉𝗎𝗍:**\n`{output.strip()}`"
+    output = f"**𝖮𝗎𝗍𝗉𝗎𝗍:**\n`{raw_output.strip()}`"
     final_output = heading + output
 
     try:
         await message.reply_text(final_output, disable_web_page_preview=True)
     except MessageTooLong:
-        with io.BytesIO(str.encode(output)) as out_file:
+        with io.BytesIO(str.encode(raw_output)) as out_file:
             out_file.name = "shell.txt"
             await message.reply_document(out_file, caption=heading)
 

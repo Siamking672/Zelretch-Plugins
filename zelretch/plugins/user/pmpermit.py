@@ -170,7 +170,7 @@ async def allowlist(client: Client, message: Message):
             name = (await client.get_users(user["user"])).first_name
             text += f"    {Symbols.anchor} {name} (`{user['user']}`) | {user['date']}\n"
         except:
-            text += f"    {Symbols.anchor} Unkown Peer (`{user['user']}`) | {user['date']}\n"
+            text += f"    {Symbols.anchor} Unknown Peer (`{user['user']}`) | {user['date']}\n"
 
     await kaleido.edit(text)
 
@@ -237,13 +237,13 @@ async def handle_incoming_pm(client: Client, message: Message):
 
     if warns <= 0:
         await client.block_user(message.from_user.id)
-        WARNS[client.me.id] = {message.from_user.id: max_spam}
+        WARNS.setdefault(client.me.id, {})[message.from_user.id] = max_spam
         return await client.send_message(
             message.from_user.id,
             f"**{Symbols.cross_mark} 𝖤𝗇𝗈𝗎𝗀𝗁 𝗈𝖿 𝗒𝗈𝗎𝗋 𝗌𝗉𝖺𝗆𝗆𝗂𝗇𝗀 𝗁𝖾𝗋𝖾! 𝖡𝗅𝗈𝖼𝗄𝗂𝗇𝗀 𝗒𝗈𝗎 𝖿𝗋𝗈𝗆 𝖯𝖬 𝗎𝗇𝗍𝗂𝗅 𝖿𝗎𝗋𝗍𝗁𝖾𝗋 𝗇𝗈𝗍𝗂𝖼𝖾.**",
         )
 
-    pm_msg = f"🍀 𝐇𝐞𝐥𝐥𝐁𝐨𝐭 𝐏𝐌 𝐒𝐞𝐜𝐮𝐫𝐢𝐭𝐲!\n\n"
+    pm_msg = f"🍀 Zelretch 𝐏𝐌 𝐒𝐞𝐜𝐮𝐫𝐢𝐭𝐲!\n\n"
     custom_pmmsg = await db.get_env(ENV.custom_pmpermit)
 
     if custom_pmmsg:
@@ -282,8 +282,8 @@ async def handle_incoming_pm(client: Client, message: Message):
     if prev_msg:
         await prev_msg.delete()
 
-    PREV_MESSAGE[client.me.id] = {message.from_user.id: msg}
-    WARNS[client.me.id] = {message.from_user.id: warns - 1}
+    PREV_MESSAGE.setdefault(client.me.id, {})[message.from_user.id] = msg
+    WARNS.setdefault(client.me.id, {})[message.from_user.id] = warns - 1
 
 
 HelpMenu("pmpermit").add(

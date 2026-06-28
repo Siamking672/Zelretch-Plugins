@@ -142,9 +142,8 @@ async def server_usage(_, message: Message):
 
 @on_message("logs", allow_master=True)
 async def getLogs(_, message: Message):
-    limit = int(message.command[1]) if len(message.command) > 1 else 100
-
     try:
+        limit = int(message.command[1]) if len(message.command) > 1 else 100
         if os.path.exists("Zelretch.log"):
             with open("Zelretch.log", "r") as file:
                 logData = file.readlines()

@@ -76,7 +76,8 @@ async def file_to_image(_, message: Message):
     if not message.reply_to_message or not message.reply_to_message.document:
         return await zelretch.delete(message, "Reply to a file to convert it to image.")
 
-    if message.reply_to_message.document.mime_type.split("/")[0] != "image":
+    mime = message.reply_to_message.document.mime_type or ""
+    if not mime.startswith("image"):
         return await zelretch.delete(message, "Reply to an image file.")
 
     kaleido = await zelretch.edit(message, "Converting ...")

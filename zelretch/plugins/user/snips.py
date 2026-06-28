@@ -6,7 +6,7 @@ from . import Config, HelpMenu, custom_handler, db, handler, zelretch, on_messag
 
 @on_message(["snip", "note"], allow_master=True)
 async def addsnip(client: Client, message: Message):
-    if len(message.command) < 2 and not message.reply_to_message:
+    if len(message.command) < 2 or not message.reply_to_message:
         return await zelretch.delete(
             message,
             f"Reply to a message with {handler}snip <keyword> to save it as a snip.",
@@ -38,7 +38,7 @@ async def rmsnip(client: Client, message: Message):
         else:
             await zelretch.delete(kaleido, f"**🍀 𝖲𝗇𝗂𝗉 𝖭𝗈𝗍𝖾 𝖽𝗈𝖾𝗌 𝗇𝗈𝗍 𝖾𝗑𝗂𝗌𝗍𝗌:** `#{keyword}`")
     else:
-        kaleido = await zelretch.edit(message, "Removing all filters...")
+        kaleido = await zelretch.edit(message, "Removing all snips...")
         await db.rm_all_snips(client.me.id, message.chat.id)
         await zelretch.delete(kaleido, "All snips have been removed.")
 
@@ -54,7 +54,13 @@ async def snips(client: Client, message: Message):
 
         if await db.is_snip(client.me.id, message.chat.id, keyword.lower()):
             data = await db.get_snip(client.me.id, message.chat.id, keyword.lower())
-            msgid = data["snips"][0]["msgid"]
+            msgid = None
+            for s in data["snips"]:
+                if s["keyword"] == keyword.lower():
+                    msgid = s["msgid"]
+                    break
+            if msgid is None:
+                return await zelretch.delete(kaleido, "Snip does not exist.")
             sent = await client.copy_message(message.chat.id, Config.LOGGER_ID, msgid)
 
             await sent.reply_text(f"**🍀 𝖲𝗇𝗂𝗉 𝖭𝗈𝗍𝖾:** `#{keyword}`")
@@ -80,10 +86,16 @@ async def snips(client: Client, message: Message):
     filters.incoming & filters.regex(r"^#\s*(.*)$") & filters.text & ~filters.service
 )
 async def snipHandler(client: Client, message: Message):
-    keyword = message.text.split("#", 1)[1].lower()
+    keyword = message.text.split("#", 1)[1].strip().lower()
     if await db.is_snip(client.me.id, message.chat.id, keyword):
         data = await db.get_snip(client.me.id, message.chat.id, keyword)
-        msgid = data["snips"][0]["msgid"]
+        msgid = None
+        for s in data["snips"]:
+            if s["keyword"] == keyword:
+                msgid = s["msgid"]
+                break
+        if msgid is None:
+            return await zelretch.delete(message, "Snip does not exist.")
 
         reply_to = (
             message.reply_to_message.id if message.reply_to_message else message.id

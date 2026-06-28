@@ -106,7 +106,10 @@ async def ban(client: Client, message: Message):
         else:
             reason = await zelretch.input(message)
         if message.command[0][0].lower() == "d":
-            await message.reply_to_message.delete()
+            try:
+                await message.reply_to_message.delete()
+            except Exception:
+                pass
     elif len(message.command) == 2:
         user = await client.get_users(message.command[1])
         reason = None
@@ -178,7 +181,10 @@ async def kick(client: Client, message: Message):
         else:
             reason = await zelretch.input(message)
         if message.command[0][0].lower() == "d":
-            await message.reply_to_message.delete()
+            try:
+                await message.reply_to_message.delete()
+            except Exception:
+                pass
     elif len(message.command) == 2:
         user = await client.get_users(message.command[1])
         reason = None
@@ -206,7 +212,10 @@ async def kick(client: Client, message: Message):
         f"**Kicked User**\n\n**User:** {user.mention}\n**User ID:** `{user.id}`\n**Reason:** `{reason}`\n**Admin:** `{message.from_user.mention}`\n**Group:** `{message.chat.title}`\n**Group ID:** `{message.chat.id}`",
     )
     await asyncio.sleep(5)
-    await message.chat.unban_member(user.id)
+    try:
+        await message.chat.unban_member(user.id)
+    except Exception:
+        pass
 
 
 @on_message(
@@ -273,6 +282,13 @@ async def unmute(client: Client, message: Message):
     try:
         permissions = ChatPermissions(
             can_send_messages=True,
+            can_send_media_messages=True,
+            can_send_other_messages=True,
+            can_send_polls=True,
+            can_add_web_page_previews=True,
+            can_change_info=True,
+            can_invite_users=True,
+            can_pin_messages=True,
         )
         await message.chat.restrict_member(user.id, permissions)
     except Exception as e:

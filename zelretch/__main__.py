@@ -5,7 +5,6 @@ from kurigram import idle
 from zelretch import __version__
 from zelretch.core import (
     Config,
-    GachaBotsSetup,
     TemplateSetup,
     UserSetup,
     db,
@@ -19,7 +18,6 @@ async def main():
     await zelretch.startup()
     await db.connect()
     await UserSetup()
-    await GachaBotsSetup()
     await TemplateSetup()
     await Flood.updateFromDB()
     await BList.updateBlacklists()

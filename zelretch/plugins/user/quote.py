@@ -36,8 +36,9 @@ def generate_quote(messages: list[dict]) -> tuple[bool, str]:
 def get_entities(message: Message) -> list[dict]:
     entities = []
 
-    if message.entities:
-        for entity in message.entities:
+    ents = message.entities or message.caption_entities
+    if ents:
+        for entity in ents:
             entities.append(
                 {
                     "type": entity.type.name.lower(),
@@ -75,12 +76,15 @@ async def quotely(client: Client, message: Message):
         if reply_msg_id:
             reply_msg = await client.get_messages(message.chat.id, reply_msg_id)
             if reply_msg and reply_msg.text:
-                replied_name = reply_msg.from_user.first_name
-                if reply_msg.from_user.last_name:
-                    replied_name += f" {reply_msg.from_user.last_name}"
+                if reply_msg.from_user:
+                    replied_name = reply_msg.from_user.first_name or ""
+                    if reply_msg.from_user.last_name:
+                        replied_name += f" {reply_msg.from_user.last_name}"
+                else:
+                    replied_name = reply_msg.chat.title or "Unknown"
 
                 reply_message = {
-                    "chatId": reply_msg.from_user.id,
+                    "chatId": reply_msg.from_user.id if reply_msg.from_user else reply_msg.chat.id,
                     "entities": get_entities(reply_msg),
                     "name": replied_name,
                     "text": reply_msg.text,
@@ -92,12 +96,15 @@ async def quotely(client: Client, message: Message):
     else:
         reply_message = {}
 
-    name = message.reply_to_message.from_user.first_name
-    if message.reply_to_message.from_user.last_name:
-        name += f" {message.reply_to_message.from_user.last_name}"
+    if message.reply_to_message.from_user:
+        name = message.reply_to_message.from_user.first_name or ""
+        if message.reply_to_message.from_user.last_name:
+            name += f" {message.reply_to_message.from_user.last_name}"
+    else:
+        name = message.chat.title or "Unknown"
 
     emoji_status = None
-    if message.reply_to_message.from_user.emoji_status:
+    if message.reply_to_message.from_user and message.reply_to_message.from_user.emoji_status:
         emoji_status = str(message.reply_to_message.from_user.emoji_status.custom_emoji_id)
 
     msg_data.append(
@@ -105,7 +112,7 @@ async def quotely(client: Client, message: Message):
             "entities": get_entities(message.reply_to_message),
             "avatar": True,
             "from": {
-                "id": message.reply_to_message.from_user.id,
+                "id": message.reply_to_message.from_user.id if message.reply_to_message.from_user else message.chat.id,
                 "name": name,
                 "emoji_status": emoji_status,
             },

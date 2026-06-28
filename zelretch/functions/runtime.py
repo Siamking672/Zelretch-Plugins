@@ -25,7 +25,7 @@ async def progress(
     diff = now - start
     if round(diff % 10.00) == 0 or current == total:
         percentage = current * 100 / total
-        speed = current / diff
+        speed = current / diff if diff else 0.0
         elapsed_time = round(diff) * 1000
         complete_time = round((total - current) / speed) * 1000
         estimated_total_time = elapsed_time + complete_time
@@ -72,10 +72,14 @@ async def update_dotenv(key: str, value: str) -> None:
     with open(".env", "r") as file:
         data = file.readlines()
 
+    found = False
     for index, line in enumerate(data):
         if line.startswith(f"{key}="):
             data[index] = f"{key}={value}\n"
+            found = True
             break
+    if not found:
+        data.append(f"{key}={value}\n")
 
     with open(".env", "w") as file:
         file.writelines(data)
@@ -117,7 +121,7 @@ async def restart(
     try:
         shutil.rmtree(Config.DWL_DIR)
         shutil.rmtree(Config.TEMP_DIR)
-    except BaseException:
+    except OSError:
         pass
 
     if clean_up:
@@ -182,7 +186,9 @@ async def initialize_git(git_repo: str, branch: str = None):
         repo.heads[selected_branch].set_tracking_branch(refs[selected_branch])
         repo.heads[selected_branch].checkout(True)
         force = True
-    with contextlib.suppress(BaseException):
+    try:
         repo.create_remote("upstream", f"https://github.com/{git_repo}")
+    except OSError:
+        pass
 
     return True, repo, force

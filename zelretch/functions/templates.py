@@ -1,285 +1,301 @@
+"""Zelretch message templates.
+
+Every template in this module follows a clean, modern layout:
+
+* Plain-ASCII labels (no mathematical Unicode) so messages are
+  searchable, lightweight, and render consistently across devices.
+* A single consistent bullet glyph (``▸``) for list items.
+* Section headers in bold with a thin divider line underneath.
+* Generous whitespace between sections.
+* The Fate / Rin Tohsaka theme is carried by the ``◆`` (diamond) and
+  ``▸`` (arrow) glyphs plus the ruby-red accent emoji where appropriate.
+
+All templates are stored as the first element of a one-item list so the
+``random.choice()`` calls in the render functions still work when users
+add their own custom templates via ``setvar``.
+"""
+
 import random
 
 from zelretch import __version__
 from zelretch.core import ENV, db
 
+
+# ---------------------------------------------------------------------------
+# Core status templates
+# ---------------------------------------------------------------------------
+
 ALIVE_TEMPLATES = [
     (
-        "🔴 **Zelretch Workshop: Active**\n\n"
-        "╭────── Kaleidoscope Core ──────\n"
-        "│ **Master:** {owner}\n"
-        "│ **Kurigram:** `{kurigram}`\n"
-        "│ **Zelretch:** `{zelretch}`\n"
-        "│ **Python:** `{python}`\n"
-        "│ **Uptime:** `{uptime}`\n"
-        "╰────── Rin Tohsaka Theme ──────"
+        "◆ **Zelretch Workshop** ◆\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        "**Status:** `Active`\n"
+        "**Master:** {owner}\n\n"
+        "▸ **Kurigram:** `{kurigram}`\n"
+        "▸ **Zelretch:** `{zelretch}`\n"
+        "▸ **Python:** `{python}`\n"
+        "▸ **Uptime:** `{uptime}`\n\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━\n"
+        "_Rin Tohsaka Theme_"
     ),
 ]
 
 PING_TEMPLATES = [
-    """**🔴 Gandr fired.**
-
-♦ **Response:** `{speed} ms`
-♦ **Uptime:** `{uptime}`
-♦ **Master:** {owner}""",
+    (
+        "◆ **Gandr**\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        "▸ **Response:** `{speed} ms`\n"
+        "▸ **Uptime:** `{uptime}`\n"
+        "▸ **Master:** {owner}"
+    ),
 ]
 
 HELP_MENU_TEMPLATES = [
-    """**📕 Grimoire for:** {owner}
-
-__Loaded__ **{plugins} Mystic Codes** __with__ **{commands} spells** __ready for deployment.__
-
-**📑 Page:** __{current}/{last}__""",
+    (
+        "◆ **Grimoire** ◆\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        "**For:** {owner}\n\n"
+        "▸ **Mystic Codes:** `{plugins}`\n"
+        "▸ **Spells:** `{commands}`\n\n"
+        "Page **{current}** of **{last}**"
+    ),
 ]
 
 COMMAND_MENU_TEMPLATES = [
-    """**Mystic Code:** `{file}`
-**Archive Note:** __{info} 🔴__
-
-**📜 Loaded Spells:** `{commands}`""",
+    (
+        "◆ **Mystic Code:** `{file}`\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        "_{info}_\n\n"
+        "▸ **Loaded Spells:** `{commands}`"
+    ),
 ]
 
-ANIME_TEMPLATES = [
-    """
-{name}
 
-╭────────────────•
-╰➢ **𝖲𝖼𝗈𝗋𝖾:** `{score}`
-╰➢ **𝖲𝗈𝗎𝗋𝖼𝖾:** `{source}`
-╰➢ **𝖳𝗒𝗉𝖾:** `{mtype}`
-╰➢ **𝖤𝗉𝗂𝗌𝗈𝖽𝖾𝗌:** `{episodes}`
-╰➢ **𝖣𝗎𝗋𝖺𝗍𝗂𝗈𝗇:** `{duration} minutes`
-╰➢ **𝖲𝗍𝖺𝗍𝗎𝗌:** `{status}`
-╰➢ **𝖥𝗈𝗋𝗆𝖺𝗍:** `{format}`
-╰➢ **𝖦𝖾𝗇𝗋𝖾:** `{genre}`
-╰➢ **𝖳𝖺𝗀𝗌:** `{tags}`
-╰➢ **𝖠𝖽𝗎𝗅𝗍 𝖱𝖺𝗍𝖾𝖽:** `{isAdult}`
-╰➢ **𝖲𝗍𝗎𝖽𝗂𝗈:** `{studio}`
-╰➢ **𝖳𝗋𝖺𝗂𝗅𝖾𝗋:** {trailer}
-╰➢ **𝖶𝖾𝖻𝗌𝗂𝗍𝖾:** {siteurl}
-╰➢ **𝖲𝗒𝗇𝗈𝗉𝗌𝗂𝗌:** [𝖢𝗅𝗂𝖼𝗄 𝖧𝖾𝗋𝖾]({description})
-╰────────────────•
-"""
+# ---------------------------------------------------------------------------
+# Anime / Manga / Character (AniList)
+# ---------------------------------------------------------------------------
+
+ANIME_TEMPLATES = [
+    (
+        "◆ **{name}**\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        "▸ **Score:** `{score}`\n"
+        "▸ **Source:** `{source}`\n"
+        "▸ **Type:** `{mtype}`\n"
+        "▸ **Episodes:** `{episodes}`\n"
+        "▸ **Duration:** `{duration} min`\n"
+        "▸ **Status:** `{status}`\n"
+        "▸ **Format:** `{format}`\n"
+        "▸ **Genre:** `{genre}`\n"
+        "▸ **Tags:** `{tags}`\n"
+        "▸ **Adult Rated:** `{isAdult}`\n"
+        "▸ **Studio:** `{studio}`\n\n"
+        "▸ **Trailer:** {trailer}\n"
+        "▸ **Website:** {siteurl}\n"
+        "▸ **Synopsis:** [Read]({description})"
+    ),
 ]
 
 MANGA_TEMPLATES = [
-    """
-{name}
-
-╭────────────────•
-╰➢ **𝖲𝖼𝗈𝗋𝖾:** `{score}`
-╰➢ **𝖲𝗈𝗎𝗋𝖼𝖾:** `{source}`
-╰➢ **𝖳𝗒𝗉𝖾:** `{mtype}`
-╰➢ **𝖢𝗁𝖺𝗉𝗍𝖾𝗋𝗌:** `{chapters}`
-╰➢ **𝖵𝗈𝗅𝗎𝗆𝖾𝗌:** `{volumes}`
-╰➢ **𝖲𝗍𝖺𝗍𝗎𝗌:** `{status}`
-╰➢ **𝖥𝗈𝗋𝗆𝖺𝗍:** `{format}`
-╰➢ **𝖦𝖾𝗇𝗋𝖾:** `{genre}`
-╰➢ **𝖠𝖽𝗎𝗅𝗍 𝖱𝖺𝗍𝖾𝖽:** `{isAdult}`
-╰➢ **𝖶𝖾𝖻𝗌𝗂𝗍𝖾:** {siteurl}
-╰➢ **𝖲𝗒𝗇𝗈𝗉𝗌𝗂𝗌:** [𝖢𝗅𝗂𝖼𝗄 𝖧𝖾𝗋𝖾]({description})
-╰────────────────•
-"""
+    (
+        "◆ **{name}**\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        "▸ **Score:** `{score}`\n"
+        "▸ **Source:** `{source}`\n"
+        "▸ **Type:** `{mtype}`\n"
+        "▸ **Chapters:** `{chapters}`\n"
+        "▸ **Volumes:** `{volumes}`\n"
+        "▸ **Status:** `{status}`\n"
+        "▸ **Format:** `{format}`\n"
+        "▸ **Genre:** `{genre}`\n"
+        "▸ **Adult Rated:** `{isAdult}`\n\n"
+        "▸ **Website:** {siteurl}\n"
+        "▸ **Synopsis:** [Read]({description})"
+    ),
 ]
 
 CHARACTER_TEMPLATES = [
-    """
-{name}
-
-╭────────────────•
-╰➢ **𝖦𝖾𝗇𝖽𝖾𝗋:** `{gender}`
-╰➢ **𝖣𝖺𝗍𝖾 𝗈𝖿 𝖡𝗂𝗋𝗍𝗁:** `{date_of_birth}`
-╰➢ **𝖠𝗀𝖾:** `{age}`
-╰➢ **𝖡𝗅𝗈𝗈𝖽 𝖳𝗒𝗉𝖾:** `{blood_type}`
-╰➢ **𝖥𝖺𝗏𝗈𝗎𝗋𝗂𝗍𝖾𝗌:** `{favorites}`
-╰➢ **𝖶𝖾𝖻𝗌𝗂𝗍𝖾:** {siteurl}{role_in}
-╰────────────────•
-{description}
-"""
+    (
+        "◆ **{name}**\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        "▸ **Gender:** `{gender}`\n"
+        "▸ **Date of Birth:** `{date_of_birth}`\n"
+        "▸ **Age:** `{age}`\n"
+        "▸ **Blood Type:** `{blood_type}`\n"
+        "▸ **Favorites:** `{favorites}`\n"
+        "▸ **Website:** {siteurl}{role_in}\n\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        "{description}"
+    ),
 ]
 
 AIRING_TEMPLATES = [
-    """
-{name}
-
-╭────────────────•
-╰➢ **𝖲𝗍𝖺𝗍𝗎𝗌:** `{status}`
-╰➢ **𝖤𝗉𝗂𝗌𝗈𝖽𝖾:** `{episode}`
-╰────────────────•{airing_info}
-"""
+    (
+        "◆ **{name}**\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        "▸ **Status:** `{status}`\n"
+        "▸ **Episode:** `{episode}`\n\n"
+        "{airing_info}"
+    ),
 ]
 
 ANILIST_USER_TEMPLATES = [
-    """
-**💫 {name}**
-
-╭──── 𝖠𝗇𝗂𝗆𝖾 ─────•
-╰➢ **𝖢𝗈𝗎𝗇𝗍:** `{anime_count}`
-╰➢ **𝖲𝖼𝗈𝗋𝖾:** `{anime_score}`
-╰➢ **𝖬𝗂𝗇𝗎𝗍𝖾𝗌 𝖲𝗉𝖾𝗇𝗍:** `{minutes}`
-╰➢ **𝖤𝗉𝗂𝗌𝗈𝖽𝖾𝗌 𝖶𝖺𝗍𝖼𝗁𝖾𝖽:** `{episodes}`
-╰────────────────•
-╭──── 𝖬𝖺𝗇𝗀𝖺 ─────•
-╰➢ **𝖢𝗈𝗎𝗇𝗍:** `{manga_count}`
-╰➢ **𝖲𝖼𝗈𝗋𝖾:** `{manga_score}`
-╰➢ **𝖢𝗁𝖺𝗉𝗍𝖾𝗋𝗌:** `{chapters}`
-╰➢ **𝖵𝗈𝗅𝗎𝗆𝖾𝗌:** `{volumes}`
-╰────────────────•
-
-𝖶𝖾𝖻𝗌𝗂𝗍𝖾: {siteurl}
-"""
+    (
+        "◆ **{name}**\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        "**Anime**\n"
+        "▸ **Count:** `{anime_count}`\n"
+        "▸ **Mean Score:** `{anime_score}`\n"
+        "▸ **Minutes Watched:** `{minutes}`\n"
+        "▸ **Episodes:** `{episodes}`\n\n"
+        "**Manga**\n"
+        "▸ **Count:** `{manga_count}`\n"
+        "▸ **Mean Score:** `{manga_score}`\n"
+        "▸ **Chapters Read:** `{chapters}`\n"
+        "▸ **Volumes Read:** `{volumes}`\n\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━\n"
+        "▸ **Profile:** {siteurl}"
+    ),
 ]
 
-CLIMATE_TEMPLATES = [
-    """
-🌆 {city_name}, {country}
 
-╭────────────────•
-╰➢ **𝖶𝖾𝖺𝗍𝗁𝖾𝗋:** {weather}
-╰➢ **𝖳𝗂𝗆𝖾𝗓𝗈𝗇𝖾:** {timezone}
-╰➢ **𝖲𝗎𝗇𝗋𝗂𝗌𝖾:** {sunrise}
-╰➢ **𝖲𝗎𝗇𝗌𝖾𝗍:** {sunset}
-╰➢ **𝖶𝗂𝗇𝖽:** {wind}
-╰➢ **𝖳𝖾𝗆𝗉𝖾𝗋𝖺𝗍𝗎𝗋𝖾:** {temperature}°C
-╰➢ **𝖥𝖾𝖾𝗅𝗌 𝗅𝗂𝗄𝖾:** {feels_like}°C
-╰➢ **𝖬𝗂𝗇𝗂𝗆𝗎𝗆:** {temp_min}°C
-╰➢ **𝖬𝖺𝗑𝗂𝗆𝗎𝗆:** {temp_max}°C
-╰➢ **𝖯𝗋𝖾𝗌𝗌𝗎𝗋𝖾:** {pressure} hPa
-╰➢ **𝖧𝗎𝗆𝗂𝖽𝗂𝗍𝗒:** {humidity}%
-╰➢ **𝖵𝗂𝗌𝗂𝖻𝗂𝗅𝗂𝗍𝗒:** {visibility} m
-╰➢ **𝖢𝗅𝗈𝗎𝖽𝗌:** {clouds}%
-╰────────────────•
-"""
-]
-
-AIR_POLLUTION_TEMPLATES = [
-    """
-🌆 {city_name}
-
-╭────────────────•
-╰➢ **𝖠𝖰𝖨:** {aqi}
-╰➢ **𝖢𝖺𝗋𝖻𝗈𝗇 𝖬𝗈𝗇𝗈𝗑𝗂𝖽𝖾:** {co}
-╰➢ **𝖭𝗈𝗂𝗍𝗋𝗈𝗀𝖾𝗇 𝖬𝗈𝗇𝗈𝗑𝗂𝖽𝖾:** {no}
-╰➢ **𝖭𝗂𝗍𝗋𝗈𝗀𝖾𝗇 𝖣𝗂𝗈𝗑𝗂𝖽𝖾:** {no2}
-╰➢ **𝖮𝗓𝗈𝗇𝖾:** {o3}
-╰➢ **𝖲𝗎𝗅𝗉𝗁𝗎𝗋 𝖣𝗂𝗈𝗑𝗂𝖽𝖾:** {so2}
-╰➢ **𝖠𝗆𝗆𝗈𝗇𝗂𝖺:** {nh3}
-╰➢ **𝖥𝗂𝗇𝖾 𝖯𝖺𝗋𝗍𝗂𝖼𝗅𝖾𝗌 (PM{sub2_5}):** {pm2_5}
-╰➢ **𝖢𝗈𝖺𝗋𝗌𝖾 𝖯𝖺𝗋𝗍𝗂𝖼𝗅𝖾𝗌 (PM{sub10}):** {pm10}
-╰────────────────•
-"""
-]
+# ---------------------------------------------------------------------------
+# GitHub
+# ---------------------------------------------------------------------------
 
 GITHUB_USER_TEMPLATES = [
-    """
-🍀 {username} ({git_id})
-
-╭──────── {id_type} ────────•
-╰➢ **𝖭𝖺𝗆𝖾:** [{name}]({profile_url})
-╰➢ **𝖡𝗅𝗈𝗀:** {blog}
-╰➢ **𝖢𝗈𝗆𝗉𝖺𝗇𝗒:** {company}
-╰➢ **𝖤𝗆𝖺𝗂𝗅:** {email}
-╰➢ **𝖫𝗈𝖼𝖺𝗍𝗂𝗈𝗇:** {location}
-╰➢ **𝖱𝖾𝗉𝗈:** {public_repos}
-╰➢ **𝖦𝗂𝗌𝗍𝗌:** {public_gists}
-╰➢ **𝖥𝗈𝗅𝗅𝗈𝗐𝖾𝗋𝗌:** {followers}
-╰➢ **𝖥𝗈𝗅𝗅𝗈𝗐𝗂𝗇𝗀:** {following}
-╰➢ **𝖠𝖼𝖼𝗈𝗎𝗇𝗍 𝖼𝗋𝖾𝖺𝗍𝖾𝖽:** {created_at}
-╰────────────────•
-
-**💫 𝖡𝗂𝗈:** {bio}
-"""
+    (
+        "◆ **{username}**\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        "▸ **Name:** [{name}]({profile_url})\n"
+        "▸ **Type:** `{id_type}`\n"
+        "▸ **ID:** `{git_id}`\n\n"
+        "**Links**\n"
+        "▸ **Blog:** {blog}\n"
+        "▸ **Company:** {company}\n"
+        "▸ **Email:** {email}\n"
+        "▸ **Location:** {location}\n\n"
+        "**Stats**\n"
+        "▸ **Repositories:** `{public_repos}`\n"
+        "▸ **Gists:** `{public_gists}`\n"
+        "▸ **Followers:** `{followers}`\n"
+        "▸ **Following:** `{following}`\n"
+        "▸ **Created:** `{created_at}`\n\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━\n"
+        "_{bio}_"
+    ),
 ]
+
+
+# ---------------------------------------------------------------------------
+# Statistics
+# ---------------------------------------------------------------------------
 
 STATISTICS_TEMPLATES = [
-    """
-🍀 {name}
-
-╭──────── 𝖢𝗁𝖺𝗇𝗇𝖾𝗅𝗌 ────────•
-╰➢ **𝖳𝗈𝗍𝖺𝗅:** `{channels}`
-╰➢ **𝖠𝖽𝗆𝗂𝗇:** `{ch_admin}`
-╰➢ **𝖮𝗐𝗇𝖾𝗋:** `{ch_owner}`
-
-╭──────── 𝖦𝗋𝗈𝗎𝗉𝗌 ────────•
-╰➢ **𝖳𝗈𝗍𝖺𝗅:** `{groups}`
-╰➢ **𝖠𝖽𝗆𝗂𝗇:** `{gc_admin}`
-╰➢ **𝖮𝗐𝗇𝖾𝗋:** `{gc_owner}`
-
-╭──────── 𝖮𝗍𝗁𝖾𝗋𝗌 ────────•
-╰➢ **𝖯𝗋𝗂𝗏𝖺𝗍𝖾:** `{users}`
-╰➢ **𝖡𝗈𝗍𝗌:** `{bots}`
-╰➢ **𝖴𝗇𝗋𝖾𝖺𝖽 𝖬𝖾𝗌𝗌𝖺𝗀𝖾𝗌:** `{unread_msg}`
-╰➢ **𝖴𝗇𝗋𝖾𝖺𝖽 𝖬𝖾𝗇𝗍𝗂𝗈𝗇𝗌:** `{unread_mention}`
-
-⌛ **𝖳𝗂𝗆𝖾 𝖳𝖺𝗄𝖾𝗇:** `{time_taken}`
-"""
+    (
+        "◆ **{name}**\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        "**Channels**\n"
+        "▸ **Total:** `{channels}`\n"
+        "▸ **Admin:** `{ch_admin}`\n"
+        "▸ **Owner:** `{ch_owner}`\n\n"
+        "**Groups**\n"
+        "▸ **Total:** `{groups}`\n"
+        "▸ **Admin:** `{gc_admin}`\n"
+        "▸ **Owner:** `{gc_owner}`\n\n"
+        "**Others**\n"
+        "▸ **Private Chats:** `{users}`\n"
+        "▸ **Bots:** `{bots}`\n"
+        "▸ **Unread Messages:** `{unread_msg}`\n"
+        "▸ **Unread Mentions:** `{unread_mention}`\n\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━\n"
+        "⏱ **Time Taken:** `{time_taken}`"
+    ),
 ]
+
+
+# ---------------------------------------------------------------------------
+# Global admin actions
+# ---------------------------------------------------------------------------
 
 GBAN_TEMPLATES = [
-    """
-╭──────── {gtype} ────────•
-╰➢ **𝖵𝗂𝖼𝗍𝗂𝗆:** {name}
-╰➢ **𝖲𝗎𝖼𝖼𝖾𝗌𝗌:** {success}
-╰➢ **𝖥𝖺𝗂𝗅𝖾𝖽:** {failed}
-╰➢ **𝖱𝖾𝖺𝗌𝗈𝗇:** {reason}
-╰────────────────•
-"""
+    (
+        "◆ **{gtype}**\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        "▸ **Target:** {name}\n"
+        "▸ **Success:** `{success}`\n"
+        "▸ **Failed:** `{failed}`\n"
+        "▸ **Reason:** {reason}"
+    ),
 ]
+
+
+# ---------------------------------------------------------------------------
+# Server usage
+# ---------------------------------------------------------------------------
 
 USAGE_TEMPLATES = [
-    """
-**📝 𝖣𝗂𝗌𝗄 & 𝖣𝗒𝗇𝗈 𝖴𝗌𝖺𝗀𝖾:**
-
-**➢ 𝖣𝗒𝗇𝗈 𝖴𝗌𝖺𝗀𝖾 𝖿𝗈𝗋** `{appName}`
-    ◈ __{appHours}hrs {appMinutes}mins__ | __{appPercentage}%__
-
-**➢ 𝖣𝗒𝗇𝗈 𝗋𝖾𝗆𝖺𝗂𝗇𝗂𝗇𝗀 𝗍𝗁𝗂𝗌 𝗆𝗈𝗇𝗍𝗁:**
-    ◈ __{hours}hrs {minutes}mins__ | __{percentage}%__
-
-**➢ 𝖣𝗂𝗌𝗄 𝖴𝗌𝖺𝗀𝖾:**
-    ◈ __{diskUsed}GB__ / __{diskTotal}GB__ | __{diskPercent}%__
-
-**➢ 𝖬𝖾𝗆𝗈𝗋𝗒 𝖴𝗌𝖺𝗀𝖾:**
-    ◈ __{memoryUsed}GB__ / __{memoryTotal}GB__ | __{memoryPercent}%__
-"""
+    (
+        "◆ **Server Usage**\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        "**Dyno — {appName}**\n"
+        "▸ **Used:** `{appHours}h {appMinutes}m` (`{appPercentage}%`)\n\n"
+        "**Dyno — This Month**\n"
+        "▸ **Remaining:** `{hours}h {minutes}m` (`{percentage}%`)\n\n"
+        "**Disk**\n"
+        "▸ **Used:** `{diskUsed}GB` / `{diskTotal}GB` (`{diskPercent}%`)\n\n"
+        "**Memory**\n"
+        "▸ **Used:** `{memoryUsed}GB` / `{memoryTotal}GB` (`{memoryPercent}%`)"
+    ),
 ]
 
+
+# ---------------------------------------------------------------------------
+# User / Chat info
+# ---------------------------------------------------------------------------
+
 USER_INFO_TEMPLATES = [
-    """
-**🍀 𝖴𝗌𝖾𝗋 𝖨𝗇𝖿𝗈 𝗈𝖿 {mention}:**
-
-**➢ 𝖥𝗂𝗋𝗌𝗍 𝖭𝖺𝗆𝖾:** `{firstName}`
-**➢ 𝖫𝖺𝗌𝗍 𝖭𝖺𝗆𝖾:** `{lastName}`
-**➢ 𝖴𝗌𝖾𝗋𝖨𝖣:** `{userId}`
-
-**➢ 𝖢𝗈𝗆𝗆𝗈𝗇 𝖦𝗋𝗈𝗎𝗉𝗌:** `{commonGroups}`
-**➢ 𝖣𝖢-𝖨𝖣:** `{dcId}`
-**➢ 𝖯𝗂𝖼𝗍𝗎𝗋𝖾𝗌:** `{totalPictures}`
-**➢ 𝖱𝖾𝗌𝗍𝗋𝗂𝖼𝗍𝖾𝖽:** `{isRestricted}`
-**➢ 𝖵𝖾𝗋𝗂𝖿𝗂𝖾𝖽:** `{isVerified}`
-**➢ 𝖡𝗈𝗍:** `{isBot}`
-**➢ 𝖡𝗂𝗈:** `{bio}`
-
-"""
+    (
+        "◆ **User Info**\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        "**{mention}**\n\n"
+        "▸ **First Name:** `{firstName}`\n"
+        "▸ **Last Name:** `{lastName}`\n"
+        "▸ **User ID:** `{userId}`\n"
+        "▸ **DC:** `{dcId}`\n\n"
+        "**Details**\n"
+        "▸ **Common Groups:** `{commonGroups}`\n"
+        "▸ **Pictures:** `{totalPictures}`\n"
+        "▸ **Restricted:** `{isRestricted}`\n"
+        "▸ **Verified:** `{isVerified}`\n"
+        "▸ **Bot:** `{isBot}`\n\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━\n"
+        "_{bio}_"
+    ),
 ]
 
 CHAT_INFO_TEMPLATES = [
-    """
-**🍀 𝖢𝗁𝖺𝗍 𝖨𝗇𝖿𝗈:**
-
-**➢ 𝖢𝗁𝖺𝗍 𝖭𝖺𝗆𝖾:** `{chatName}`
-**➢ 𝖢𝗁𝖺𝗍 𝖨𝖣:** `{chatId}`
-**➢ 𝖢𝗁𝖺𝗍 𝖫𝗂𝗇𝗄:** {chatLink}
-**➢ 𝖮𝗐𝗇𝖾𝗋:** {chatOwner}
-**➢ 𝖣𝖢-𝖨𝖣:** `{dcId}`
-**➢ 𝖬𝖾𝗆𝖻𝖾𝗋𝗌:** `{membersCount}`
-**➢ 𝖠𝖽𝗆𝗂𝗇𝗌:** `{adminsCount}`
-**➢ 𝖡𝗈𝗍𝗌:** `{botsCount}`
-**➢ 𝖣𝖾𝗌𝖼𝗋𝗂𝗉𝗍𝗂𝗈𝗇:** `{description}`
-
-"""
+    (
+        "◆ **Chat Info**\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        "**{chatName}**\n\n"
+        "▸ **Chat ID:** `{chatId}`\n"
+        "▸ **Link:** {chatLink}\n"
+        "▸ **Owner:** {chatOwner}\n"
+        "▸ **DC:** `{dcId}`\n\n"
+        "**Members**\n"
+        "▸ **Total:** `{membersCount}`\n"
+        "▸ **Admins:** `{adminsCount}`\n"
+        "▸ **Bots:** `{botsCount}`\n\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━\n"
+        "_{description}_"
+    ),
 ]
 
+
+# ---------------------------------------------------------------------------
+# Render functions
+# ---------------------------------------------------------------------------
 
 async def alive_template(owner: str, uptime: str) -> str:
     template = await db.get_env(ENV.alive_template)
@@ -387,24 +403,6 @@ async def anilist_user_templates(
         volumes=manga[3],
         siteurl=siteurl,
     )
-
-
-async def climate_templates(**kwargs) -> str:
-    template = await db.get_env(ENV.climate_template)
-    if template:
-        message = template
-    else:
-        message = random.choice(CLIMATE_TEMPLATES)
-    return message.format(**kwargs)
-
-
-async def airpollution_templates(**kwargs) -> str:
-    template = await db.get_env(ENV.airpollution_template)
-    if template:
-        message = template
-    else:
-        message = random.choice(AIR_POLLUTION_TEMPLATES)
-    return message.format(**kwargs)
 
 
 async def statistics_templates(**kwargs) -> str:

@@ -3,7 +3,7 @@ import time
 
 import httpx
 from bs4 import BeautifulSoup
-from urllib.parse import quote, urlparse
+from urllib.parse import quote
 from zelretch.core import Symbols
 
 from .paste import post_to_telegraph
@@ -83,17 +83,17 @@ manga_query = """query ($id: Int,$search: String) {
 
 
 character_query = """query ($id: Int, $search: String) {
-  	Page {
-	    characters (id: $id, search: $search) {
+        Page {
+            characters (id: $id, search: $search) {
             id
             name {
                 full
-        	    native
-      	    }
-          	image {
+                    native
+            }
+                image {
                 large
             }
-      	    description
+            description
             gender
             dateOfBirth {
                 year
@@ -102,7 +102,7 @@ character_query = """query ($id: Int, $search: String) {
             }
             age
             bloodType
-      	    siteUrl
+            siteUrl
             favourites
             media {
                 nodes {
@@ -142,9 +142,9 @@ airing_query = """query ($id: Int, $idMal:Int, $search: String) {
 
 
 anilist_user_query = """query($id: Int, $search: String) {
-	User(id: $id, name: $search) {
-		id
-		name
+        User(id: $id, name: $search) {
+                id
+                name
         siteUrl
         statistics {
             anime {
@@ -160,16 +160,8 @@ anilist_user_query = """query($id: Int, $search: String) {
                 volumesRead
             }
         }
-	}
+        }
 }"""
-
-
-def is_valid_url(text: str) -> bool:
-    try:
-        result = urlparse(text)
-        return all([result.scheme, result.netloc])
-    except ValueError:
-        return False
 
 
 def post_request(query: str, search_term: str):

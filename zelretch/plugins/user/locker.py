@@ -1,6 +1,3 @@
-import datetime
-import time
-
 from kurigram import Client
 from kurigram.enums import ChatType
 from kurigram.types import ChatPermissions, Message
@@ -20,14 +17,17 @@ async def lockGC(client: Client, message: Message):
 
     if len(message.command) > 2:
         time_data = message.command[2]
-        if time_data.endswith(("d", "day", "days")):
-            mtime = int(time_data.split("d")[0].strip()) * 24 * 60 * 60
-        elif time_data.endswith(("h", "hrs", "hour", "hours")):
-            mtime = int(time_data.split("h")[0].strip()) * 60 * 60
-        elif time_data.endswith(("m", "mins", "minute", "minutes")):
-            mtime = int(time_data.split("m")[0].strip()) * 60
-        else:
-            mtime = 0
+        try:
+            if "d" in time_data:
+                mtime = int(time_data.split("d")[0].strip()) * 24 * 60 * 60
+            elif "h" in time_data:
+                mtime = int(time_data.split("h")[0].strip()) * 60 * 60
+            elif "m" in time_data:
+                mtime = int(time_data.split("m")[0].strip()) * 60
+            else:
+                return await zelretch.delete(message, "Invalid duration format. Use xd, xh, or xm.")
+        except ValueError:
+            return await zelretch.delete(message, "Duration must be a number. Use xd, xh, or xm.")
     else:
         mtime = 0
         time_data = "forever"
@@ -62,10 +62,7 @@ async def lockGC(client: Client, message: Message):
     else:
         return await zelretch.delete(message, "Invalid lock type.")
 
-    until_date = datetime.datetime.fromtimestamp(time.time() + mtime)
-    await client.restrict_chat_member(
-        message.chat.id, message.from_user.id, perms, until_date
-    )
+    await client.set_chat_permissions(message.chat.id, perms)
 
     await zelretch.edit(
         message,
@@ -113,7 +110,7 @@ async def unlockGC(client: Client, message: Message):
     else:
         return await zelretch.delete(message, "Invalid lock type.")
 
-    await client.restrict_chat_member(message.chat.id, message.from_user.id, perms)
+    await client.set_chat_permissions(message.chat.id, perms)
 
     await zelretch.edit(message, f"**Unlocked {lock_type} for {message.chat.title}**")
 

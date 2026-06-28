@@ -8,13 +8,18 @@ from . import HelpMenu, db, zelretch, on_message
 
 @on_message("echo", allow_master=True)
 async def echo(client: Client, message: Message):
-    if message.reply_to_message:
+    if message.reply_to_message and message.reply_to_message.from_user:
         user = message.reply_to_message.from_user.id
     elif len(message.command) > 1:
-        user = (await client.get_users(message.command[1])).id
+        try:
+            user = (await client.get_users(message.command[1])).id
+        except Exception:
+            return await zelretch.delete(
+                message, "Reply to a user or give their id/username."
+            )
     else:
         return await zelretch.delete(
-            message, "Reply to an user or pass me a user id to start echoing!"
+            message, "Reply to a user or give their id/username."
         )
 
     if await db.is_echo(client.me.id, message.chat.id, user):
@@ -26,13 +31,18 @@ async def echo(client: Client, message: Message):
 
 @on_message("unecho", allow_master=True)
 async def unecho(client: Client, message: Message):
-    if message.reply_to_message:
+    if message.reply_to_message and message.reply_to_message.from_user:
         user = message.reply_to_message.from_user.id
     elif len(message.command) > 1:
-        user = (await client.get_users(message.command[1])).id
+        try:
+            user = (await client.get_users(message.command[1])).id
+        except Exception:
+            return await zelretch.delete(
+                message, "Reply to a user or give their id/username."
+            )
     else:
         return await zelretch.delete(
-            message, "Reply to an user or pass me a user id to stop echoing!"
+            message, "Reply to a user or give their id/username."
         )
 
     if not await db.is_echo(client.me.id, message.chat.id, user):
@@ -57,10 +67,11 @@ async def listecho(client: Client, message: Message):
 
 @on_message(["resend", "copy"], allow_master=True)
 async def reSend(_, message: Message):
-    if message.reply_to_message:
-        await message.reply_to_message.copy(
-            message.chat.id, reply_to_message_id=message.reply_to_message.id
-        )
+    if not message.reply_to_message:
+        return await zelretch.delete(message, "Reply to a message to resend it.")
+    await message.reply_to_message.copy(
+        message.chat.id, reply_to_message_id=message.reply_to_message.id
+    )
     await message.delete()
 
 

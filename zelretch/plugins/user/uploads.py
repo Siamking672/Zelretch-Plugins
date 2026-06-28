@@ -46,11 +46,9 @@ async def uploadDir(_, message: Message):
         return await zelretch.error(kaleido, f"**Error:** `{query}` **not found.**")
 
     files_list = []
-    for root, dirs, files in os.walk(query):
+    for root, _, files in os.walk(query):
         for file in files:
             files_list.append(os.path.join(root, file))
-        for dir in dirs:
-            files_list.append(os.path.join(root, dir))
 
     uploaded = 0
     await kaleido.edit(f"**Uploading...** `{len(files_list)} files...`")

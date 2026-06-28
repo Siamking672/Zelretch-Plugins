@@ -18,7 +18,7 @@ async def carbon(_, message: Message):
 
     driver, resp = Driver.get()
     if not driver:
-        return await zelretch.error(message, resp)
+        return await zelretch.error(kaleido, resp)
 
     await kaleido.edit("**[ 75% ]** __Making carbon...__")
     image = await Driver.generate_carbon(driver, code)
@@ -42,7 +42,7 @@ async def karbon(_, message: Message):
 
     driver, resp = Driver.get()
     if not driver:
-        return await zelretch.error(message, resp)
+        return await zelretch.error(kaleido, resp)
 
     await kaleido.edit("**[ 75% ]** __Making karbon...__")
     image = await Driver.generate_carbon(driver, code, True)

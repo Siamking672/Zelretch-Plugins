@@ -1,7 +1,7 @@
 from .clients import zelretch
 from .config import ENV, Config, Limits, Symbols
 from .database import db
-from .initializer import GachaBotsSetup, TemplateSetup, UserSetup
+from .initializer import TemplateSetup, UserSetup
 from .logger import LOGS
 
 __all__ = [
@@ -11,7 +11,6 @@ __all__ = [
     "Limits",
     "Symbols",
     "db",
-    "GachaBotsSetup",
     "TemplateSetup",
     "UserSetup",
     "LOGS",

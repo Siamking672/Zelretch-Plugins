@@ -22,8 +22,8 @@ async def banall(client: Client, message: Message):
         except Exception as e:
             return await zelretch.error(message, f"__Invalid chatId.__\n\n`{e}`")
 
-    ban_right = await message.chat.get_member(client.me.id)
-    if not ban_right.privileges.can_restrict_members:
+    ban_right = await client.get_chat_member(chat_id, client.me.id)
+    if not (ban_right.privileges and ban_right.privileges.can_restrict_members):
         return await zelretch.delete(
             message,
             f"__I don't have enough rights to ban users in {chat_name}.__\n\n__Give me permission to ban users and try again.__",
@@ -60,14 +60,14 @@ async def unbanall(client: Client, message: Message):
 
     if len(message.command) > 1:
         try:
-            chat = await zelretch.get_chat(message.command[1])
+            chat = await client.get_chat(message.command[1])
             chat_id = chat.id
             chat_name = chat.title
         except Exception as e:
             return await zelretch.error(message, f"__Invalid chatId.__\n\n`{e}`")
 
-    ban_right = await message.chat.get_member(zelretch.me.id)
-    if not ban_right.privileges.can_restrict_members:
+    ban_right = await client.get_chat_member(chat_id, client.me.id)
+    if not (ban_right.privileges and ban_right.privileges.can_restrict_members):
         return await zelretch.delete(
             message,
             f"__I don't have enough rights to unban users in {chat_name}.__\n\n__Give me permission to ban users and try again.__",
@@ -111,8 +111,8 @@ async def kickall(client: Client, message: Message):
         except Exception as e:
             return await zelretch.error(message, f"__Invalid chatId.__\n\n`{e}`")
 
-    ban_right = await message.chat.get_member(client.me.id)
-    if not ban_right.privileges.can_restrict_members:
+    ban_right = await client.get_chat_member(chat_id, client.me.id)
+    if not (ban_right.privileges and ban_right.privileges.can_restrict_members):
         return await zelretch.delete(
             message,
             f"__I don't have enough rights to kick users in {chat_name}.__\n\n__Give me permission to ban users and try again.__",
@@ -156,7 +156,10 @@ async def deleteall(client: Client, message: Message):
         )
 
     kaleido = await zelretch.edit(message, "__Deleting all messages from this user.__")
-    user = message.reply_to_message.from_user.id
+    target = message.reply_to_message.from_user
+    if not target:
+        return await zelretch.delete(message, "Can't identify that user.")
+    user = target.id
 
     await client.delete_user_history(message.chat.id, user)
     await zelretch.delete(kaleido, "__All messages from this user has been deleted.__")

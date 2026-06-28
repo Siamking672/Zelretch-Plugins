@@ -8,6 +8,7 @@ from kurigram.types import Message
 
 from zelretch.core import Config, db, zelretch
 from zelretch.functions.formatter import add_to_dict, get_from_dict, readable_time
+from zelretch.functions.images import convert_to_png
 
 from . import HelpMenu, custom_handler, group_only, on_message
 
@@ -36,6 +37,8 @@ afk_quotes = [
 
 @on_message("afk")
 async def afk(_, message: Message):
+    if not message.from_user:
+        return
     if await db.is_afk(message.from_user.id):
         return await zelretch.delete(message, "🙄 𝖨'𝗆 𝖺𝗅𝗋𝖾𝖺𝖽𝗒 𝖠𝖥𝖪!")
 
@@ -74,6 +77,9 @@ async def afk(_, message: Message):
 
 @custom_handler(filters.incoming & ~filters.bot & ~filters.service)
 async def afk_watch(client: Client, message: Message):
+    if not message.from_user:
+        return
+
     afk_data = await db.get_afk(client.me.id)
     if not afk_data:
         return
@@ -91,7 +97,10 @@ async def afk_watch(client: Client, message: Message):
     if afk_data["media_type"] == "animation":
         media = await client.get_messages(Config.LOGGER_ID, afk_data["media"])
         sent = await client.send_animation(
-            message.chat.id, media.animation.file_id, caption, True
+            message.chat.id,
+            media.animation.file_id,
+            caption=caption,
+            reply_to_message_id=message.id,
         )
 
     elif afk_data["media_type"] in ["audio", "photo", "video", "voice"]:
@@ -105,9 +114,13 @@ async def afk_watch(client: Client, message: Message):
 
     elif afk_data["media_type"] == "sticker":
         media = await client.get_messages(Config.LOGGER_ID, afk_data["media"])
-        await client.download_media(media, "afk.png")
-        sent = await message.reply_photo("afk.png", caption=caption)
-        os.remove("afk.png")
+        sticker_path = await client.download_media(media, file_name=Config.TEMP_DIR + "sticker.png")
+        try:
+            converted = convert_to_png(sticker_path)
+        except Exception:
+            converted = sticker_path
+        sent = await message.reply_photo(converted, caption=caption)
+        media = converted
 
     else:
         sent = await message.reply_text(caption)
@@ -132,7 +145,7 @@ async def remove_afk(_, message: Message):
     if not message.from_user:
         return
     if await db.is_afk(message.from_user.id):
-        if "afk" in message.text:
+        if message.text and "afk" in message.text:
             return
 
         data = await db.get_afk(message.from_user.id)

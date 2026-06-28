@@ -41,7 +41,7 @@ async def kangSticker(client: Client, message: Message):
         or f"{nickname}'s Vol.{pack_id} ({pack_type.title()})"
     )
     pack_url_suffix = (
-        f"HB{client.me.id}_vol{pack_id}_{pack_type}_by_{zelretch.bot.me.username}"
+        f"ZB{client.me.id}_vol{pack_id}_{pack_type}_by_{zelretch.bot.me.username}"
     )
 
     if message.reply_to_message.sticker:
@@ -81,7 +81,7 @@ async def kangSticker(client: Client, message: Message):
                         await db.get_env(ENV.sticker_packname)
                         or f"{nickname}'s Vol.{pack_id} ({pack_type.title()})"
                     )
-                    pack_url_suffix = f"HB{client.me.id}_vol{pack_id}_{pack_type}_by_{zelretch.bot.me.username}"
+                    pack_url_suffix = f"ZB{client.me.id}_vol{pack_id}_{pack_type}_by_{zelretch.bot.me.username}"
                     continue
                 else:
                     await add_sticker(zelretch.bot, stickerset, sticker)
@@ -118,7 +118,7 @@ async def packKang(client: Client, message: Message):
     pack_id = 1
     nickname = f"@{client.me.username}" if client.me.username else client.me.first_name
     packname = await zelretch.input(message) or f"{nickname}'s Pack (Vol.{pack_id})"
-    pack_url_suffix = f"HB{client.me.id}_pkvol{pack_id}_by_{zelretch.bot.me.username}"
+    pack_url_suffix = f"ZB{client.me.id}_pkvol{pack_id}_by_{zelretch.bot.me.username}"
 
     if not message.reply_to_message.sticker:
         return await zelretch.delete(kaleido, "Reply to a sticker to kang whole pack!")
@@ -145,7 +145,7 @@ async def packKang(client: Client, message: Message):
             if stickerset:
                 pack_id += 1
                 pack_url_suffix = (
-                    f"HB{client.me.id}_pkvol{pack_id}_by_{zelretch.bot.me.username}"
+                    f"ZB{client.me.id}_pkvol{pack_id}_by_{zelretch.bot.me.username}"
                 )
                 packname = (
                     await zelretch.input(message) or f"{nickname}'s Pack (Vol.{pack_id})"
@@ -188,7 +188,7 @@ async def stickerInfo(_, message: Message):
         return await zelretch.delete(kaleido, "This sticker is not part of a pack.")
 
     pack_emoji = []
-    for emojis in sticker_set.packs:
+    for emojis in (sticker_set.packs or []):
         if emojis.emoticon not in pack_emoji:
             pack_emoji.append(emojis.emoticon)
 

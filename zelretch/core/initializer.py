@@ -58,13 +58,6 @@ async def UserSetup() -> None:
     await _GbanUsers()
 
 
-async def GachaBotsSetup() -> None:
-    """Initialize GachaBots Config"""
-    bots = await db.get_all_gachabots_id()
-    for bot in bots:
-        Config.GACHA_BOTS.add(bot)
-
-
 async def TemplateSetup() -> None:
     """Initialize Templates Config"""
     module_name = "temp_module"

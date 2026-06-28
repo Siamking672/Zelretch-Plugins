@@ -31,7 +31,7 @@ async def autopost(client: Client, message: Message):
             kaleido, "You can't autopost in the same group/channel."
         )
 
-    if _chat.id in await db.is_autopost(client.me.id, _chat.id, message.chat.id):
+    if await db.is_autopost(client.me.id, _chat.id, message.chat.id):
         return await zelretch.delete(
             kaleido, "This group/channel is already in autopost list."
         )
@@ -67,7 +67,7 @@ async def stop_autopost(client: Client, message: Message):
             kaleido, "You can only autopost in groups and channels."
         )
 
-    if _chat.id not in await db.is_autopost(client.me.id, _chat.id, message.chat.id):
+    if not await db.is_autopost(client.me.id, _chat.id, message.chat.id):
         return await zelretch.delete(kaleido, "This group/channel is not in autopost list.")
 
     await db.rm_autopost(client.me.id, _chat.id, message.chat.id)
@@ -90,23 +90,24 @@ async def autoposts(client: Client, message: Message):
         return await zelretch.delete(kaleido, "No autoposts found.")
 
     text = f"**𝖠𝖼𝗍𝗂𝗏𝖾 𝖠𝗎𝗍𝗈𝗉𝗈𝗌𝗍𝗌 𝖿𝗈𝗋: {client.me.mention}**\n\n"
-    for i in data:
-        from_chat = await client.get_chat(i["from_channel"])
-        to_chat = await client.get_chat(i["to_channel"])
+    for doc in data:
+        for entry in doc.get("autopost", []):
+            from_chat = await client.get_chat(entry["from_channel"])
+            to_chat = await client.get_chat(entry["to_channel"])
 
-        from_chat_name = (
-            f"{from_chat.title} [{from_chat.id}]" if from_chat else i["from_channel"]
-        )
-        to_chat_name = f"{to_chat.title} [{to_chat.id}]" if to_chat else i["to_channel"]
+            from_chat_name = (
+                f"{from_chat.title} [{from_chat.id}]" if from_chat else entry["from_channel"]
+            )
+            to_chat_name = f"{to_chat.title} [{to_chat.id}]" if to_chat else entry["to_channel"]
 
-        text += f"   {Symbols.anchor} **From:** {from_chat_name}\n"
-        text += f"   {Symbols.anchor} **To:** {to_chat_name}\n"
-        text += f"   {Symbols.anchor} **Date:** {i['date']}\n\n"
+            text += f"   {Symbols.anchor} **From:** {from_chat_name}\n"
+            text += f"   {Symbols.anchor} **To:** {to_chat_name}\n"
+            text += f"   {Symbols.anchor} **Date:** {entry['date']}\n\n"
 
     await zelretch.edit(kaleido, text)
 
 
-@custom_handler(filters.incoming & filters.group & filters.channel & ~filters.service)
+@custom_handler(filters.incoming & (filters.group | filters.channel) & ~filters.service)
 async def handle_autopost(client: Client, message: Message):
     if not await db.is_autopost(client.me.id, message.chat.id):
         return
@@ -115,14 +116,10 @@ async def handle_autopost(client: Client, message: Message):
     if not data:
         return
 
-    from_chat = await client.get_chat(data["from_channel"])
-    if not from_chat:
-        return
-
-    if message.chat.id != data["to_channel"]:
-        return
-
-    await message.copy(int(data["to_channel"]))
+    for entry in data.get("autopost", []):
+        if entry["from_channel"] != message.chat.id:
+            continue
+        await message.copy(int(entry["to_channel"]))
 
 
 HelpMenu("autopost").add(

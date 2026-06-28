@@ -71,7 +71,7 @@ async def ping(client: Client, message: Message):
                 img,
                 caption=caption,
             )
-            await kaleido.delete()
+        await kaleido.delete()
         return
     await zelretch.edit(kaleido, caption, no_link_preview=True)
 
@@ -97,7 +97,7 @@ async def history(client: Client, message: Message):
     except Exception as e:
         return await zelretch.error(kaleido, f"`{str(e)}`")
 
-    if "you have used up your quota for today" in response.text:
+    if response.text and "you have used up your quota for today" in response.text:
         return await zelretch.delete(
             kaleido,
             f"Your quota of using SangMata Bot is over. Wait till 00:00 UTC before using it again.",

@@ -88,6 +88,11 @@ async def setpfp(client: Client, message: Message):
                 kaleido, "Reply to a photo or video to set as profile pic."
             )
     except Exception as e:
+        if 'dwl_path' in locals():
+            try:
+                os.remove(dwl_path)
+            except OSError:
+                pass
         return await zelretch.error(kaleido, f"`{str(e)}`")
 
     await zelretch.delete(kaleido, "Profile pic updated successfully.")
@@ -174,6 +179,7 @@ async def delpfp(client: Client, message: Message):
         return await zelretch.error(kaleido, "No profile pics found.")
 
     await client.delete_profile_photos(profile_pics)
+    await zelretch.delete(kaleido, f"**Deleted** `{len(profile_pics)}` **profile pics.**")
 
 
 @on_message("github", allow_master=True)

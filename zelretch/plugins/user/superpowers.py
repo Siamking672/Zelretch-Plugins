@@ -50,7 +50,7 @@ async def globalpromote(client: Client, message: Message):
     failed = 0
     kaleido = await zelretch.edit(message, f"Gpromote initiated on {user.mention}...")
 
-    async for dialog in client.get_dialogs:
+    async for dialog in client.get_dialogs():
         if dialog.chat.type in [
             ChatType.CHANNEL,
             ChatType.GROUP,
@@ -61,10 +61,10 @@ async def globalpromote(client: Client, message: Message):
                 success += 1
             except FloodWait as e:
                 await kaleido.edit(
-                    f"Gpromote initiated on {user.mention}...\nSleeping for {e.x} seconds due to floodwait..."
+                    f"Gpromote initiated on {user.mention}...\nSleeping for {e.value} seconds due to floodwait..."
                 )
-                await asyncio.sleep(e.x)
-                await dialog.chat.ban_member(user.id)
+                await asyncio.sleep(e.value)
+                await dialog.chat.promote_member(user.id, privileges)
                 success += 1
                 await kaleido.edit(f"Gpromote initiated on {user.mention}...")
             except BaseException:
@@ -125,7 +125,7 @@ async def globaldemote(client: Client, message: Message):
     failed = 0
     kaleido = await zelretch.edit(message, f"Gdemote initiated on {user.mention}...")
 
-    async for dialog in client.get_dialogs:
+    async for dialog in client.get_dialogs():
         if dialog.chat.type in [
             ChatType.CHANNEL,
             ChatType.GROUP,
@@ -136,10 +136,10 @@ async def globaldemote(client: Client, message: Message):
                 success += 1
             except FloodWait as e:
                 await kaleido.edit(
-                    f"Gdemote initiated on {user.mention}...\nSleeping for {e.x} seconds due to floodwait..."
+                    f"Gdemote initiated on {user.mention}...\nSleeping for {e.value} seconds due to floodwait..."
                 )
-                await asyncio.sleep(e.x)
-                await dialog.chat.ban_member(user.id)
+                await asyncio.sleep(e.value)
+                await dialog.chat.promote_member(user.id, privileges)
                 success += 1
                 await kaleido.edit(f"Gdemote initiated on {user.mention}...")
             except BaseException:
@@ -211,9 +211,9 @@ async def globalban(client: Client, message: Message):
                 success += 1
             except FloodWait as e:
                 await kaleido.edit(
-                    f"Gban initiated on {user.mention}...\nSleeping for {e.x} seconds due to floodwait..."
+                    f"Gban initiated on {user.mention}...\nSleeping for {e.value} seconds due to floodwait..."
                 )
-                await asyncio.sleep(e.x)
+                await asyncio.sleep(e.value)
                 await dialog.chat.ban_member(user.id)
                 success += 1
                 await kaleido.edit(f"Gban initiated on {user.mention}...")
@@ -272,7 +272,7 @@ async def unglobalban(client: Client, message: Message):
             try:
                 await dialog.chat.unban_member(user.id)
             except FloodWait as e:
-                await asyncio.sleep(e.x)
+                await asyncio.sleep(e.value)
                 await dialog.chat.unban_member(user.id)
             except BaseException:
                 pass
@@ -334,9 +334,9 @@ async def globalkick(client: Client, message: Message):
                 success += 1
             except FloodWait as e:
                 await kaleido.edit(
-                    f"Gkick initiated on {user.mention}...\nSleeping for {e.x} seconds due to floodwait..."
+                    f"Gkick initiated on {user.mention}...\nSleeping for {e.value} seconds due to floodwait..."
                 )
-                await asyncio.sleep(e.x)
+                await asyncio.sleep(e.value)
                 await dialog.chat.ban_member(
                     user.id, datetime.datetime.now() + datetime.timedelta(seconds=35)
                 )
@@ -382,10 +382,10 @@ async def globalmute(client: Client, message: Message):
         reason = await zelretch.input(message) or "No reason provided."
 
     if user.is_self:
-        return await zelretch.delete(message, "I can't gkick myself.")
+        return await zelretch.delete(message, "I can't gmute myself.")
 
     if user.id in Config.AUTH_USERS:
-        return await zelretch.delete(message, "I can't gkick my auth user.")
+        return await zelretch.delete(message, "I can't gmute my auth user.")
 
     if user.id in Config.MUTED_USERS:
         return await zelretch.delete(message, "This user is already gmuted.")
@@ -412,9 +412,9 @@ async def globalmute(client: Client, message: Message):
                 success += 1
             except FloodWait as e:
                 await kaleido.edit(
-                    f"Gmute initiated on {user.mention}...\nSleeping for {e.x} seconds due to floodwait..."
+                    f"Gmute initiated on {user.mention}...\nSleeping for {e.value} seconds due to floodwait..."
                 )
-                await asyncio.sleep(e.x)
+                await asyncio.sleep(e.value)
                 await dialog.chat.restrict_member(user.id, permissions)
                 success += 1
                 await kaleido.edit(f"Gmute initiated on {user.mention}...")
@@ -463,7 +463,16 @@ async def unglobalmute(client: Client, message: Message):
             f"**𝖴𝗇𝗀𝗆𝗎𝗍𝖾𝖽** {user.mention}!\n\n**𝖦𝗆𝗎𝗍𝖾 𝖱𝖾𝖺𝗌𝗈𝗇 𝗐𝖺𝗌:** `{reason}`",
         )
 
-    permissions = ChatPermissions(can_send_messages=True)
+    permissions = ChatPermissions(
+        can_send_messages=True,
+        can_send_media_messages=True,
+        can_send_other_messages=True,
+        can_send_polls=True,
+        can_add_web_page_previews=True,
+        can_change_info=True,
+        can_invite_users=True,
+        can_pin_messages=True,
+    )
 
     async for dialog in client.get_dialogs():
         if dialog.chat.type in [
@@ -474,7 +483,7 @@ async def unglobalmute(client: Client, message: Message):
             try:
                 await dialog.chat.restrict_member(user.id, permissions)
             except FloodWait as e:
-                await asyncio.sleep(e.x)
+                await asyncio.sleep(e.value)
                 await dialog.chat.restrict_member(user.id, permissions)
             except BaseException:
                 pass
@@ -517,10 +526,10 @@ async def gmutelist(_, message: Message):
 
 @Client.on_chat_member_updated()
 async def globalbanwatcher(_, u: ChatMemberUpdated):
-    if not (member.new_chat_member and member.new_chat_member.status not in {CMS.BANNED, CMS.LEFT, CMS.RESTRICTED} and not member.old_chat_member):
+    if not (u.new_chat_member and u.new_chat_member.status not in {CMS.BANNED, CMS.LEFT, CMS.RESTRICTED} and not u.old_chat_member):
         return
     
-    user = member.new_chat_member.user if member.new_chat_member else member.from_user
+    user = u.new_chat_member.user if u.new_chat_member else u.from_user
 
     if await db.is_gbanned(user.id):
         gban_data = await db.get_gban_user(user.id)

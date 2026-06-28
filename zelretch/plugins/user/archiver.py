@@ -29,7 +29,7 @@ async def zip_files(_, message: Message):
 
     zip_path = Config.TEMP_DIR + f"zipped_{int(time.time())}.zip"
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zip_file:
-        zip_file.write(download_path)
+        zip_file.write(download_path, arcname=os.path.basename(download_path))
 
     await zelretch.delete(kaleido, "Zipped Successfully.")
     await message.reply_document(
@@ -60,10 +60,14 @@ async def unzip_file(_, message: Message):
         progress_args=(kaleido, start, "📦 Unzipping"),
     )
 
-    with zipfile.ZipFile(download_path, "r") as zip_file:
-        if not os.path.isdir(Config.TEMP_DIR + "unzipped/"):
-            os.mkdir(Config.TEMP_DIR + "unzipped/")
-        zip_file.extractall(Config.TEMP_DIR + "unzipped/")
+    try:
+        with zipfile.ZipFile(download_path, "r") as zip_file:
+            if not os.path.isdir(Config.TEMP_DIR + "unzipped/"):
+                os.mkdir(Config.TEMP_DIR + "unzipped/")
+            zip_file.extractall(Config.TEMP_DIR + "unzipped/")
+    except zipfile.BadZipFile:
+        os.remove(download_path)
+        return await zelretch.delete(kaleido, "That file is not a valid zip archive.")
 
     await zelretch.delete(kaleido, "Unzipped Successfully.")
     files = await get_files_from_directory(Config.TEMP_DIR + "unzipped/")
