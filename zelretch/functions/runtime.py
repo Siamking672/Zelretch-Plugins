@@ -188,7 +188,8 @@ async def initialize_git(git_repo: str, branch: str = None):
         force = True
     try:
         repo.create_remote("upstream", f"https://github.com/{git_repo}")
-    except OSError:
+    except Exception:
+        # Remote already exists from a previous deploy — that's fine.
         pass
 
     return True, repo, force
