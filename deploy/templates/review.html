@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Review · Zelretch Wizard{% endblock %}
+{% set step='review' %}
+
+{% block content %}
+<h2 class="card-title">Review &amp; Deploy</h2>
+<p class="card-sub">
+  Confirm the configuration below. Sensitive values are masked for your
+  safety; the actual values will be used as-is at deploy time.
+  {% if restored %}<strong class="restored-tag">↻ Restored from database.</strong>{% endif %}
+</p>
+
+{% if auto_restored %}
+<div class="alert alert-info">
+  <strong>✦ Auto-restored from DATABASE_URL.</strong>
+  Your Hugging Face Space (or environment) had <code>DATABASE_URL</code> set,
+  so the wizard fetched your saved configuration automatically. Review the
+  values below and click <strong>Deploy</strong> to start the bot.
+</div>
+{% endif %}
+
+{% set cfg = config or {} %}
+<table class="review-table">
+  <tbody>
+    <tr><th>API ID</th><td><code>{{ cfg.API_ID or '—' }}</code></td></tr>
+    <tr><th>API Hash</th><td><code>{{ mask(cfg.API_HASH, 4) if cfg.API_HASH else '—' }}</code></td></tr>
+    <tr><th>Bot Token</th><td><code>{{ mask(cfg.BOT_TOKEN, 10) if cfg.BOT_TOKEN else '—' }}</code></td></tr>
+    <tr><th>Owner ID</th><td><code>{{ cfg.OWNER_ID or '—' }}</code></td></tr>
+    <tr><th>Logger Chat ID</th><td><code>{{ cfg.LOGGER_ID or '—' }}</code></td></tr>
+    <tr><th>MongoDB URL</th><td><code>{{ mask(cfg.DATABASE_URL, 14) if cfg.DATABASE_URL else '—' }}</code></td></tr>
+    <tr><th>Database Name</th><td><code>{{ cfg.DATABASE_NAME or 'Zelretch' }}</code></td></tr>
+    <tr><th>Handlers</th><td><code>{{ cfg.HANDLERS or '. ! ?' }}</code></td></tr>
+    <tr><th>Plugin Repo</th><td><code>{{ cfg.PLUGINS_REPO or 'Siamking672/Zelretch-Plugins' }}</code></td></tr>
+    <tr><th>Plugin Branch</th><td><code>{{ cfg.PLUGINS_BRANCH or 'main' }}</code></td></tr>
+    <tr>
+      <th>Userbot Session</th>
+      <td>
+        {% if cfg.SESSION_STRING %}
+          <code>{{ mask(cfg.SESSION_STRING, 8) if cfg.SESSION_STRING else '' }} ({{ cfg.SESSION_STRING|length if cfg.SESSION_STRING else 0 }} chars)</code>
+        {% else %}
+          <span class="muted">Not configured (assistant bot only)</span>
+        {% endif %}
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="actions">
+  <a class="btn btn-ghost" href="/step/required">← Edit Variables</a>
+  <a class="btn btn-ghost" href="/step/userbot">Edit Session →</a>
+  <button class="btn btn-primary btn-deploy" id="btn-deploy">⚡ Deploy</button>
+</div>
+
+<div id="deploy-error" class="alert alert-error hidden"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.__ZELRETCH_REVIEW__ = true;
+</script>
+<script src="{{ url_for('static', filename='wizard.js') }}"></script>
+{% endblock %}

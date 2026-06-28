@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Restore · Zelretch Wizard{% endblock %}
+{% set step='intro' %}
+
+{% block content %}
+<h2 class="card-title">Restore from Existing Database</h2>
+<p class="card-sub">
+  Enter the MongoDB URL of your previous Zelretch deployment. The wizard
+  will connect, fetch the saved configuration, and skip ahead to the
+  review screen so you can deploy immediately.
+</p>
+
+{% if error %}
+<div class="alert alert-error">{{ error }}</div>
+{% endif %}
+
+<form method="post" action="/restore" class="form">
+  <div class="field">
+    <label for="DATABASE_URL">MongoDB URL <span class="req">*</span></label>
+    <input type="password" id="DATABASE_URL" name="DATABASE_URL"
+           value="{{ values.DATABASE_URL if values else '' }}"
+           placeholder="mongodb+srv://user:pass@cluster/..."
+           autocomplete="off" required />
+    <p class="hint">Both <code>mongodb://</code> and <code>mongodb+srv://</code> are supported.</p>
+  </div>
+
+  <div class="field">
+    <label for="DATABASE_NAME">Database Name</label>
+    <input type="text" id="DATABASE_NAME" name="DATABASE_NAME"
+           value="{{ values.DATABASE_NAME if values else 'Zelretch' }}"
+           placeholder="Zelretch" />
+    <p class="hint">Defaults to <code>Zelretch</code>. Change only if your previous deployment used a different name.</p>
+  </div>
+
+  <div class="actions">
+    <a class="btn btn-ghost" href="/">← Back</a>
+    <button class="btn btn-primary" type="submit">Connect &amp; Restore</button>
+  </div>
+</form>
+{% endblock %}

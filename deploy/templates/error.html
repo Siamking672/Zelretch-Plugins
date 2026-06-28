@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Error · Zelretch Wizard{% endblock %}
+{% set step='intro' %}
+
+{% block content %}
+<h2 class="card-title">Something went wrong</h2>
+<p class="card-sub">{{ error or 'An unexpected error occurred.' }}</p>
+
+{% if detail %}
+<pre class="error-detail">{{ detail }}</pre>
+{% endif %}
+
+<div class="actions">
+  <a class="btn btn-primary" href="/">← Back to start</a>
+</div>
+{% endblock %}

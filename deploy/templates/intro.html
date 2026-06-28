@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Start · Zelretch Wizard{% endblock %}
+{% set step='intro' %}
+
+{% block content %}
+<h2 class="card-title">Open the Kaleidoscope</h2>
+<p class="card-sub">
+  Choose how you want to deploy Zelretch. First-time users configure every
+  variable from scratch; returning users can restore from a previous
+  deployment's database.
+</p>
+
+<div class="choice-grid">
+  <a class="choice" href="/step/required">
+    <div class="choice-icon">✦</div>
+    <div class="choice-body">
+      <h3>New Deployment</h3>
+      <p>Start fresh. The wizard will guide you through every required variable, an optional userbot session, then deploy.</p>
+    </div>
+    <div class="choice-arrow">→</div>
+  </a>
+
+  <a class="choice" href="/restore">
+    <div class="choice-icon">↻</div>
+    <div class="choice-body">
+      <h3>Restore from Database</h3>
+      <p>Already deployed before? Enter only your MongoDB URL — the wizard fetches the saved configuration and continues.</p>
+    </div>
+    <div class="choice-arrow">→</div>
+  </a>
+</div>
+
+<div class="info-strip">
+  <strong>What happens next?</strong>
+  <span>The wizard runs entirely on your machine. Sensitive values are stored in your MongoDB database and never sent anywhere else.</span>
+</div>
+{% endblock %}

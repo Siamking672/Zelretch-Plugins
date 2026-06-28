@@ -1,0 +1,14 @@
+# Pip constraints file for the plugin repository's requirements.
+#
+# The orchestrator passes --constraint <this file> when running
+# `pip install -r requirements.txt` against the downloaded plugin repo.
+# This prevents known-broken package versions from being installed even
+# if the plugin's requirements.txt explicitly requests them.
+#
+# Add entries here when a third-party package releases a broken version
+# that crashes the bot at import or startup time.
+
+# cinemagoer 2026.6.27+ uses an invalid SQLite URL that crashes the bot
+# at import time in plugins/user/google.py (imdb = Cinemagoer()).
+# Pre-2026 versions use the correct sqlite:///cinemagoer.db format.
+cinemagoer<2026

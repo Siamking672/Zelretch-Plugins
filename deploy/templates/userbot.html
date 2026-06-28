@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Userbot Session · Zelretch Wizard{% endblock %}
+{% set step='userbot' %}
+
+{% block content %}
+<h2 class="card-title">Userbot Session <span class="badge-optional">Optional</span></h2>
+<p class="card-sub">
+  Zelretch runs as both an assistant <em>bot</em> (using BOT_TOKEN) and
+  one or more <em>userbot</em> accounts (using your personal Telegram
+  account via a session string). This step is optional — you can skip it
+  and deploy with the assistant bot only.
+</p>
+
+{% if errors %}
+<div class="alert alert-error">
+  <strong>Please fix the following:</strong>
+  <ul>
+    {% for field, msg in errors.items() %}<li><code>{{ field }}</code>: {{ msg }}</li>{% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<form method="post" action="/step/userbot" id="userbot-form" class="form">
+  <div class="field">
+    <label for="SESSION_STRING">Session String</label>
+    <textarea id="SESSION_STRING" name="SESSION_STRING" rows="4"
+              placeholder="Paste an existing Pyrogram session string here, or use the OTP flow below to generate one.">{{ values.SESSION_STRING if values else '' }}</textarea>
+    <p class="hint">Leave empty if you want to generate one with the OTP flow below.</p>
+  </div>
+
+  <div class="divider"><span>or generate a new session</span></div>
+
+  <div class="grid-2">
+    <div class="field">
+      <label for="OTP_API_ID">API ID</label>
+      <input type="text" id="OTP_API_ID" name="OTP_API_ID" value="{{ api_id }}"
+             placeholder="Same as above" inputmode="numeric" />
+    </div>
+    <div class="field">
+      <label for="OTP_API_HASH">API Hash</label>
+      <input type="password" id="OTP_API_HASH" name="OTP_API_HASH" value="{{ api_hash }}"
+             placeholder="Same as above" autocomplete="off" />
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="field">
+      <label for="PHONE">Phone Number</label>
+      <input type="text" id="PHONE" name="PHONE"
+             value="{{ values.PHONE if values else '' }}"
+             placeholder="+8801XXXXXXXXX" />
+    </div>
+    <div class="field">
+      <label for="OTP">OTP</label>
+      <input type="text" id="OTP" name="OTP" placeholder="1 2 3 4 5" disabled />
+    </div>
+  </div>
+
+  <div class="field hidden" id="password-field">
+    <label for="PASSWORD">Two-Step Verification Password</label>
+    <input type="password" id="PASSWORD" name="PASSWORD" autocomplete="off" />
+    <p class="hint">Required only if your account has 2FA enabled. Press Enter or click <strong>Submit Password</strong> below.</p>
+    <div class="actions actions-inline">
+      <button class="btn btn-secondary" type="button" id="btn-submit-password">Submit Password</button>
+    </div>
+  </div>
+
+  <div id="otp-status" class="alert alert-info hidden"></div>
+
+  <div class="actions">
+    <a class="btn btn-ghost" href="/step/required">← Back</a>
+    <button class="btn btn-ghost" type="submit" name="action" value="skip" formnovalidate>Skip →</button>
+    <button class="btn btn-secondary" type="button" id="btn-send-otp">Send OTP</button>
+    <button class="btn btn-secondary" type="button" id="btn-verify-otp" disabled>Verify OTP</button>
+    <button class="btn btn-primary" type="submit" name="action" value="save">Save &amp; Continue →</button>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='wizard.js') }}"></script>
+<script src="{{ url_for('static', filename='session.js') }}"></script>
+{% endblock %}

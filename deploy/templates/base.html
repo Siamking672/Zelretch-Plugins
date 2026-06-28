@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Zelretch Wizard{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <div class="bg-glow"></div>
+  <main class="shell">
+    <header class="brand">
+      <div class="brand-mark">◆</div>
+      <div class="brand-text">
+        <h1>Zelretch</h1>
+        <p>Kaleidoscope Deployment Workshop</p>
+      </div>
+    </header>
+
+    <div class="step-indicator">
+      <span class="step {% if step=='intro' %}active{% endif %}">1 · Start</span>
+      <span class="step {% if step=='required' %}active{% endif %}">2 · Variables</span>
+      <span class="step {% if step=='userbot' %}active{% endif %}">3 · Session</span>
+      <span class="step {% if step=='review' %}active{% endif %}">4 · Review</span>
+      <span class="step {% if step=='status' %}active{% endif %}">5 · Deploy</span>
+    </div>
+
+    <section class="card">
+      {% block content %}{% endblock %}
+    </section>
+
+    <footer class="foot">
+      <span>Zelretch Wizard · GPL-3.0 · Fate-inspired fan theme</span>
+    </footer>
+  </main>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

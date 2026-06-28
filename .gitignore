@@ -3,14 +3,22 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
+.Python
 *.egg-info/
 .pytest_cache/
 
-# Runtime artifacts
+# Wizard runtime artifacts
+.env
+.env.local
+.zelretch_plugins/
 downloads/
 temp/
-*.session
-*.session-journal
+data/
+
+# The plugins/ directory should NOT be in this repo.
+# The wizard downloads the plugin repository at runtime from GitHub.
+# Hugging Face rejects binary files (fonts, images) in git pushes.
+plugins/
 
 # IDE / OS
 .vscode/

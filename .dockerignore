@@ -1,0 +1,12 @@
+.git
+.gitignore
+.env
+.env.local
+*.md
+!README.md
+data/
+downloads/
+temp/
+.zelretch_plugins/
+__pycache__/
+*.pyc
