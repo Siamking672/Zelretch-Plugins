@@ -1,0 +1,26 @@
+# Zelretch - UserBot
+# Addons - additional Python dependencies used by the addon plugins.
+#
+# Install with: pip install -r addons.txt
+# (the Zelretch installer also picks up this file when present).
+
+covid
+emoji
+fonttools
+gtts
+gingerit
+jikanpy
+phlogo
+pokedex.py
+pyfiglet
+pygments
+pyjokes
+quotefancy
+shazamio
+speechrecognition
+speedtest-cli
+textblob
+wikipedia
+Pillow
+pytesseract
+googletrans
