@@ -1,63 +1,58 @@
-# Zelretch - UserBot
-# Copyright (C) 2021-2026 TeamUltroid (original) / Zelretch Maintainers (rewrite)
-#
-# This file is a part of < https://github.com/TeamUltroid/UltroidAddons/ > (original)
-# Rewritten for Kurigram by the Zelretch project.
-# Licensed under the GNU Affero General Public License v3 or later.
+# Zelretch Addons — Inline PyPI search
+# Ported from UltroidAddons/inline/pypi.py
+# Copyright (C) 2021-2022 TeamUltroid — AGPL v3
+# Copyright (C) 2026 Zelretch Contributors
 
-"""Inline pypi search - respond to inline queries with PyPI package results."""
+"""Inline query: search PyPI for a package."""
 
-from __future__ import annotations
+import requests
 
-import json
-import urllib.parse
-import urllib.request
+from zelretch.core.decorators import in_ring
 
-from plugins import LOGS, zelretch_bot
+try:
+    from kurigram.types import (
+        InlineQueryResultArticle,
+        InputTextMessageContent,
+    )
+    KURIGRAM_AVAILABLE = True
+except ImportError:  # pragma: no cover
+    KURIGRAM_AVAILABLE = False
 
 
+@in_ring
 async def pypi_inline(client, inline_query):
-    q = inline_query.query.strip()
-    if not q:
+    if not inline_query.query:
         return
+    if not inline_query.query.startswith("pypi "):
+        return
+    query = inline_query.query.split(maxsplit=1)[1].strip()
     try:
-        url = "https://pypi.org/simple/" + urllib.parse.quote(q) + "/"
-        # The simple API returns HTML, so fall back to the JSON API.
-        url = f"https://pypi.org/pypi/{urllib.parse.quote(q)}/json"
-        req = urllib.request.Request(url, headers={"User-Agent": "Zelretch/1.0"})
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            data = json.loads(resp.read().decode())
-        info = data.get("info", {})
-        if not info:
-            return
-        from kurigram.types import (  # type: ignore
-            InlineQueryResultArticle,
-            InputTextMessageContent,
+        resp = requests.get(
+            "https://pypi.org/pypi/" + query + "/json",
+            timeout=10,
         )
+        if resp.status_code != 200:
+            return
+        data = resp.json()
+        info = data.get("info", {})
+        if not KURIGRAM_AVAILABLE:
+            return
         await client.answer_inline_query(
             inline_query.id,
             results=[
                 InlineQueryResultArticle(
-                    id=f"pypi-{q}",
-                    title=f"{info.get('name', q)} {info.get('version', '')}",
-                    description=info.get("summary", "")[:200],
+                    id=str(info.get("name", query)),
+                    title=info.get("name", "?"),
+                    description=info.get("summary", ""),
                     input_message_content=InputTextMessageContent(
                         message_text=(
-                            f"**{info['name']}** v{info.get('version', '?')}\n\n"
+                            f"**{info.get('name')}** v{info.get('version')}\n\n"
                             f"{info.get('summary', '')}\n\n"
-                            f"[PyPI]({info.get('package_url', '')})"
+                            f"[PyPI]({info.get('package_url')})"
                         ),
                     ),
                 )
             ],
         )
-    except Exception as er:
-        LOGS.info(f"pypi inline failed: {er}")
-
-
-if zelretch_bot is not None:
-    try:
-        from kurigram import filters  # type: ignore
-        zelretch_bot.add_inline_handler(pypi_inline, None)
-    except Exception as er:
-        LOGS.info(f"pypi inline handler not attached: {er}")
+    except Exception:
+        pass

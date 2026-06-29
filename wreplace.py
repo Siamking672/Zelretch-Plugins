@@ -1,23 +1,26 @@
-# Zelretch - UserBot
-# Copyright (C) 2021-2026 TeamUltroid (original) / Zelretch Maintainers (rewrite)
-#
-# This file is a part of < https://github.com/TeamUltroid/UltroidAddons/ > (original)
-# Rewritten for Kurigram by the Zelretch project.
-# Licensed under the GNU Affero General Public License v3 or later.
+# Zelretch Addons — Word replace
+# Ported from UltroidAddons/wreplace.py
+# Copyright (C) 2021-2022 TeamUltroid — AGPL v3
+# Copyright (C) 2026 Zelretch Contributors
 
 """
-✘ Commands Available -
+✘ Commands Available
 
-• `{i}wreplace <text>`
-    Replace whitespace with underscores (useful for filename-safe strings).
+• `{i}wreplace <old> <new> <text>`
+    Replace `old` with `new` in `text`.
 """
 
-from __future__ import annotations
+from zelretch.core.decorators import zelretch_cmd
+from zelretch.core.wrappers import eor
 
-from plugins import eor, zelretch_cmd
 
-
-@zelretch_cmd(pattern=r"wreplace\s+(.+)")
-async def wreplace(event):
-    text = event.matches[0].group(1)
-    await eor(event, text.replace(" ", "_"))
+@zelretch_cmd(pattern=r"wreplace (\S+) (\S+) (.+)")
+async def wreplace(client, message):
+    try:
+        old = message.matches[0].group(1)
+        new = message.matches[0].group(2)
+        text = message.matches[0].group(3)
+    except (AttributeError, IndexError):
+        return await eor(message, "`Usage: .wreplace <old> <new> <text>`")
+    result = text.replace(old, new)
+    await eor(message, f"`{result}`")

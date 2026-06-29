@@ -1,54 +1,51 @@
-# Zelretch - UserBot
-# Copyright (C) 2021-2026 TeamUltroid (original) / Zelretch Maintainers (rewrite)
-#
-# This file is a part of < https://github.com/TeamUltroid/UltroidAddons/ > (original)
-# Rewritten for Kurigram by the Zelretch project.
-# Licensed under the GNU Affero General Public License v3 or later.
+# Zelretch Addons — Truth or Dare
+# Ported from UltroidAddons/truthdare.py
+# Copyright (C) 2021-2022 TeamUltroid — AGPL v3
+# Copyright (C) 2026 Zelretch Contributors
 
 """
-✘ Commands Available -
+✘ Commands Available
 
 • `{i}truth`
-    Random truth question.
+    Get a random truth question.
 
 • `{i}dare`
-    Random dare.
+    Get a random dare.
 """
-
-from __future__ import annotations
 
 import random
 
-from plugins import eor, zelretch_cmd
+from zelretch.core.decorators import zelretch_cmd
+from zelretch.core.wrappers import eor
 
-_TRUTHS = [
-    "What is your biggest fear?",
-    "What's the most embarrassing thing you've ever done?",
-    "Who is your secret crush?",
+TRUTHS = [
+    "What's the most embarrassing thing you've done in public?",
+    "What's a secret you've never told anyone?",
     "What's the biggest lie you've ever told?",
-    "What's the worst gift you've ever received?",
-    "Have you ever cheated on a test?",
-    "What's your most annoying habit?",
-    "What's the weirdest dream you've had?",
+    "Who do you have a crush on right now?",
+    "What's the weirdest dream you've ever had?",
+    "What's your biggest fear?",
+    "Have you ever pretended to be sick to avoid someone?",
+    "What's the most childish thing you still do?",
 ]
 
-_DARES = [
-    "Sing the chorus of your favorite song.",
-    "Talk in a funny voice for the next 5 minutes.",
-    "Send a sticker of the last emoji you used.",
-    "Tell a joke right now.",
-    "Compliment the person above you.",
-    "Do 10 jumping jacks.",
-    "Send your last photo.",
-    "Speak only in questions for the next 5 turns.",
+DARES = [
+    "Speak in an accent for the next 5 minutes.",
+    "Send your last selfie to the chat.",
+    "Compliment the person above you for 30 seconds straight.",
+    "Do 10 pushups and send proof.",
+    "Sing the chorus of your favorite song out loud.",
+    "Text 'I love you' to the last person you messaged.",
+    "Don't speak for the next 3 rounds.",
+    "Do your best dance move and send a video.",
 ]
 
 
 @zelretch_cmd(pattern="truth$")
-async def truth(event):
-    await eor(event, f"🧐 Truth: {random.choice(_TRUTHS)}")
+async def truth(client, message):
+    await eor(message, f"🤔 **Truth:**\n\n{random.choice(TRUTHS)}")
 
 
 @zelretch_cmd(pattern="dare$")
-async def dare(event):
-    await eor(event, f"😈 Dare: {random.choice(_DARES)}")
+async def dare(client, message):
+    await eor(message, f"😈 **Dare:**\n\n{random.choice(DARES)}")

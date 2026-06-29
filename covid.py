@@ -1,48 +1,43 @@
-# Zelretch - UserBot
-# Copyright (C) 2021-2026 TeamUltroid (original) / Zelretch Maintainers (rewrite)
-#
-# This file is a part of < https://github.com/TeamUltroid/UltroidAddons/ > (original)
-# Rewritten for Kurigram by the Zelretch project.
-# Licensed under the GNU Affero General Public License v3 or later.
+# Zelretch Addons — Covid plugin
+# Ported from UltroidAddons/covid.py
+# Copyright (C) 2020-2022 TeamUltroid — AGPL v3
+# Copyright (C) 2026 Zelretch Contributors
 
 """
-✘ Commands Available -
+✘ Commands Available
 
 • `{i}covid <country>`
-    Show COVID-19 statistics for the given country (or global).
+    Show COVID-19 statistics for the given country.
 """
 
-from __future__ import annotations
+import requests
 
-import json
-import urllib.request
-
-from plugins import eod, eor, zelretch_cmd
+from zelretch.core.decorators import zelretch_cmd
+from zelretch.core.wrappers import eor
 
 
-@zelretch_cmd(pattern=r"covid(?:\s+(\S+))?$")
-async def covid(event):
-    country = (event.matches[0].group(1) if event.matches else "all").strip().lower()
-    msg = await event.reply(f"Fetching COVID stats for `{country}`...")
+@zelretch_cmd(pattern=r"covid( (.*)|$)")
+async def covid(client, message):
+    parts = message.text.split(maxsplit=1)
+    if len(parts) < 2 or not parts[1].strip():
+        return await eor(message, "Give a country name to search for its Covid cases.")
+    country = parts[1].strip().lower()
+    msg = await message.reply_text(f"`Fetching COVID stats for {country.title()}…`")
     try:
-        if country == "all":
-            url = "https://disease.sh/v3/covid-19/all"
-        else:
-            url = f"https://disease.sh/v3/covid-19/countries/{country}"
-        req = urllib.request.Request(url, headers={"User-Agent": "Zelretch/1.0"})
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            data = json.loads(resp.read().decode())
+        resp = requests.get(f"https://disease.sh/v3/covid-19/countries/{country}", timeout=15)
+        data = resp.json()
         if "message" in data:
-            return await eod(msg, f"Country `{country}` not found.", time=5)
-        text = (
-            f"**COVID-19 statistics** - `{country}`\n\n"
-            f"• Cases: `{data.get('cases', 0):,}`\n"
-            f"• Today: `{data.get('todayCases', 0):,}`\n"
-            f"• Deaths: `{data.get('deaths', 0):,}`\n"
-            f"• Recovered: `{data.get('recovered', 0):,}`\n"
-            f"• Active: `{data.get('active', 0):,}`\n"
-            f"• Critical: `{data.get('critical', 0):,}`\n"
+            return await msg.edit_text(f"`{data['message']}`")
+        cases = data.get("cases", 0)
+        active = data.get("active", 0)
+        deaths = data.get("deaths", 0)
+        recovered = data.get("recovered", 0)
+        await msg.edit_text(
+            f"**COVID-19 Stats — {data.get('country', country.title())}**\n\n"
+            f"• **Cases:** `{cases:,}`\n"
+            f"• **Active:** `{active:,}`\n"
+            f"• **Deaths:** `{deaths:,}`\n"
+            f"• **Recovered:** `{recovered:,}`"
         )
-        await msg.edit(text)
-    except Exception as er:
-        await eod(msg, f"Could not fetch stats: `{er}`", time=10)
+    except Exception as err:
+        await msg.edit_text(f"**ERROR:** `{err}`")

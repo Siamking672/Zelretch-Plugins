@@ -1,28 +1,46 @@
-# Zelretch - UserBot
-# Copyright (C) 2021-2026 TeamUltroid (original) / Zelretch Maintainers (rewrite)
-#
-# This file is a part of < https://github.com/TeamUltroid/UltroidAddons/ > (original)
-# Rewritten for Kurigram by the Zelretch project.
-# Licensed under the GNU Affero General Public License v3 or later.
+# Zelretch Addons — Figlet ASCII art
+# Ported from UltroidAddons/figlet.py
+# Copyright (C) 2021-2022 TeamUltroid — AGPL v3
+# Copyright (C) 2026 Zelretch Contributors
 
 """
-✘ Commands Available -
+✘ Commands Available
 
 • `{i}figlet <text>`
-    Render text as ASCII art (uses pyfiglet if installed).
+    Convert text to ASCII art (figlet).
+
+• `{i}figletlist`
+    List available figlet fonts.
 """
 
-from __future__ import annotations
+from zelretch.core.decorators import zelretch_cmd
+from zelretch.core.wrappers import eor
 
-from plugins import eod, eor, zelretch_cmd
 
-
-@zelretch_cmd(pattern=r"figlet\s+(.+)")
-async def figlet(event):
-    text = event.matches[0].group(1)
+@zelretch_cmd(pattern=r"figlet ?(.*)")
+async def figlet(client, message):
+    parts = message.text.split(maxsplit=1)
+    if len(parts) < 2:
+        return await eor(message, "`Give some text.`")
+    text = parts[1].strip()
     try:
-        import pyfiglet  # type: ignore
+        import pyfiglet
+        art = pyfiglet.figlet_format(text[:30])
+        if len(art) > 3500:
+            art = art[:3500] + "…"
+        await eor(message, f"```\n{art}\n```")
     except ImportError:
-        return await eod(event, "Install `pyfiglet` to use this command.", time=10)
-    art = pyfiglet.figlet_format(text)
-    await eor(event, f"```\n{art}\n```")
+        await eor(message, "`pyfiglet not installed. Run: pip install pyfiglet`")
+    except Exception as err:
+        await eor(message, f"`{err}`")
+
+
+@zelretch_cmd(pattern="figletlist$")
+async def figlet_list(client, message):
+    try:
+        import pyfiglet
+        fonts = pyfiglet.FigletFont.getFonts()
+        text = ", ".join(fonts[:100])
+        await eor(message, f"`Available fonts ({len(fonts)} total):`\n\n{text}")
+    except ImportError:
+        await eor(message, "`pyfiglet not installed.`")

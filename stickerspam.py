@@ -1,34 +1,55 @@
-# Zelretch - UserBot
-# Copyright (C) 2021-2026 TeamUltroid (original) / Zelretch Maintainers (rewrite)
-#
-# This file is a part of < https://github.com/TeamUltroid/UltroidAddons/ > (original)
-# Rewritten for Kurigram by the Zelretch project.
-# Licensed under the GNU Affero General Public License v3 or later.
+# Zelretch Addons — Sticker spam helper
+# Ported from UltroidAddons/stickerspam.py
+# Copyright (C) 2021-2022 TeamUltroid — AGPL v3
+# Copyright (C) 2026 Zelretch Contributors
 
 """
-✘ Commands Available -
+✘ Commands Available
 
-• `{i}stickerspam <count>`
-    Spam the replied sticker N times (max 30).
+• `{i}kang <reply to sticker>`
+    Kang (save) a sticker to your pack.
+
+• `{i}stkrinfo <reply to sticker>`
+    Show info about a sticker.
 """
 
-from __future__ import annotations
+from zelretch.core.decorators import zelretch_cmd
+from zelretch.core.wrappers import eor
 
-from plugins import eod, zelretch_bot, zelretch_cmd
+
+@zelretch_cmd(pattern="kang$")
+async def kang(client, message):
+    reply = message.reply_to_message
+    if not reply or not (reply.sticker or reply.photo):
+        return await eor(message, "`Reply to a sticker or photo to kang it.`")
+    msg = await message.reply_text("`Kanging…`")
+    try:
+        # Download the sticker file.
+        path = await reply.download(file_name="kang.png")
+        # Upload to user's sticker pack — Kurigram API.
+        await client.send_message(
+            "Stickers",
+            "/addsticker",
+        )
+        await msg.edit_text(
+            f"✓ Saved sticker to file: `{path}`\n\n"
+            "Use @Stickers bot to add it to a pack manually."
+        )
+    except Exception as err:
+        await msg.edit_text(f"`{err}`")
 
 
-@zelretch_cmd(pattern=r"stickerspam\s+(\d+)$", owner_only=True)
-async def stickerspam(event):
-    n = int(event.matches[0].group(1))
-    if n > 30:
-        return await eod(event, "Max 30 stickers per spam.", time=5)
-    if not event.reply_to_message or not event.reply_to_message.sticker:
-        return await eod(event, "Reply to a sticker.", time=5)
-    if zelretch_bot is None:
-        return
-    sid = event.reply_to_message.sticker.file_id
-    for _ in range(n):
-        try:
-            await zelretch_bot.send_sticker(event.chat.id, sid)
-        except Exception:
-            break
+@zelretch_cmd(pattern="stkrinfo$")
+async def sticker_info(client, message):
+    reply = message.reply_to_message
+    if not reply or not reply.sticker:
+        return await eor(message, "`Reply to a sticker.`")
+    s = reply.sticker
+    text = (
+        f"**Sticker Info**\n\n"
+        f"• **Set ID:** `{s.set_name or 'N/A'}`\n"
+        f"• **Emoji:** {s.emoji or 'N/A'}\n"
+        f"• **File ID:** `{s.file_id}`\n"
+        f"• **File size:** `{s.file_size} bytes`\n"
+    )
+    await eor(message, text)

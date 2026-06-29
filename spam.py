@@ -1,72 +1,55 @@
-# Zelretch - UserBot
-# Copyright (C) 2021-2026 TeamUltroid (original) / Zelretch Maintainers (rewrite)
-#
-# This file is a part of < https://github.com/TeamUltroid/UltroidAddons/ > (original)
-# Rewritten for Kurigram by the Zelretch project.
-# Licensed under the GNU Affero General Public License v3 or later.
+# Zelretch Addons — Spam tool
+# Ported from UltroidAddons/spam.py
+# Copyright (C) 2021-2022 TeamUltroid — AGPL v3
+# Copyright (C) 2026 Zelretch Contributors
 
 """
-✘ Commands Available -
+✘ Commands Available
 
-• `{i}spam <count> <text>`
-    Repeat text N times as separate messages (max 20).
+• `{i}spam <count> <message>`
+    Send a message N times (owner only). Use responsibly.
 
-• `{i}spamstick <count>`
-    Send the replied sticker N times (max 20).
-
-• `{i}dspam <delay> <count> <text>`
-    Delayed spam with a delay between messages.
+• `{i}dspam <delay> <count> <message>`
+    Delayed spam — N times with M seconds between.
 """
-
-from __future__ import annotations
 
 import asyncio
 
-from plugins import eod, eor, zelretch_bot, zelretch_cmd
+from zelretch.core.decorators import zelretch_cmd
+from zelretch.core.wrappers import eor
 
 
-@zelretch_cmd(pattern=r"spam\s+(\d+)\s+(.+)$", owner_only=True)
-async def spam(event):
-    n = int(event.matches[0].group(1))
-    text = event.matches[0].group(2)
-    if n > 20:
-        return await eod(event, "Maximum spam count is 20.", time=5)
-    if zelretch_bot is None:
-        return
-    for _ in range(n):
+@zelretch_cmd(pattern=r"spam (\d+) (.+)", owner_only=True)
+async def spam(client, message):
+    try:
+        count = int(message.matches[0].group(1))
+        text = message.matches[0].group(2)
+    except (AttributeError, IndexError, ValueError):
+        return await eor(message, "`Usage: .spam <count> <message>`")
+    if count > 100:
+        return await eor(message, "`Max 100 messages per spam.`")
+    for _ in range(count):
         try:
-            await event.reply(text)
+            await client.send_message(message.chat.id, text)
         except Exception:
             break
+    await message.delete()
 
 
-@zelretch_cmd(pattern=r"spamstick\s+(\d+)$", owner_only=True)
-async def spamstick(event):
-    n = int(event.matches[0].group(1))
-    if n > 20:
-        return await eod(event, "Maximum spam count is 20.", time=5)
-    if not event.reply_to_message or not event.reply_to_message.sticker:
-        return await eod(event, "Reply to a sticker first.", time=5)
-    sticker = event.reply_to_message.sticker.file_id
-    if zelretch_bot is None:
-        return
-    for _ in range(n):
+@zelretch_cmd(pattern=r"dspam (\d+) (\d+) (.+)", owner_only=True)
+async def dspam(client, message):
+    try:
+        delay = float(message.matches[0].group(1))
+        count = int(message.matches[0].group(2))
+        text = message.matches[0].group(3)
+    except (AttributeError, IndexError, ValueError):
+        return await eor(message, "`Usage: .dspam <delay> <count> <message>`")
+    if count > 100:
+        return await eor(message, "`Max 100 messages per spam.`")
+    for _ in range(count):
         try:
-            await zelretch_bot.send_sticker(event.chat.id, sticker)
+            await client.send_message(message.chat.id, text)
         except Exception:
             break
-
-
-@zelretch_cmd(pattern=r"dspam\s+(\d+)\s+(\d+)\s+(.+)$", owner_only=True)
-async def dspam(event):
-    delay = int(event.matches[0].group(1))
-    n = int(event.matches[0].group(2))
-    text = event.matches[0].group(3)
-    if n > 20:
-        return await eod(event, "Maximum spam count is 20.", time=5)
-    for _ in range(n):
-        try:
-            await event.reply(text)
-            await asyncio.sleep(delay)
-        except Exception:
-            break
+        await asyncio.sleep(delay)
+    await message.delete()

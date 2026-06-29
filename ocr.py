@@ -1,44 +1,42 @@
-# Zelretch - UserBot
-# Copyright (C) 2021-2026 TeamUltroid (original) / Zelretch Maintainers (rewrite)
-#
-# This file is a part of < https://github.com/TeamUltroid/UltroidAddons/ > (original)
-# Rewritten for Kurigram by the Zelretch project.
-# Licensed under the GNU Affero General Public License v3 or later.
+# Zelretch Addons — OCR (image to text)
+# Ported from UltroidAddons/ocr.py
+# Copyright (C) 2021-2022 TeamUltroid — AGPL v3
+# Copyright (C) 2026 Zelretch Contributors
 
 """
-✘ Commands Available -
+✘ Commands Available
 
-• `{i}ocr`
-    Run OCR on the replied image (uses ``pytesseract`` if installed).
+• `{i}ocr <reply to image>`
+    Extract text from an image (uses OCR.space free API).
 """
 
-from __future__ import annotations
+import requests
 
-import os
-import tempfile
-
-from plugins import eod, eor, zelretch_bot, zelretch_cmd
+from zelretch.config import get_config
+from zelretch.core.decorators import zelretch_cmd
+from zelretch.core.wrappers import eor
 
 
 @zelretch_cmd(pattern="ocr$")
-async def ocr(event):
-    if not event.reply_to_message or not event.reply_to_message.photo:
-        return await eod(event, "Reply to an image.", time=5)
-    if zelretch_bot is None:
-        return
+async def ocr(client, message):
+    reply = message.reply_to_message
+    if not reply or not reply.photo:
+        return await eor(message, "`Reply to an image to extract text.`")
+    msg = await message.reply_text("`Extracting text…`")
     try:
-        import pytesseract  # type: ignore
-        from PIL import Image  # type: ignore
-    except ImportError:
-        return await eod(event, "Install `pytesseract` and `Pillow` (plus the tesseract binary).", time=10)
-    msg = await event.reply("Running OCR...")
-    with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as f:
-        path = f.name
-    try:
-        await zelretch_bot.download_media(event.reply_to_message, file_name=path)
-        text = pytesseract.image_to_string(Image.open(path))
-        await msg.edit(f"**OCR result:**\n\n`{text.strip() or '(no text detected)'}`")
-    except Exception as er:
-        await eod(msg, f"OCR failed: `{er}`", time=10)
-    finally:
-        os.unlink(path)
+        photo = await reply.download(in_memory=True)
+        api_key = get_config("OCR_SPACE_API_KEY", "helloworld")
+        resp = requests.post(
+            "https://api.ocr.space/parse/image",
+            files={"filename": ("img.jpg", photo.read(), "image/jpeg")},
+            data={"apikey": api_key, "language": "eng"},
+            timeout=30,
+        )
+        data = resp.json()
+        parsed = data.get("ParsedResults", [{}])[0].get("ParsedText", "").strip()
+        if parsed:
+            await msg.edit_text(f"**Extracted text:**\n\n`{parsed[:3000]}`")
+        else:
+            await msg.edit_text("`No text recognized.`")
+    except Exception as err:
+        await msg.edit_text(f"`{err}`")

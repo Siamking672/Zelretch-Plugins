@@ -1,12 +1,21 @@
-# Zelretch Addons
-# .gitignore
-
 __pycache__/
 *.py[cod]
+*$py.class
+*.so
+.Python
 *.egg-info/
+.eggs/
+build/
+dist/
+venv/
 .venv/
-.env
-*.session
+env/
 *.log
-.pytest_cache/
+logs/
+.vscode/
+.idea/
+*.swp
 .DS_Store
+Thumbs.db
+.env
+.env.local

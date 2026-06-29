@@ -1,37 +1,35 @@
-# Zelretch - UserBot
-# Copyright (C) 2021-2026 TeamUltroid (original) / Zelretch Maintainers (rewrite)
-#
-# This file is a part of < https://github.com/TeamUltroid/UltroidAddons/ > (original)
-# Rewritten for Kurigram by the Zelretch project.
-# Licensed under the GNU Affero General Public License v3 or later.
+# Zelretch Addons — Wikipedia plugin
+# Ported from UltroidAddons/wikipedia.py
+# Copyright (C) 2021-2022 TeamUltroid — AGPL v3
+# Copyright (C) 2026 Zelretch Contributors
 
 """
-✘ Commands Available -
+✘ Commands Available
 
-• `{i}wiki <search query>`
-    Wikipedia search from Telegram.
+• `{i}wiki <query>`
+    Search Wikipedia from Telegram.
 """
 
-from __future__ import annotations
+import wikipedia
 
-from plugins import eod, eor, zelretch_cmd
+from zelretch.core.decorators import zelretch_cmd
+from zelretch.core.wrappers import eor
 
 
-@zelretch_cmd(pattern=r"wiki\s+(.+)")
-async def wiki(event):
-    srch = event.matches[0].group(1).strip()
-    msg = await event.reply(f"Searching `{srch}` on Wikipedia...")
+@zelretch_cmd(pattern=r"wiki ?(.*)")
+async def wiki(client, message):
+    query = message.text.split(maxsplit=1)
+    if len(query) < 2 or not query[1].strip():
+        return await eor(message, "`Give some text to search on Wikipedia.`")
+    search = query[1].strip()
+    msg = await message.reply_text(f"`Searching {search} on Wikipedia…`")
     try:
-        import wikipedia  # type: ignore
-    except ImportError:
-        return await eod(msg, "Install `wikipedia` to use this command.", time=10)
-    try:
-        summary = wikipedia.summary(srch)
-        text = f"**Search Query:** {srch}\n\n**Results:** {summary}"
-        await msg.edit(text)
-    except wikipedia.exceptions.DisambiguationError as e:
-        await msg.edit(f"Multiple matches: {', '.join(e.options[:5])}")
+        summary = wikipedia.summary(search, sentences=4)
+        text = f"**Search Query:** `{search}`\n\n**Result:** {summary}"
+        await msg.edit_text(text)
+    except wikipedia.exceptions.DisambiguationError as err:
+        await msg.edit_text(f"**Disambiguation** — did you mean:\n`{', '.join(err.options[:5])}`")
     except wikipedia.exceptions.PageError:
-        await msg.edit(f"No Wikipedia page found for `{srch}`.")
+        await msg.edit_text("`No Wikipedia page matched your query.`")
     except Exception as err:
-        await msg.edit(f"**ERROR**: {err}")
+        await msg.edit_text(f"**ERROR:** `{err}`")

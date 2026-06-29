@@ -1,40 +1,34 @@
-# Zelretch - UserBot
-# Copyright (C) 2021-2026 TeamUltroid (original) / Zelretch Maintainers (rewrite)
-#
-# This file is a part of < https://github.com/TeamUltroid/UltroidAddons/ > (original)
-# Rewritten for Kurigram by the Zelretch project.
-# Licensed under the GNU Affero General Public License v3 or later.
+# Zelretch Addons — Astronomy picture of the day
+# Ported from UltroidAddons/astronomy.py
+# Copyright (C) 2021-2022 TeamUltroid — AGPL v3
+# Copyright (C) 2026 Zelretch Contributors
 
 """
-✘ Commands Available -
+✘ Commands Available
 
-• `{i}astronomy`
-    Fetch the astronomy picture of the day (NASA APOD).
-    Set ``NASA_API_KEY`` via `.setvar` to use a personal key (otherwise DEMO_KEY).
+• `{i}apod`
+    Fetch NASA's Astronomy Picture of the Day.
 """
 
-from __future__ import annotations
+import requests
 
-import json
-import urllib.request
-
-from plugins import eod, eor, udB, zelretch_cmd
+from zelretch.core.decorators import zelretch_cmd
+from zelretch.core.wrappers import eor
 
 
-@zelretch_cmd(pattern="astronomy$")
-async def astronomy(event):
-    api_key = (udB.get_key("NASA_API_KEY") if udB else None) or "DEMO_KEY"
-    msg = await event.reply("Fetching astronomy picture of the day...")
+@zelretch_cmd(pattern="apod$")
+async def apod(client, message):
+    msg = await message.reply_text("`Fetching APOD…`")
     try:
-        url = f"https://api.nasa.gov/planetary/apod?api_key={api_key}"
-        req = urllib.request.Request(url, headers={"User-Agent": "Zelretch/1.0"})
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            data = json.loads(resp.read().decode())
-        text = (
-            f"**{data.get('title', 'Astronomy Picture of the Day')}**\n\n"
-            f"{data.get('explanation', '')}\n\n"
-            f"[Image URL]({data.get('url')})"
-        )
-        await msg.edit(text, disable_web_page_preview=False)
-    except Exception as er:
-        await eod(msg, f"Could not fetch APOD: `{er}`", time=10)
+        resp = requests.get("https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY", timeout=15)
+        data = resp.json()
+        title = data.get("title", "Astronomy Picture of the Day")
+        explanation = data.get("explanation", "")[:600]
+        url = data.get("hdurl") or data.get("url")
+        if url:
+            await client.send_photo(message.chat.id, url, caption=f"**{title}**\n\n{explanation}")
+            await msg.delete()
+        else:
+            await msg.edit_text(f"**{title}**\n\n{explanation}")
+    except Exception as err:
+        await msg.edit_text(f"`{err}`")

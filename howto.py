@@ -1,49 +1,34 @@
-# Zelretch - UserBot
-# Copyright (C) 2021-2026 TeamUltroid (original) / Zelretch Maintainers (rewrite)
-#
-# This file is a part of < https://github.com/TeamUltroid/UltroidAddons/ > (original)
-# Rewritten for Kurigram by the Zelretch project.
-# Licensed under the GNU Affero General Public License v3 or later.
+# Zelretch Addons — Howto (how-to do things)
+# Ported from UltroidAddons/howto.py
+# Copyright (C) 2021-2022 TeamUltroid — AGPL v3
+# Copyright (C) 2026 Zelretch Contributors
 
 """
-✘ Commands Available -
+✘ Commands Available
 
 • `{i}howto <query>`
-    Look up a quick how-to via the duckduckgo instant answer API.
+    Get a quick how-to summary (Wikipedia-style).
 """
 
-from __future__ import annotations
+import wikipedia
 
-import json
-import urllib.parse
-import urllib.request
-
-from plugins import eod, eor, zelretch_cmd
+from zelretch.core.decorators import zelretch_cmd
+from zelretch.core.wrappers import eor
 
 
-@zelretch_cmd(pattern=r"howto\s+(.+)")
-async def howto(event):
-    query = event.matches[0].group(1).strip()
-    msg = await event.reply(f"Looking up `{query}`...")
+@zelretch_cmd(pattern=r"howto ?(.*)")
+async def howto(client, message):
+    parts = message.text.split(maxsplit=1)
+    if len(parts) < 2:
+        return await eor(message, "`Give a query.`")
+    query = parts[1].strip()
+    msg = await message.reply_text(f"`Looking up how to {query}…`")
     try:
-        url = "https://api.duckduckgo.com/?q=" + urllib.parse.quote(query) + \
-              "&format=json&no_html=1&skip_disambig=1"
-        req = urllib.request.Request(url, headers={"User-Agent": "Zelretch/1.0"})
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            data = json.loads(resp.read().decode())
-        if data.get("AbstractText"):
-            text = f"**{data['Heading']}**\n\n{data['AbstractText']}"
-            if data.get("AbstractURL"):
-                text += f"\n\n[Source]({data['AbstractURL']})"
-            await msg.edit(text)
-        else:
-            related = data.get("RelatedTopics", [])[:5]
-            if not related:
-                return await eod(msg, f"No instant answer for `{query}`.", time=5)
-            lines = []
-            for item in related:
-                if isinstance(item, dict) and item.get("Text"):
-                    lines.append(f"• {item['Text'][:200]}")
-            await msg.edit("**Related results:**\n\n" + "\n".join(lines))
-    except Exception as er:
-        await eod(msg, f"Lookup failed: `{er}`", time=10)
+        summary = wikipedia.summary(f"how to {query}", sentences=3, auto_suggest=False)
+        await msg.edit_text(f"**How to {query}:**\n\n{summary}")
+    except wikipedia.exceptions.DisambiguationError as err:
+        await msg.edit_text(f"Be more specific. Did you mean:\n`{', '.join(err.options[:5])}`")
+    except wikipedia.exceptions.PageError:
+        await msg.edit_text("`No results found.`")
+    except Exception as err:
+        await msg.edit_text(f"`{err}`")

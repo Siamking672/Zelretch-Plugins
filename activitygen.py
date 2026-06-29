@@ -1,33 +1,38 @@
-# Zelretch - UserBot
-# Copyright (C) 2021-2026 TeamUltroid (original) / Zelretch Maintainers (rewrite)
-#
-# This file is a part of < https://github.com/TeamUltroid/UltroidAddons/ > (original)
-# Rewritten for Kurigram by the Zelretch project.
-# Licensed under the GNU Affero General Public License v3 or later.
+# Zelretch Addons — Activity generator
+# Ported from UltroidAddons/activitygen.py
+# Copyright (C) 2021-2022 TeamUltroid — AGPL v3
+# Copyright (C) 2026 Zelretch Contributors
 
 """
-✘ Commands Available -
+✘ Commands Available
 
-• `{i}activitygen`
-    Generate a random "last seen" activity for the bot account.
+• `{i}activity <count>`
+    Send N "typing…" indicators (no actual message) — useful for testing.
 """
 
-from __future__ import annotations
+import asyncio
 
-import random
+from zelretch.core.decorators import zelretch_cmd
+from zelretch.core.wrappers import eor
 
-from plugins import eor, zelretch_cmd
-
-_ACTIVITIES = [
-    "Playing .help",
-    "Listening to .ping",
-    "Watching the chat",
-    "Streaming Zelretch v1.0.0",
-    "Competing in userbot wars",
-    "Editing messages at the speed of light",
-]
+try:
+    from kurigram.enums import ChatAction
+    CHAT_ACTION_AVAILABLE = True
+except ImportError:  # pragma: no cover
+    CHAT_ACTION_AVAILABLE = False
 
 
-@zelretch_cmd(pattern="activitygen$")
-async def activitygen(event):
-    await eor(event, f"🎮 Suggested activity: `{random.choice(_ACTIVITIES)}`")
+@zelretch_cmd(pattern=r"activity (\d+)", owner_only=True)
+async def activity(client, message):
+    if not CHAT_ACTION_AVAILABLE:
+        return await eor(message, "`kurigram ChatAction not available.`")
+    n = int(message.matches[0].group(1))
+    if n > 50:
+        return await eor(message, "`Max 50.`")
+    await message.delete()
+    for _ in range(n):
+        try:
+            await client.send_chat_action(message.chat.id, ChatAction.TYPING)
+        except Exception:
+            break
+        await asyncio.sleep(2)

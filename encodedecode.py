@@ -1,39 +1,88 @@
-# Zelretch - UserBot
-# Copyright (C) 2021-2026 TeamUltroid (original) / Zelretch Maintainers (rewrite)
-#
-# This file is a part of < https://github.com/TeamUltroid/UltroidAddons/ > (original)
-# Rewritten for Kurigram by the Zelretch project.
-# Licensed under the GNU Affero General Public License v3 or later.
+# Zelretch Addons — Encode / Decode (base64, hex, url)
+# Ported from UltroidAddons/encodedecode.py
+# Copyright (C) 2021-2022 TeamUltroid — AGPL v3
+# Copyright (C) 2026 Zelretch Contributors
 
 """
-✘ Commands Available -
+✘ Commands Available
 
 • `{i}encode <text>`
     Base64-encode text.
 
-• `{i}decode <text>`
+• `{i}decode <base64>`
     Base64-decode text.
+
+• `{i}hexencode <text>`
+    Hex-encode text.
+
+• `{i}hexdecode <hex>`
+    Hex-decode text.
+
+• `{i}urlencode <text>`
+    URL-encode text.
+
+• `{i}urldecode <text>`
+    URL-decode text.
 """
 
-from __future__ import annotations
-
 import base64
+from urllib.parse import quote, unquote
 
-from plugins import eod, eor, zelretch_cmd
-
-
-@zelretch_cmd(pattern=r"encode\s+(.+)")
-async def encode_text(event):
-    text = event.matches[0].group(1)
-    encoded = base64.b64encode(text.encode()).decode()
-    await eor(event, f"**Encoded:**\n`{encoded}`")
+from zelretch.core.decorators import zelretch_cmd
+from zelretch.core.wrappers import eor
 
 
-@zelretch_cmd(pattern=r"decode\s+(.+)")
-async def decode_text(event):
-    text = event.matches[0].group(1).strip()
+@zelretch_cmd(pattern=r"encode ?(.*)")
+async def encode_b64(client, message):
+    parts = message.text.split(maxsplit=1)
+    if len(parts) < 2:
+        return await eor(message, "`Give some text to encode.`")
+    encoded = base64.b64encode(parts[1].encode()).decode()
+    await eor(message, f"`{encoded}`")
+
+
+@zelretch_cmd(pattern=r"decode ?(.*)")
+async def decode_b64(client, message):
+    parts = message.text.split(maxsplit=1)
+    if len(parts) < 2:
+        return await eor(message, "`Give base64 to decode.`")
     try:
-        decoded = base64.b64decode(text.encode()).decode()
-        await eor(event, f"**Decoded:**\n`{decoded}`")
-    except Exception as er:
-        await eod(event, f"Could not decode: `{er}`", time=5)
+        decoded = base64.b64decode(parts[1].strip()).decode(errors="replace")
+        await eor(message, f"`{decoded}`")
+    except Exception as err:
+        await eor(message, f"`{err}`")
+
+
+@zelretch_cmd(pattern=r"hexencode ?(.*)")
+async def hex_encode(client, message):
+    parts = message.text.split(maxsplit=1)
+    if len(parts) < 2:
+        return await eor(message, "`Give some text.`")
+    await eor(message, f"`{parts[1].encode().hex()}`")
+
+
+@zelretch_cmd(pattern=r"hexdecode ?(.*)")
+async def hex_decode(client, message):
+    parts = message.text.split(maxsplit=1)
+    if len(parts) < 2:
+        return await eor(message, "`Give hex string.`")
+    try:
+        await eor(message, f"`{bytes.fromhex(parts[1].strip()).decode(errors='replace')}`")
+    except Exception as err:
+        await eor(message, f"`{err}`")
+
+
+@zelretch_cmd(pattern=r"urlencode ?(.*)")
+async def url_encode(client, message):
+    parts = message.text.split(maxsplit=1)
+    if len(parts) < 2:
+        return await eor(message, "`Give some text.`")
+    await eor(message, f"`{quote(parts[1])}`")
+
+
+@zelretch_cmd(pattern=r"urldecode ?(.*)")
+async def url_decode(client, message):
+    parts = message.text.split(maxsplit=1)
+    if len(parts) < 2:
+        return await eor(message, "`Give some text.`")
+    await eor(message, f"`{unquote(parts[1])}`")

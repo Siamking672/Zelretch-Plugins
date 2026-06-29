@@ -1,8 +1,8 @@
-# Zelretch - UserBot
-# Copyright (C) 2021-2026 TeamUltroid (original) / Zelretch Maintainers (rewrite)
-#
-# This file is a part of < https://github.com/TeamUltroid/UltroidAddons/ > (original)
-# Rewritten for Kurigram by the Zelretch project.
-# Licensed under the GNU Affero General Public License v3 or later.
+# Zelretch Addons — Inline subpackage
+# Copyright (C) 2021-2022 TeamUltroid — AGPL v3
+# Copyright (C) 2026 Zelretch Contributors
 
-"""Inline helper addons - handlers triggered by inline queries."""
+"""Inline-query plugins for the Zelretch assistant bot."""
+
+# Submodules register themselves via @in_ring decorator when imported.
+# Add new inline plugins below to enable them.

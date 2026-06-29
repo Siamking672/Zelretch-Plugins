@@ -1,52 +1,50 @@
-# Zelretch - UserBot
-# Copyright (C) 2021-2026 TeamUltroid (original) / Zelretch Maintainers (rewrite)
-#
-# This file is a part of < https://github.com/TeamUltroid/UltroidAddons/ > (original)
-# Rewritten for Kurigram by the Zelretch project.
-# Licensed under the GNU Affero General Public License v3 or later.
+# Zelretch Addons — Pokedex lookup
+# Ported from UltroidAddons/pokedex.py
+# Copyright (C) 2021-2022 TeamUltroid — AGPL v3
+# Copyright (C) 2026 Zelretch Contributors
 
 """
-✘ Commands Available -
+✘ Commands Available
 
-• `{i}pokedex <pokemon name>`
-    Show Pokémon details (via the PokéAPI).
+• `{i}pokedex <pokemon>`
+    Show Pokemon stats.
 """
 
-from __future__ import annotations
+import requests
 
-import json
-import urllib.request
-
-from plugins import eod, eor, zelretch_cmd
+from zelretch.core.decorators import zelretch_cmd
+from zelretch.core.wrappers import eor
 
 
-@zelretch_cmd(pattern=r"pokedex\s+(.+)")
-async def pokedex(event):
-    name = event.matches[0].group(1).strip().lower()
-    msg = await event.reply(f"Looking up `{name}`...")
+@zelretch_cmd(pattern=r"pokedex ?(.*)")
+async def pokedex(client, message):
+    parts = message.text.split(maxsplit=1)
+    if len(parts) < 2:
+        return await eor(message, "`Give a Pokemon name or ID.`")
+    name = parts[1].strip().lower()
+    msg = await message.reply_text(f"`Looking up {name}…`")
     try:
-        req = urllib.request.Request(
-            f"https://pokeapi.co/api/v2/pokemon/{name}",
-            headers={"User-Agent": "Zelretch/1.0"},
-        )
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            data = json.loads(resp.read().decode())
+        resp = requests.get(f"https://pokeapi.co/api/v2/pokemon/{name}", timeout=15)
+        if resp.status_code != 200:
+            return await msg.edit_text(f"`Pokemon '{name}' not found.`")
+        data = resp.json()
         types = ", ".join(t["type"]["name"] for t in data.get("types", []))
-        abilities = ", ".join(a["ability"]["name"] for a in data.get("abilities", []))
+        stats = "\n".join(
+            f"• **{s['stat']['name'].title()}:** `{s['base_stat']}`"
+            for s in data.get("stats", [])
+        )
         sprite = (data.get("sprites") or {}).get("front_default")
         text = (
-            f"**{data['name'].title()}** (#{data['id']})\n\n"
-            f"• Type: `{types}`\n"
-            f"• Abilities: `{abilities}`\n"
-            f"• Height: `{data.get('height', 0) / 10} m`\n"
-            f"• Weight: `{data.get('weight', 0) / 10} kg`\n"
+            f"**#{data['id']} — {data['name'].title()}**\n\n"
+            f"• **Type:** {types}\n"
+            f"• **Height:** {data.get('height', 0) / 10} m\n"
+            f"• **Weight:** {data.get('weight', 0) / 10} kg\n\n"
+            f"**Stats:**\n{stats}"
         )
         if sprite:
-            await event.reply(text)
+            await client.send_photo(message.chat.id, sprite, caption=text)
+            await msg.delete()
         else:
-            await eor(msg, text)
-        await msg.delete()
-    except urllib.error.HTTPError:
-        await eod(msg, f"Pokémon `{name}` not found.", time=5)
-    except Exception as er:
-        await eod(msg, f"Could not fetch Pokémon: `{er}`", time=10)
+            await msg.edit_text(text)
+    except Exception as err:
+        await msg.edit_text(f"`{err}`")

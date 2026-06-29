@@ -1,33 +1,32 @@
-# Zelretch - UserBot
-# Copyright (C) 2021-2026 TeamUltroid (original) / Zelretch Maintainers (rewrite)
-#
-# This file is a part of < https://github.com/TeamUltroid/UltroidAddons/ > (original)
-# Rewritten for Kurigram by the Zelretch project.
-# Licensed under the GNU Affero General Public License v3 or later.
+# Zelretch Addons — IMDB plugin
+# Ported from UltroidAddons/imdb.py
+# Copyright (C) 2021-2022 TeamUltroid — AGPL v3
+# Copyright (C) 2026 Zelretch Contributors
 
 """
-✘ Commands Available -
+✘ Commands Available
 
-• `{i}imdb <keyword>`
-    Search movie details from IMDB (via the imdbot inline bot).
+• `{i}imdb <movie>`
+    Search IMDB for movie details (uses inline bot).
 """
 
-from __future__ import annotations
+from zelretch.core.decorators import zelretch_cmd
+from zelretch.core.wrappers import eor
 
-from plugins import eod, eor, zelretch_bot, zelretch_cmd
 
-
-@zelretch_cmd(pattern=r"imdb\s+(.+)")
-async def imdb(event):
-    m = await event.reply("...")
-    movie_name = event.matches[0].group(1).strip()
-    if zelretch_bot is None:
-        return await eod(m, "Bot client not ready.", time=5)
+@zelretch_cmd(pattern=r"imdb ?(.*)")
+async def imdb(client, message):
+    match = message.text.split(maxsplit=1)
+    if len(match) < 2 or not match[1].strip():
+        return await eor(message, "`Provide a movie name.`")
+    movie = match[1].strip()
+    msg = await message.reply_text("`Searching IMDB…`")
     try:
-        results = await zelretch_bot.inline_query("imdbot", movie_name)
-        if not results:
-            return await eod(m, "No results found.", time=5)
-        await results[0].click(event.chat.id)
-        await m.delete()
-    except Exception as er:
-        return await eod(m, f"Could not search IMDB: `{er}`", time=10)
+        results = await client.inline_query("imdbot", movie)
+        if results:
+            await results[0].click(message.chat.id)
+            await msg.delete()
+        else:
+            await msg.edit_text("`No results found.`")
+    except Exception as err:
+        await msg.edit_text(f"`{err}`")

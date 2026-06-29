@@ -1,45 +1,34 @@
-# Zelretch - UserBot
-# Copyright (C) 2021-2026 TeamUltroid (original) / Zelretch Maintainers (rewrite)
-#
-# This file is a part of < https://github.com/TeamUltroid/UltroidAddons/ > (original)
-# Rewritten for Kurigram by the Zelretch project.
-# Licensed under the GNU Affero General Public License v3 or later.
+# Zelretch Addons — Animated fonts (Pygments)
+# Ported from UltroidAddons/fontsnew.py
+# Copyright (C) 2021-2022 TeamUltroid — AGPL v3
+# Copyright (C) 2026 Zelretch Contributors
 
 """
-✘ Commands Available -
+✘ Commands Available
 
-• `{i}fontsnew <text>`
-    Render text in a random decorative font.
+• `{i}font <text>`
+    Convert text to unicode decorative font.
 """
 
-from __future__ import annotations
+from zelretch.core.decorators import zelretch_cmd
+from zelretch.core.wrappers import eor
 
-import random
-
-from plugins import eor, zelretch_cmd
-
-_FONTS = {
-    "𝒜": "𝒜𝐵𝒞𝒟𝐸𝐹𝒢𝐻𝐼𝒥𝒦𝐿𝑀𝒩𝒪𝒫𝒬𝑅𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵𝒶𝒷𝒸𝒹𝑒𝒻𝑔𝒽𝒾𝒿𝓀𝓁𝓂𝓃𝑜𝓅𝓆𝓇𝓈𝓉𝓊𝓋𝓌𝓍𝓎𝓏",
-    "𝓐": "𝓐𝓑𝓒𝓓𝓔𝓕𝓖𝓗𝓘𝓙𝓚𝓛𝓜𝓝𝓞𝓟𝓠𝓡𝓢𝓣𝓤𝓥𝓦𝓧𝓨𝓩𝓪𝓫𝓬𝓭𝓮𝓯𝓰𝓱𝓲𝓳𝓴𝓵𝓶𝓷𝓸𝓹𝓺𝓻𝓼𝓽𝓾𝓿𝔀𝔁𝔂𝔃",
-    "𝔄": "𝔄𝔅ℭ𝔇𝔈𝔉𝔊ℌℑ𝔍𝔎𝔏𝔐𝔑𝔒𝔓𝔔ℜ𝔖𝔗𝔘𝔙𝔚𝔛𝔜ℨ𝔞𝔟𝔠𝔡𝔢𝔣𝔤𝔥𝔦𝔧𝔨𝔩𝔪𝔫𝔬𝔭𝔮𝔯𝔰𝔱𝔲𝔳𝔴𝔵𝔶𝔷",
-    "🅰": "🅰🅱🅲🅳🅴🅵🅶🅷🅸🅹🅺🅻🅼🅽🅾🅿🆀🆁🆂🆃🆄🆅🆆🆇🆈🆉",
-}
+FONTS = [
+    str.maketrans("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "𝓐𝓑𝓒𝓓𝓔𝓕𝓖𝓗𝓘𝓙𝓚𝓛𝓜𝓝𝓞𝓟𝓠𝓡𝓢𝓣𝓤𝓥𝓦𝓧𝓨𝓩"),
+    str.maketrans("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "𝔸𝔹ℂ𝔻𝔼𝔽𝔾ℍ𝕀𝕁𝕂𝕃𝕄ℕ𝕆ℙℚℝ𝕊𝕋𝕌𝕍𝕎𝕏𝕐ℤ"),
+    str.maketrans("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "🅰🅱🅲🅳🅴🅵🅶🅷🅸🅹🅺🅻🅼🅽🅾🅿🆀🆁🆂🆃🆄🆅🆆🆇🆈🆉"),
+    str.maketrans("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏ"),
+    str.maketrans("abcdefghijklmnopqrstuvwxyz", "ᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘϙʀꜱᴛᴜᴠᴡxʏᴢ"),
+]
 
 
-@zelretch_cmd(pattern=r"fontsnew\s+(.+)")
-async def fontsnew(event):
-    text = event.matches[0].group(1).upper()
-    font_map = random.choice(list(_FONTS.values()))
-    # Build a char-by-char map.
-    base = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    out = []
-    for c in text:
-        if c in base:
-            idx = base.index(c)
-            if idx < len(font_map):
-                out.append(font_map[idx])
-            else:
-                out.append(c)
-        else:
-            out.append(c)
-    await eor(event, "".join(out))
+@zelretch_cmd(pattern=r"font ?(.*)")
+async def font(client, message):
+    parts = message.text.split(maxsplit=1)
+    if len(parts) < 2:
+        return await eor(message, "`Give some text.`")
+    text = parts[1].strip()
+    lines = []
+    for idx, table in enumerate(FONTS[:4], 1):
+        lines.append(f"**{idx}:** {text.translate(table)}")
+    await eor(message, "\n".join(lines))

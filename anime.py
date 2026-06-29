@@ -1,49 +1,50 @@
-# Zelretch - UserBot
-# Copyright (C) 2021-2026 TeamUltroid (original) / Zelretch Maintainers (rewrite)
-#
-# This file is a part of < https://github.com/TeamUltroid/UltroidAddons/ > (original)
-# Rewritten for Kurigram by the Zelretch project.
-# Licensed under the GNU Affero General Public License v3 or later.
+# Zelretch Addons — Anime character search
+# Ported from UltroidAddons/anime.py
+# Copyright (C) 2021-2022 TeamUltroid — AGPL v3
+# Copyright (C) 2026 Zelretch Contributors
 
 """
-✘ Commands Available -
+✘ Commands Available
 
-• `{i}character <character name>`
-   Fetch anime character details (via Jikan / MyAnimeList).
+• `{i}character <name>`
+    Fetch anime character details from Jikan (MyAnimeList).
 """
 
-from __future__ import annotations
+import jikanpy
 
-from plugins import eod, eor, zelretch_cmd
+from zelretch.core.decorators import zelretch_cmd
+from zelretch.core.wrappers import eor
 
 
-@zelretch_cmd(pattern=r"character\s+(.+)")
-async def anime_char_search(event):
-    xx = await event.reply("Searching...")
-    char_name = event.matches[0].group(1).strip()
+@zelretch_cmd(pattern=r"character ?(.*)")
+async def anime_char_search(client, message):
+    parts = message.text.split(maxsplit=1)
+    if len(parts) < 2 or not parts[1].strip():
+        return await eor(message, "`Enter the name of a character.`", time=5)
+    name = parts[1].strip()
+    msg = await message.reply_text("`Searching…`")
     try:
-        import jikanpy  # type: ignore
-    except ImportError:
-        return await eod(xx, "Install `jikanpy` to use this command.", time=10)
-    jikan = jikanpy.jikan.Jikan()
-    try:
-        s = jikan.search("character", char_name)
+        jikan = jikanpy.Jikan()
+        s = jikan.search("character", name)
+        if not s.get("results"):
+            return await msg.edit_text("`Couldn't find character!`")
+        mal_id = s["results"][0]["mal_id"]
+        char = jikan.character(mal_id)
+        text = f"**[{char['name']}]({char['url']})**"
+        if char.get("name_kanji"):
+            text += f"  [{char['name_kanji']}]\n"
+        else:
+            text += "\n"
+        if char.get("nicknames"):
+            text += f"\n**Nicknames:** `{', '.join(char['nicknames'])}`\n"
+        about = (char.get("about") or "").split("\n", 1)[0].strip().replace("\n", " ")
+        text += f"\n**About:** __{about[:600]}__"
+        if char.get("image_url"):
+            await client.send_photo(message.chat.id, char["image_url"], caption=text)
+            await msg.delete()
+        else:
+            await msg.edit_text(text)
     except jikanpy.exceptions.APIException:
-        return await eod(xx, "Couldn't find character!", time=5)
-    a = s["results"][0]["mal_id"]
-    char_json = jikan.character(a)
-    pic = char_json["image_url"]
-    msg = f"**[{char_json['name']}]({char_json['url']})**"
-    if char_json.get("name_kanji") and char_json["name_kanji"] != "Japanese":
-        msg += f" [{char_json['name_kanji']}]\n"
-    else:
-        msg += "\n"
-    if char_json.get("nicknames"):
-        msg += f"\n**Nicknames**: `{', '.join(char_json['nicknames'])}`\n"
-    about = (char_json.get("about") or "").split("\n", 1)[0].strip().replace("\n", "")
-    msg += f"\n**About**: __{about}__"
-    try:
-        await event.reply(msg, disable_web_page_preview=False)
-    except Exception:
-        await eor(xx, msg)
-    await xx.delete()
+        await msg.edit_text("`Jikan API error — try again later.`")
+    except Exception as err:
+        await msg.edit_text(f"`{err}`")

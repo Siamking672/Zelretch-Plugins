@@ -1,106 +1,122 @@
+# Zelretch Addons
+
 <p align="center">
-  <h1 align="center"><b>Zelretch Addons</b></h1>
+  <strong>Kurigram-compatible plugin repository for the Zelretch userbot.</strong>
 </p>
 
-<b>Community plugin repository for the Zelretch UserBot - Kurigram-based and compatible with the Zelretch plugin loader.</b>
-
-[![Zelretch Addons](https://img.shields.io/badge/Zelretch-Addons-7c5cff)](#)
-[![License](https://img.shields.io/badge/License-AGPLv3-blue)](LICENSE)
-[![Based on UltroidAddons](https://img.shields.io/badge/Based%20on-UltroidAddons-critical)](https://github.com/TeamUltroid/UltroidAddons)
-
----
-
-# What is this?
-
-This repository contains the addon plugins that ship alongside
-[Zelretch](https://github.com/TeamUltroid/Ultroid). Each `.py` file in the
-root directory is a plugin that the Zelretch main project auto-loads when
-the `ADDONS` config flag is `True` (the default).
-
-The Zelretch plugin loader detects this folder in one of three locations:
-
-1. `./addons/` (current working directory)
-2. `./Zelretch-Addons/` (cloned next to the main repo)
-3. `../Zelretch-Addons/` (cloned as a sibling)
-
-so you can simply clone this repo next to the main one and Zelretch will
-find it on the next start.
+This is the **separate addons repository** loaded by the
+[Zelretch main project](https://github.com/TeamUltroid/Ultroid). It mirrors the
+structure of the original
+[UltroidAddons](https://github.com/TeamUltroid/UltroidAddons) but rewrites every
+plugin to use Kurigram (Pyrogram fork) APIs instead of Telethon.
 
 ---
 
-# Plugin catalogue
+## How Zelretch loads these addons
 
-| Plugin | Command(s) | Description |
-|--------|-----------|-------------|
-| `anime.py` | `.character <name>` | Anime character lookup via Jikan / MyAnimeList. |
-| `animechan.py` | `.animechan` | Random anime quote. |
-| `astronomy.py` | `.astronomy` | NASA Astronomy Picture of the Day. |
-| `autocorrect.py` | `.autocorrect <text>` | Auto-correct text via TextBlob. |
-| `activitygen.py` | `.activitygen` | Suggest a random "last seen" activity. |
-| `covid.py` | `.covid [country]` | COVID-19 statistics per country or globally. |
-| `encodedecode.py` | `.encode` / `.decode <text>` | Base64 encode / decode. |
-| `figlet.py` | `.figlet <text>` | ASCII art via pyfiglet. |
-| `fontsnew.py` | `.fontsnew <text>` | Render text in a decorative unicode font. |
-| `fun.py` | `.joke` | Random programming joke. |
-| `hack.py` | `.hack` | Fake "hacking" animation. |
-| `howto.py` | `.howto <query>` | DuckDuckGo instant-answer lookup. |
-| `imdb.py` | `.imdb <keyword>` | IMDB lookup via inline bot. |
-| `inline/pypi.py` | (inline) `@your_bot pypi <name>` | Inline PyPI package search. |
-| `morsecode.py` | `.morse` / `.demorse <code>` | Morse code encoder / decoder. |
-| `ocr.py` | `.ocr` (reply to image) | Optical character recognition via pytesseract. |
-| `pokedex.py` | `.pokedex <name>` | Pokémon details via PokéAPI. |
-| `quote.py` | `.quote` | Random inspirational quote. |
-| `rng.py` | `.random [min] [max]` / `.coinflip` | Random number / coin flip. |
-| `spam.py` | `.spam <n> <text>` / `.spamstick <n>` / `.dspam <delay> <n> <text>` | Repeat text or stickers. |
-| `spellcheck.py` | `.spellcheck <word>` | Spell-check a single word. |
-| `stickerspam.py` | `.stickerspam <n>` | Spam a replied sticker N times. |
-| `truthdare.py` | `.truth` / `.dare` | Truth or dare prompts. |
-| `typography.py` | `.typography <style> <text>` | Unicode typography (bold / italic / script / double-struck). |
-| `wikipedia.py` | `.wiki <query>` | Wikipedia summary. |
-| `wreplace.py` | `.wreplace <text>` | Replace whitespace with underscores. |
+1. On boot (or when you run `.updateaddons`), Zelretch clones this repository
+   into `./addons/` (URL configurable via `ADDONS_URL` in your setup wizard).
+2. The plugin loader scans every `*.py` file in `addons/` and imports each one.
+3. Plugins register handlers using `@zelretch_cmd(pattern="...")` from
+   `zelretch.core.decorators` — the same decorator the built-in plugins use.
+4. Each plugin's `__doc__` string is parsed for the `✘ Commands Available` block
+   and exposed via the `.help <plugin>` command.
+
+For the full plugin architecture docs, see the
+[main project's README](https://github.com/TeamUltroid/Ultroid).
 
 ---
 
-# Contributing
+## Available plugins
 
-Pull requests are very welcome. Follow the format below when porting or
-writing a new plugin:
+| Plugin | Commands | Description |
+|---|---|---|
+| `anime.py` | `.character <name>` | Anime character lookup via Jikan (MyAnimeList). |
+| `astronomy.py` | `.apod` | NASA Astronomy Picture of the Day. |
+| `autocorrect.py` | `.autocorrect <text>` | Auto-correct spelling with TextBlob. |
+| `brainfuck.py` | `.bf <code>`, `.bfencode <text>` | Brainfuck interpreter + encoder. |
+| `covid.py` | `.covid <country>` | COVID-19 statistics (disease.sh). |
+| `encodedecode.py` | `.encode`, `.decode`, `.hexencode`, `.hexdecode`, `.urlencode`, `.urldecode` | Base64 / hex / URL codecs. |
+| `fastly.py` | `.shorten <url>` | URL shortener (is.gd). |
+| `figlet.py` | `.figlet <text>`, `.figletlist` | ASCII art via pyfiglet. |
+| `findsong.py` | `.findsong <reply>` | Identify song (Shazam). |
+| `fontsnew.py` | `.font <text>` | Decorative unicode fonts. |
+| `fun.py` | `.slap`, `.hug`, `.8ball` | Fun interactive commands. |
+| `hack.py` | `.hack` | Fake hacking animation (just for fun). |
+| `howto.py` | `.howto <query>` | How-to summaries (Wikipedia). |
+| `imdb.py` | `.imdb <movie>` | IMDB movie lookup (inline bot). |
+| `morsecode.py` | `.morse`, `.demorse` | Morse code encoder/decoder. |
+| `ncode.py` | `.ncode`, `.ndecode` | Numeric code encoder/decoder. |
+| `ocr.py` | `.ocr <reply to image>` | Image to text via OCR.space. |
+| `pokedex.py` | `.pokedex <pokemon>` | Pokemon stats via PokeAPI. |
+| `qrcode.py` | `.qr <text>` | Generate QR codes. |
+| `quotefancy.py` | `.quotefancy <text>` | Fancy quote image generator. |
+| `random.py` | `.quote`, `.fact`, `.joke` | Random inspirational content. |
+| `searchmsgs.py` | `.search <query>` | Search messages in the current chat. |
+| `song.py` | `.lyrics <song>` | Song lyrics lookup. |
+| `spam.py` | `.spam`, `.dspam` | Message spam (owner-only). |
+| `spellcheck.py` | `.spell <word>` | Spell check (TextBlob). |
+| `speechtool.py` | `.tts <text>` | Text-to-speech (gTTS). |
+| `stickerspam.py` | `.kang`, `.stkrinfo` | Sticker tools. |
+| `sticklet.py` | (placeholder) | Sticker text tool. |
+| `test.py` | `.test` | Sanity test command. |
+| `totalmsgs.py` | `.totalmsgs` | Count messages in the current chat. |
+| `truthdare.py` | `.truth`, `.dare` | Truth or dare. |
+| `waifu.py` | `.waifu` | Random waifu image. |
+| `whichsong.py` | `.whichsong <reply>` | Alias for findsong. |
+| `wikipedia.py` | `.wiki <query>` | Wikipedia search. |
+| `wreplace.py` | `.wreplace <old> <new> <text>` | Word replacement. |
+| `inline/pypi.py` | (inline query) `@assistant pypi <pkg>` | Inline PyPI search. |
+
+---
+
+## Writing a new addon
 
 ```python
-# Credits @username (creator of plugin and who ported)
+# myplugin.py
+"""
+✘ Commands Available
 
-# Ported from (if ported else skip)
+• `{i}hello` — Say hello.
+"""
 
-# Ported for Zelretch < https://github.com/TeamUltroid/Ultroid >
+from zelretch.core.decorators import zelretch_cmd
+from zelretch.core.wrappers import eor
+
+
+@zelretch_cmd(pattern="hello$")
+async def hello(client, message):
+    await eor(message, "Hello from Zelretch addons!")
 ```
 
-Each plugin file should start with a docstring of the form:
+Drop the file into the repository root, commit, push, then run
+`.updateaddons` inside Zelretch — the plugin is loaded automatically.
 
-```python
-"""
-✘ Commands Available -
-
-• `{i}command <args>`
-    One-line description shown by `.help <plugin>`.
-"""
-```
-
-so the help system can pick it up.
+The `{i}` placeholder in the docstring is replaced with the configured command
+handler at display time (default `.`).
 
 ---
 
-# License
+## Requirements
 
-Zelretch Addons is licensed under the [GNU Affero General Public License v3 or later](LICENSE),
-inherited from the original UltroidAddons project.
+Each plugin that needs extra pip packages should add them to
+[`addons.txt`](addons.txt). The Zelretch loader installs addons.txt requirements
+on first boot, then on every `.updateaddons`.
+
+If a plugin's import fails (missing dep), the loader logs a warning and skips
+that plugin — it does not crash the bot.
 
 ---
 
-# Credits
+## Credits
 
-Zelretch Addons is a rewrite of
+These addons are a Kurigram port of the original
 [UltroidAddons](https://github.com/TeamUltroid/UltroidAddons) by
-[TeamUltroid](https://t.me/TeamUltroid). The original authors retain all
-credit for the plugin catalogue and community contributions.
+[TeamUltroid](https://github.com/TeamUltroid).
 
-> Made with 💕 by the Zelretch maintainers, on top of UltroidAddons by [@TeamUltroid](https://t.me/TeamUltroid).
+- **Original authors:** TeamUltroid and UltroidAddons contributors
+- **Original license:** AGPL v3
+- **Zelretch port:** Zelretch Contributors (2026)
+
+See [LICENSE](LICENSE) for the full AGPL v3 text and individual plugin headers
+for in-line attribution (e.g. plugins ported from NiceGrill, DarkCobra, etc.).

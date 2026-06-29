@@ -1,32 +1,34 @@
-# Zelretch - UserBot
-# Copyright (C) 2021-2026 TeamUltroid (original) / Zelretch Maintainers (rewrite)
-#
-# This file is a part of < https://github.com/TeamUltroid/UltroidAddons/ > (original)
-# Rewritten for Kurigram by the Zelretch project.
-# Licensed under the GNU Affero General Public License v3 or later.
+# Zelretch Addons — Spell checker
+# Ported from UltroidAddons/spellcheck.py
+# Copyright (C) 2021-2022 TeamUltroid — AGPL v3
+# Copyright (C) 2026 Zelretch Contributors
 
 """
-✘ Commands Available -
+✘ Commands Available
 
-• `{i}spellcheck <word>`
-    Check the spelling of a word (uses ``textblob``).
+• `{i}spell <word>`
+    Check the spelling of a word.
 """
 
-from __future__ import annotations
+from zelretch.core.decorators import zelretch_cmd
+from zelretch.core.wrappers import eor
 
-from plugins import eod, eor, zelretch_cmd
 
-
-@zelretch_cmd(pattern=r"spellcheck\s+(\S+)")
-async def spellcheck(event):
-    word = event.matches[0].group(1)
+@zelretch_cmd(pattern=r"spell ?(.*)")
+async def spell(client, message):
+    parts = message.text.split(maxsplit=1)
+    if len(parts) < 2:
+        return await eor(message, "`Give a word to check.`")
+    word = parts[1].strip()
     try:
-        from textblob import TextBlob  # type: ignore
-        b = TextBlob(word)
-        corrected = b.correct()
-        if str(corrected).lower() == word.lower():
-            await eor(event, f"✅ `{word}` looks correct.")
+        from textblob import TextBlob
+        blob = TextBlob(word)
+        corrected = str(blob.correct())
+        if corrected.lower() == word.lower():
+            await eor(message, f"✓ `{word}` is spelled correctly.")
         else:
-            await eor(event, f"❓ Did you mean `{corrected}`?")
+            await eor(message, f"Did you mean: `{corrected}`?")
     except ImportError:
-        await eod(event, "Install `textblob` to use this command.", time=10)
+        await eor(message, "`textblob is not installed. Run: pip install textblob`")
+    except Exception as err:
+        await eor(message, f"`{err}`")

@@ -1,28 +1,29 @@
-# Zelretch - UserBot
-# Copyright (C) 2021-2026 TeamUltroid (original) / Zelretch Maintainers (rewrite)
-#
-# This file is a part of < https://github.com/TeamUltroid/UltroidAddons/ > (original)
-# Rewritten for Kurigram by the Zelretch project.
-# Licensed under the GNU Affero General Public License v3 or later.
+# Zelretch Addons — Autocorrect
+# Ported from UltroidAddons/autocorrect.py
+# Copyright (C) 2021-2022 TeamUltroid — AGPL v3
+# Copyright (C) 2026 Zelretch Contributors
 
 """
-✘ Commands Available -
+✘ Commands Available
 
 • `{i}autocorrect <text>`
-    Auto-correct text (uses ``textblob`` if installed).
+    Auto-correct spelling of an entire sentence.
 """
 
-from __future__ import annotations
+from zelretch.core.decorators import zelretch_cmd
+from zelretch.core.wrappers import eor
 
-from plugins import eod, eor, zelretch_cmd
 
-
-@zelretch_cmd(pattern=r"autocorrect\s+(.+)")
-async def autocorrect(event):
-    text = event.matches[0].group(1)
+@zelretch_cmd(pattern=r"autocorrect ?(.*)")
+async def autocorrect(client, message):
+    parts = message.text.split(maxsplit=1)
+    if len(parts) < 2:
+        return await eor(message, "`Give a sentence.`")
     try:
-        from textblob import TextBlob  # type: ignore
-        corrected = TextBlob(text).correct()
-        await eor(event, f"**Original:** {text}\n\n**Corrected:** {corrected}")
+        from textblob import TextBlob
+        corrected = str(TextBlob(parts[1]).correct())
+        await eor(message, f"**Original:** `{parts[1]}`\n**Corrected:** `{corrected}`")
     except ImportError:
-        await eod(event, "Install `textblob` to use this command.", time=10)
+        await eor(message, "`textblob not installed. Run: pip install textblob`")
+    except Exception as err:
+        await eor(message, f"`{err}`")

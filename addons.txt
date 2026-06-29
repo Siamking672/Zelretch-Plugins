@@ -1,26 +1,35 @@
-# Zelretch - UserBot
-# Addons - additional Python dependencies used by the addon plugins.
-#
+# Zelretch Addons — pip requirements
 # Install with: pip install -r addons.txt
-# (the Zelretch installer also picks up this file when present).
+#
+# Each plugin should declare its own optional dependencies. The loader will
+# skip a plugin gracefully if its imports fail.
 
-covid
+# Core utilities
 emoji
 fonttools
-gtts
-gingerit
-jikanpy
-phlogo
-pokedex.py
+pillow
 pyfiglet
 pygments
 pyjokes
-quotefancy
-shazamio
-speechrecognition
-speedtest-cli
-textblob
 wikipedia
-Pillow
-pytesseract
-googletrans
+
+# API integrations (optional — only needed if you enable the relevant plugin)
+covid
+jikanpy
+gtts
+speechrecognition
+textblob
+gingerit
+shazamio
+speedtest-cli
+pokedex.py
+quotefancy
+
+# Lyrics / music
+git+https://github.com/New-dev0/AsyncLyricsExtractor.git
+
+# Ph logo (random placeholder logo generator)
+phlogo
+
+# OCR (optional — only if you use the ocr.py plugin)
+# pytesseract
